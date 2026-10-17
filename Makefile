@@ -15,7 +15,8 @@ venv:
 
 collection-tree:
 	mkdir -p $(COLL)
-	rsync -a --delete --exclude build --exclude .references --exclude .venv --exclude .git --exclude .superpowers ./ $(COLL)/
+	rsync -a --delete --delete-excluded --exclude build --exclude .references --exclude .venv --exclude /.git --exclude .superpowers --exclude .agents --exclude .claude --exclude mise.toml ./ $(COLL)/
+	cd $(COLL) && git init -q && git add -A
 
 lint:
 	$(BIN)/ansible-lint
