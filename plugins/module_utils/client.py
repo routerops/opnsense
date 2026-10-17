@@ -86,7 +86,7 @@ def require_saved(response):
     if not isinstance(response, dict):
         raise OPNsenseError("unexpected write response: %r" % (response,))
     if response.get("result") != "saved":
-        raise OPNsenseError("write failed: %s" % response.get("result"), validations=response.get("validations"))
+        raise OPNsenseError("write rejected by OPNsense: %s" % response.get("result"), validations=response.get("validations"))
 
 
 def require_ok(response):

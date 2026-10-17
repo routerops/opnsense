@@ -155,6 +155,7 @@ def test_require_saved_raises_with_validations():
     with pytest.raises(OPNsenseError) as e:
         require_saved({"result": "failed", "validations": {"general.listenport": "bad"}})
     assert e.value.validations == {"general.listenport": "bad"}
+    assert e.value.msg == "write rejected by OPNsense: failed"
 
 
 def test_require_ok_accepts_any_case_and_whitespace():
