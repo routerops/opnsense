@@ -71,6 +71,8 @@ options:
     description:
       - Values of fields OPNsense accepts but never returns, such as passwords, in the same shape as O(fields).
       - They are not compared, never logged, shown in the diff or returned, and are sent along with any write.
+      - Every name must exist in the C(get) response; OPNsense returns update-only fields as empty strings, so a misspelled name fails the task.
+      - A name must not appear in both O(fields) and O(write_only).
     type: dict
     default: {}
   update_write_only:
@@ -199,6 +201,9 @@ def main():
     compared = p["fields"]
     separators = p["separators"]
     ordered = tuple(p["ordered_fields"])
+    overlap = sorted(set(flatten(compared)) & set(write_only))
+    if overlap:
+        module.fail_json(msg="field '%s' is in both fields and write_only" % "', '".join(overlap))
     known = set(flatten(compared)) | set(write_only)
     for option, names in (("ordered_fields", ordered), ("separators", separators)):
         unknown = sorted(set(names) - known)
@@ -212,6 +217,11 @@ def main():
             section = get_path(response, p["key"])
         except KeyError:
             module.fail_json(msg="key '%s' not found in response" % p["key"])
+        for name in write_only:
+            try:
+                get_path(section, name)
+            except KeyError:
+                module.fail_json(msg="field '%s' not found in '%s'" % (name, p["key"]))
         try:
             changes = field_diff(section, compared, ordered, separators)
             current = snapshot(section, compared, ordered, separators)

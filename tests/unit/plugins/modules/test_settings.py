@@ -170,3 +170,20 @@ def test_uncomparable_value_fails_with_message(run_module):
     result = run_module(settings, dict(BASE_ARGS, fields={"listenport": 9100}), fake(read={"general": {"listenport": "abc"}}))
     assert result["failed"] is True
     assert "listenport" in result["msg"]
+
+
+def test_unknown_write_only_field_fails(run_module):
+    client = fake()
+    result = run_module(settings, dict(BASE_ARGS, fields={"enabled": True}, write_only={"secrte": "s3cr3t-value"}), client)
+    assert result["failed"] is True
+    assert "secrte" in result["msg"]
+    assert posts(client) == []
+
+
+def test_field_in_fields_and_write_only_fails(run_module):
+    client = fake()
+    args = dict(BASE_ARGS, fields={"enabled": True, "secret": "plain-value"}, write_only={"secret": "s3cr3t-value"})
+    result = run_module(settings, args, client)
+    assert result["failed"] is True
+    assert "secret" in result["msg"]
+    assert posts(client) == []
