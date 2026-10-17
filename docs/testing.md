@@ -7,13 +7,14 @@
 | Item | Setting |
 |---|---|
 | Host | the owner's Proxmox |
-| OPNsense | latest 26.7.x, at least 26.7.6 (the interface assignment tests need it) |
-| WAN | a bridge without a physical port; the Proxmox host holds the gateway address on it and masquerades it, so the VM can download firmware and plugins but no other machine sees its traffic |
-| LAN | a second bridge without a physical port; the Proxmox host holds one address on it; the VM's DHCP server is off |
-| Access | an SSH tunnel through the Proxmox host to the VM's LAN address, for example `ssh -L 8443:<vm-lan-ip>:443 <proxmox-host>` |
-| Plugins | `os-acme-client`, `os-node_exporter`, `os-mdns-repeater` installed before the snapshot |
-| API user | `ansible-test`, only the privileges in the table below |
-| Snapshot | `clean`, taken after the update, the plugins and the API user |
+| OPNsense | latest 26.7.x, at least 26.7.6 (the interface assignment tests need it); currently 26.7.7 (amd64, FreeBSD 15.1-RELEASE-p4) |
+| VM | VMID 9090 (`opnsense-test`), `onboot 0`, disk excluded from backups (`backup=0`) |
+| WAN | `vtnet0` on `vmbr-optwan`, a bridge without a physical port: VM 10.250.0.2/30, the Proxmox host 10.250.0.1 as gateway, DNS 1.1.1.1; the host masquerades it, and the nft table `opnsense_test` lets the VM reach the internet but neither the home network nor the ISP network |
+| LAN | `vtnet1` on `vmbr-optlan`, a bridge without a physical port: VM 10.250.1.1/24, the Proxmox host 10.250.1.2; DHCP is off (dhcpd and Kea not running, port 67 closed) |
+| Access | an SSH tunnel through the Proxmox host: `ssh -L 8443:10.250.1.1:443 <proxmox-host>` |
+| Plugins | `os-acme-client` 4.17, `os-node_exporter` 1.2, `os-mdns-repeater` 1.2, installed before the snapshot |
+| API user | `ansible-test`, no shell, only the privileges in the table below |
+| Snapshot | `clean`, taken with the VM shut down and the ISO ejected, after the update, the plugins and the API user |
 | TLS | the VM's self-signed certificate; `OPNSENSE_VALIDATE_CERTS=false` is only for this VM |
 
 ## Run
@@ -43,4 +44,4 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 
 | Date | OPNsense | Test | Result |
 |---|---|---|---|
-| 17.10.2026 | 26.7.x (at least 26.7.6) | `settings_nodeexporter` | passed (`failed=0`, one ignored expected failure); the fault-injected copy failed on the idempotency assert as intended |
+| 17.10.2026 | 26.7.7 | `settings_nodeexporter` | passed (`failed=0`, one ignored expected failure); the fault-injected copy failed on the idempotency assert as intended |
