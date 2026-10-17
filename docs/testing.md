@@ -27,7 +27,7 @@ OPNSENSE_INTEGRATION=1 make integration TARGET=settings_nodeexporter
 unset OPNSENSE_API_KEY OPNSENSE_API_SECRET OPNSENSE_URL OPNSENSE_VALIDATE_CERTS
 ```
 
-Omit `TARGET` to run every test. Reset the VM between runs on the Proxmox node: `qm rollback <vmid> clean && qm start <vmid>`; `make integration` has no Proxmox access.
+Omit `TARGET` to run every test. Reset the VM between runs on the Proxmox node: `qm rollback 9090 clean && qm start 9090` (VMID 9090 on the owner's node); `make integration` has no Proxmox access.
 
 A new check counts only after it failed once against a real fault: copy the test playbook outside the repository, change one wanted value in the idempotency task, run it with `ANSIBLE_COLLECTIONS_PATH=$PWD/build .venv/bin/ansible-playbook <copy>` and see the assert fail, then roll the VM back.
 
