@@ -1,9 +1,11 @@
 # SPDX-FileCopyrightText: routerops.opnsense contributors
 # SPDX-License-Identifier: BSD-2-Clause
+# Internal to routerops.opnsense, not a public API; it may change in any release.
+# Connection options, client construction and dotted-key helpers shared by the modules.
 
 from __future__ import annotations
 
-from ansible_collections.routerops.opnsense.plugins.module_utils.client import OPNsenseClient
+from ansible_collections.routerops.opnsense.plugins.module_utils._client import OPNsenseClient
 
 CONNECTION_ARGSPEC = dict(
     url=dict(type="str", required=True),
@@ -15,6 +17,7 @@ CONNECTION_ARGSPEC = dict(
 
 
 def client_from_params(params):
+    """Build an OPNsenseClient from the module's connection parameters."""
     return OPNsenseClient(
         params["url"],
         params["api_key"],
@@ -25,6 +28,7 @@ def client_from_params(params):
 
 
 def get_path(data, key):
+    """Follow a dotted key through nested dicts; raise KeyError naming the key when a step is missing."""
     for part in key.split("."):
         if not isinstance(data, dict) or part not in data:
             raise KeyError(key)
@@ -33,6 +37,7 @@ def get_path(data, key):
 
 
 def nest(key, value):
+    """Wrap a value in nested dicts along a dotted key; the inverse of get_path."""
     for part in reversed(key.split(".")):
         value = {part: value}
     return value

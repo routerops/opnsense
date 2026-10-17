@@ -11,18 +11,22 @@ from ansible.module_utils.testing import patch_module_args
 
 
 class FakeClient:
-    def __init__(self, get_response, post_responses=None):
+    def __init__(self, get_response, post_responses=None, get_by_path=None):
         self.get_response = get_response
         self.post_responses = post_responses or {}
+        self.get_by_path = get_by_path or {}
         self.calls = []
 
     def get(self, path):
         self.calls.append(("GET", path, None))
-        return self.get_response
+        return self.get_by_path.get(path, self.get_response)
 
     def post(self, path, payload=None):
         self.calls.append(("POST", path, payload))
-        return self.post_responses.get(path, {"result": "saved", "status": "ok"})
+        response = self.post_responses.get(path, {"result": "saved", "status": "ok"})
+        if isinstance(response, list):
+            return response.pop(0)
+        return response
 
 
 @pytest.fixture

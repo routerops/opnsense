@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - settings - a request OPNsense rejects with an error now shows OPNsense's error message; this applies to every module of the collection.

@@ -24,7 +24,7 @@ Run from the repository root while the tunnel is open. The secret is read withou
 ```sh
 read -r "OPNSENSE_API_KEY?API key: "; read -rs "OPNSENSE_API_SECRET?API secret: "; echo
 export OPNSENSE_API_KEY OPNSENSE_API_SECRET OPNSENSE_URL=https://127.0.0.1:8443 OPNSENSE_VALIDATE_CERTS=false
-OPNSENSE_INTEGRATION=1 make integration TARGET=settings_nodeexporter
+OPNSENSE_INTEGRATION=1 make integration TARGET=test-nodeexporter-settings
 unset OPNSENSE_API_KEY OPNSENSE_API_SECRET OPNSENSE_URL OPNSENSE_VALIDATE_CERTS
 ```
 
@@ -50,10 +50,14 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 
 | Test | Privilege | Source |
 |---|---|---|
-| `settings_nodeexporter` | `page-services-nodeexporter` ("Services: Prometheus Exporter", `api/nodeexporter/*`) | `opnsense-plugins/sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/ACL/ACL.xml` |
+| `test-nodeexporter-settings` | `page-services-nodeexporter` ("Services: Prometheus Exporter", `api/nodeexporter/*`) | `opnsense-plugins/sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/ACL/ACL.xml` |
+| `test-dnsmasq-host-item` | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml` |
+| `test-firewall-alias-item` | `page-firewall-alias-edit` ("Firewall: Alias: Edit", `api/firewall/alias/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml` |
 
 ## Verified runs
 
 | Date | OPNsense | Test | Result |
 |---|---|---|---|
-| 17.10.2026 | 26.7.7 | `settings_nodeexporter` | passed (`failed=0`, one ignored expected failure); the fault-injected copy failed on the idempotency assert as intended |
+| 17.10.2026 | 26.7.7 | `test-nodeexporter-settings` | passed (`failed=0`, one ignored expected failure); the fault-injected copy failed on the idempotency assert as intended |
+| 17.10.2026 | 26.7.7 | `test-dnsmasq-host-item` | passed (`failed=0`, one ignored expected failure); the fault-injected copy failed on the idempotency assert as intended |
+| 17.10.2026 | 26.7.7 | `test-firewall-alias-item` | passed (`failed=0`); the fault-injected copy failed on the idempotency assert as intended |

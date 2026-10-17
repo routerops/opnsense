@@ -4,4 +4,5 @@
 requires_ansible: ">=2.20.0"
 action_groups:
   opnsense:
+    - item
     - settings
