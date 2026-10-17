@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import http.client
 import json
 import time
 import urllib.error
@@ -66,6 +67,8 @@ class OPNsenseClient:
             raise OPNsenseError("%s %s failed with HTTP %s" % (method, url, e.code), status=e.code)
         except urllib.error.URLError as e:
             raise OPNsenseError("%s %s failed: %s" % (method, url, e.reason))
+        except (OSError, http.client.HTTPException) as e:
+            raise OPNsenseError("%s %s failed: %s" % (method, url, e))
         try:
             data = json.loads(body)
         except ValueError:
@@ -80,10 +83,14 @@ def _not_found(path):
 
 
 def require_saved(response):
+    if not isinstance(response, dict):
+        raise OPNsenseError("unexpected write response: %r" % (response,))
     if response.get("result") != "saved":
         raise OPNsenseError("write failed: %s" % response.get("result"), validations=response.get("validations"))
 
 
 def require_ok(response):
+    if not isinstance(response, dict):
+        raise OPNsenseError("unexpected action response: %r" % (response,))
     if str(response.get("status", "")).strip().lower() != "ok":
         raise OPNsenseError("action failed: %s %s" % (response.get("status"), response.get("status_msg", "")))

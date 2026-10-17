@@ -75,3 +75,20 @@ def test_nested_fields_diff_and_nest():
     d = field_diff({"source": {"network": "any", "port": "", "not": "0"}}, {"source": {"network": "lan", "not": False}})
     assert d == {"source.network": ("any", "lan")}
     assert nest_fields({"source.network": "lan"}) == {"source": {"network": "lan"}}
+
+
+def test_normalize_int_against_option_map():
+    assert normalize({"0": {"selected": 0}, "3": {"selected": 1}}, 3) == 3
+
+
+def test_field_diff_non_numeric_int_names_field():
+    with pytest.raises(ValueError, match="loglevel"):
+        field_diff({"loglevel": "abc"}, {"loglevel": 3})
+
+
+def test_float_wanted_compares_as_string():
+    assert field_diff({"ratio": "0.5"}, {"ratio": 0.5}) == {}
+
+
+def test_string_wanted_against_list_read():
+    assert normalize(["a", "b"], "a,b") == "a,b"

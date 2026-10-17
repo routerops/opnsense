@@ -74,7 +74,9 @@ options:
     type: dict
     default: {}
   update_write_only:
-    description: With V(always), the write-only fields force a write on every run.
+    description:
+      - A settings singleton is never created, so with V(on_create) the write-only values are only sent along when another field in O(fields) changes.
+      - Use V(always) to set a write-only value for the first time or to rotate it; the task then writes and reports changed on every run.
     type: str
     choices: [on_create, always]
     default: on_create
@@ -197,6 +199,11 @@ def main():
     compared = p["fields"]
     separators = p["separators"]
     ordered = tuple(p["ordered_fields"])
+    known = set(flatten(compared)) | set(write_only)
+    for option, names in (("ordered_fields", ordered), ("separators", separators)):
+        unknown = sorted(set(names) - known)
+        if unknown:
+            module.fail_json(msg="unknown field '%s' in %s" % ("', '".join(unknown), option))
 
     client = client_from_params(p)
     try:
@@ -210,6 +217,8 @@ def main():
             current = snapshot(section, compared, ordered, separators)
         except KeyError as e:
             module.fail_json(msg="field '%s' not found in '%s'" % (e.args[0], p["key"]))
+        except ValueError as e:
+            module.fail_json(msg=str(e))
 
         write_needed = bool(changes) or bool(write_only and p["update_write_only"] == "always")
         if write_needed and not module.check_mode:

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import http.client
 import io
 import json
 import urllib.error
@@ -165,3 +166,25 @@ def test_require_ok_raises_with_status_msg():
     with pytest.raises(OPNsenseError) as e:
         require_ok({"status": "failed", "status_msg": "boom"})
     assert "boom" in e.value.msg
+
+
+def test_get_retries_on_timeout(monkeypatch):
+    fake = install(monkeypatch, TimeoutError("read timed out"), b"{}")
+    OPNsenseClient("https://fw.example", "k", "s").get("a/b/get")
+    assert len(fake.calls) == 2
+
+
+def test_remote_disconnect_raises_opnsense_error(monkeypatch):
+    install(monkeypatch, http.client.RemoteDisconnected("closed"))
+    with pytest.raises(OPNsenseError):
+        OPNsenseClient("https://fw.example", "k", "s").post("a/b/set", {})
+
+
+def test_require_saved_rejects_non_dict():
+    with pytest.raises(OPNsenseError):
+        require_saved([])
+
+
+def test_require_ok_rejects_non_dict():
+    with pytest.raises(OPNsenseError):
+        require_ok("done")

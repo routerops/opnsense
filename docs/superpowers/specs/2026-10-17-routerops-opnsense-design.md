@@ -80,7 +80,7 @@ Both modules:
 - `--diff` shows before and after per field.
 - `changed` only on a real write; one apply per call, skipped when nothing changed or when the caller passes no apply path.
 - Return values include the identifier of every added or matched item.
-- Fields OPNsense accepts but never returns (passwords, pre-shared keys, private keys, ACME DNS provider tokens) go with their values in a separate `write_only` option (a dict in the shape of `fields`, declared `no_log=True` so Ansible masks every value before it logs the arguments): they are left out of the compare and the diff, and are written only when an item is created, unless `update_write_only: always` (after Ansible's `update_password`) (assistant's call).
+- Fields OPNsense accepts but never returns (passwords, pre-shared keys, private keys, ACME DNS provider tokens) go with their values in a separate `write_only` option (a dict in the shape of `fields`, declared `no_log=True` so Ansible masks every value before it logs the arguments): they are left out of the compare and the diff, and are written only when an item is created, unless `update_write_only: always` (after Ansible's `update_password`) (assistant's call). A settings singleton is never created, so in `settings` the write-only values are only sent along with another change, and `update_write_only: always` is needed to set or rotate one.
 - A reference to another item (an OpenVPN instance's certificate, an IPsec child's connection) is a UUID the caller takes from an earlier task's return value; the modules do not resolve references.
 - The modules never reorder items; the caller sets `sequence` where order matters (filter rules, NAT).
 

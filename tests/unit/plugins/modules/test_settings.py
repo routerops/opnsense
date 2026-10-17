@@ -10,7 +10,7 @@ from ansible_collections.routerops.opnsense.plugins.modules import settings
 
 from .conftest import FakeClient
 
-CONNECTION = {"url": "https://fw.example", "api_key": "k", "api_secret": "s"}
+CONNECTION = {"url": "https://fw.example", "api_key": "test-api-key", "api_secret": "test-api-secret"}
 BASE_ARGS = dict(CONNECTION, path="nodeexporter/general", key="general", apply="nodeexporter/service/reconfigure")
 BASE_READ = {"general": {"enabled": "0", "listenport": "9100", "cpu": "1", "secret": ""}}
 
@@ -152,3 +152,21 @@ def test_nested_write_only_merges_into_payload(run_module):
     args = dict(BASE_ARGS, fields={"enabled": True, "auth": {"user": "u"}}, write_only={"auth": {"password": "s3cr3t-value"}})
     run_module(settings, args, client)
     assert posts(client)[0][2] == {"general": {"enabled": "1", "auth": {"password": "s3cr3t-value"}}}
+
+
+def test_unknown_ordered_field_fails(run_module):
+    result = run_module(settings, dict(BASE_ARGS, fields={"cpu": True}, ordered_fields=["cpus"]), fake())
+    assert result["failed"] is True
+    assert "cpus" in result["msg"]
+
+
+def test_unknown_separator_field_fails(run_module):
+    result = run_module(settings, dict(BASE_ARGS, fields={"cpu": True}, separators={"contnet": "\n"}), fake())
+    assert result["failed"] is True
+    assert "contnet" in result["msg"]
+
+
+def test_uncomparable_value_fails_with_message(run_module):
+    result = run_module(settings, dict(BASE_ARGS, fields={"listenport": 9100}), fake(read={"general": {"listenport": "abc"}}))
+    assert result["failed"] is True
+    assert "listenport" in result["msg"]

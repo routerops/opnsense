@@ -28,14 +28,18 @@ def normalize(read, wanted, ordered=False, separator=","):
     if isinstance(wanted, bool):
         return read in SELECTED
     if isinstance(wanted, int):
-        if read in ("", None):
+        if _is_option_map(read):
+            read = separator.join(_selected_keys(read))
+        if read in ("", None, []):
             return None
         return int(read)
     if isinstance(wanted, list):
         values = _as_list(read, separator)
         return values if ordered else sorted(values)
-    if read is None or read == []:
+    if read is None:
         return ""
+    if isinstance(read, list):
+        return separator.join(str(v) for v in read)
     if _is_option_map(read):
         return separator.join(_selected_keys(read))
     return str(read)
@@ -59,7 +63,9 @@ def _comparable(wanted, ordered):
     if isinstance(wanted, list):
         values = [str(v) for v in wanted]
         return values if ordered else sorted(values)
-    return wanted
+    if isinstance(wanted, (bool, int)):
+        return wanted
+    return str(wanted)
 
 
 def field_diff(current, wanted, ordered_fields=(), separators=None, _prefix=""):
@@ -73,7 +79,10 @@ def field_diff(current, wanted, ordered_fields=(), separators=None, _prefix=""):
             changes.update(field_diff(current[name], want, ordered_fields, separators, full + "."))
             continue
         ordered = full in ordered_fields
-        before = normalize(current[name], want, ordered, separators.get(full, ","))
+        try:
+            before = normalize(current[name], want, ordered, separators.get(full, ","))
+        except (TypeError, ValueError):
+            raise ValueError("field '%s': cannot compare %r with %r" % (full, current[name], want))
         if before != _comparable(want, ordered):
             changes[full] = (before, want)
     return changes
