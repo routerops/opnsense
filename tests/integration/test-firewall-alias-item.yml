@@ -1,0 +1,95 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against firewall aliases
+  hosts: localhost
+  gather_facts: false
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      url: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}"
+      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS', default='true') | bool }}"
+      path: firewall/alias
+      key: alias
+      lookup: [name]
+      separators:
+        content: "\n"
+      apply: firewall/alias/reconfigure
+  vars:
+    opnsense_test_alias:
+      name: rt_test_hosts
+      type: host
+      content: [192.0.2.21, 192.0.2.22]
+      description: routerops test
+  tasks:
+    - name: Run the alias tests
+      block:
+        - name: Add the alias in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add the alias
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          register: opnsense_test_add
+
+        - name: Add the alias again with its content reversed
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_alias | combine({'content': ['192.0.2.22', '192.0.2.21']}) }}"
+          register: opnsense_test_again
+
+        - name: Add the alias again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Add an address to the alias
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_alias | combine({'content': ['192.0.2.21', '192.0.2.22', '192.0.2.23']}) }}"
+          register: opnsense_test_update
+
+        - name: Delete the alias
+          routerops.opnsense.item:
+            items:
+              - fields:
+                  name: rt_test_hosts
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Delete the alias again
+          routerops.opnsense.item:
+            items:
+              - fields:
+                  name: rt_test_hosts
+                state: absent
+          register: opnsense_test_delete_again
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'][0]['action'] == 'added'
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_delete['changed']
+              - opnsense_test_delete['outcomes'][0]['action'] == 'deleted'
+              - not opnsense_test_delete_again['changed']
+      always:
+        - name: Remove the test alias
+          routerops.opnsense.item:
+            items:
+              - fields:
+                  name: rt_test_hosts
+                state: absent

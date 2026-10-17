@@ -1,0 +1,3 @@
+---
+major_changes:
+  - item - new module to manage OPNsense items (aliases, hosts, rules and others) through the MVC API.

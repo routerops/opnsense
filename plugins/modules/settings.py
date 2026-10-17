@@ -1,13 +1,14 @@
 # SPDX-FileCopyrightText: routerops.opnsense contributors
 # SPDX-License-Identifier: GPL-3.0-or-later
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# Module routerops.opnsense.settings: manage an OPNsense settings singleton.
 
 from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: settings
 short_description: Manage an OPNsense settings singleton through the MVC API
-version_added: 0.1.0
+version_added: "0.1.0"
 description:
   - Reads a settings singleton with its C(get) action, compares the named fields and writes only the fields that differ with its C(set) action.
   - Runs the apply action once after a write, and never when nothing changed.
@@ -21,27 +22,9 @@ attributes:
   diff_mode:
     support: full
     description: Shows the changed fields before and after. Field values are printed, so personal data such as hostnames or MAC addresses can appear.
+extends_documentation_fragment:
+  - routerops.opnsense.connection
 options:
-  url:
-    description: Base URL of the OPNsense web interface, for example C(https://fw.example).
-    type: str
-    required: true
-  api_key:
-    description: API key of the OPNsense user.
-    type: str
-    required: true
-  api_secret:
-    description: API secret of the OPNsense user.
-    type: str
-    required: true
-  validate_certs:
-    description: Verify the TLS certificate. Set to V(false) only for a test system with a self-signed certificate.
-    type: bool
-    default: true
-  timeout:
-    description: HTTP timeout in seconds.
-    type: int
-    default: 30
   path:
     description: Controller base path below C(/api/), for example C(nodeexporter/general).
     type: str
@@ -137,19 +120,21 @@ validations:
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.routerops.opnsense.plugins.module_utils.client import (
+from ansible_collections.routerops.opnsense.plugins.module_utils._client import (
     OPNsenseError,
     require_ok,
     require_saved,
 )
-from ansible_collections.routerops.opnsense.plugins.module_utils.common import (
+from ansible_collections.routerops.opnsense.plugins.module_utils._common import (
     CONNECTION_ARGSPEC,
     client_from_params,
     get_path,
     nest,
 )
-from ansible_collections.routerops.opnsense.plugins.module_utils.fields import (
+from ansible_collections.routerops.opnsense.plugins.module_utils._fields import (
+    check_names,
     field_diff,
+    flatten,
     nest_fields,
     normalize,
     to_api,
@@ -159,6 +144,7 @@ DEFAULT_ACTIONS = {"get": "get", "set": "set"}
 
 
 def snapshot(current, wanted, ordered_fields, separators, prefix=""):
+    """Return the wanted fields' current values, normalised and nested like the wanted fields."""
     values = {}
     for name, want in wanted.items():
         full = prefix + name
@@ -167,16 +153,6 @@ def snapshot(current, wanted, ordered_fields, separators, prefix=""):
         else:
             values[name] = normalize(current[name], want, full in ordered_fields, separators.get(full, ","))
     return values
-
-
-def flatten(wanted, prefix=""):
-    flat = {}
-    for name, value in wanted.items():
-        if isinstance(value, dict):
-            flat.update(flatten(value, prefix + name + "."))
-        else:
-            flat[prefix + name] = value
-    return flat
 
 
 ARGUMENT_SPEC = dict(
@@ -194,6 +170,7 @@ ARGUMENT_SPEC = dict(
 
 
 def main():
+    """Compare the settings singleton with the wanted fields, write the differences and apply."""
     module = AnsibleModule(argument_spec=ARGUMENT_SPEC, supports_check_mode=True)
     p = module.params
     actions = dict(DEFAULT_ACTIONS, **p["actions"])
@@ -201,14 +178,10 @@ def main():
     compared = p["fields"]
     separators = p["separators"]
     ordered = tuple(p["ordered_fields"])
-    overlap = sorted(set(flatten(compared)) & set(write_only))
-    if overlap:
-        module.fail_json(msg="field '%s' is in both fields and write_only" % "', '".join(overlap))
-    known = set(flatten(compared)) | set(write_only)
-    for option, names in (("ordered_fields", ordered), ("separators", separators)):
-        unknown = sorted(set(names) - known)
-        if unknown:
-            module.fail_json(msg="unknown field '%s' in %s" % ("', '".join(unknown), option))
+    try:
+        check_names(compared, write_only, ordered, separators)
+    except ValueError as e:
+        module.fail_json(msg=str(e))
 
     client = client_from_params(p)
     try:

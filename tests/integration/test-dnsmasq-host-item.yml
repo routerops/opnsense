@@ -1,0 +1,137 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against Dnsmasq hosts
+  hosts: localhost
+  gather_facts: false
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      url: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}"
+      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS', default='true') | bool }}"
+      path: dnsmasq/settings
+      key: host
+      lookup: [host, domain]
+      actions:
+        search: searchHost
+        get: getHost
+        add: addHost
+        set: setHost
+        del: delHost
+      apply: dnsmasq/service/reconfigure
+  vars:
+    opnsense_test_one:
+      host: rt-one
+      domain: example.test
+      ip: 192.0.2.11
+      descr: routerops test
+    opnsense_test_two:
+      host: rt-two
+      domain: example.test
+      ip: 192.0.2.12
+      descr: routerops test
+  tasks:
+    - name: Run the host tests
+      block:
+        - name: Add the first host in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add both hosts
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_add
+
+        - name: Add both hosts again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_again
+
+        - name: Add both hosts again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Change the description of the first host
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'descr': 'routerops test changed'}) }}"
+          register: opnsense_test_update
+
+        - name: Purge the second host in check mode
+          routerops.opnsense.item:
+            purge: true
+            items:
+              - fields: "{{ opnsense_test_one | combine({'descr': 'routerops test changed'}) }}"
+          check_mode: true
+          register: opnsense_test_purge_check
+
+        - name: Purge the second host
+          routerops.opnsense.item:
+            purge: true
+            items:
+              - fields: "{{ opnsense_test_one | combine({'descr': 'routerops test changed'}) }}"
+          register: opnsense_test_purge
+
+        - name: Remove the already purged second host
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+          register: opnsense_test_absent_gone
+
+        - name: Remove the first host
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Add a host with an invalid address
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'ip': '192.0.2.300'}) }}"
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - opnsense_test_add['outcomes'] | map(attribute='uuid') | select | list | length == 2
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - opnsense_test_purge_check['changed']
+              - opnsense_test_purge_check['purged'] == [opnsense_test_add['outcomes'][1]['uuid']]
+              - opnsense_test_purge['changed']
+              - opnsense_test_purge['purged'] == [opnsense_test_add['outcomes'][1]['uuid']]
+              - not opnsense_test_absent_gone['changed']
+              - opnsense_test_delete['changed']
+              - opnsense_test_delete['outcomes'][0]['action'] == 'deleted'
+              - opnsense_test_invalid['failed']
+              - opnsense_test_invalid['validations'] is defined
+      always:
+        - name: Remove both test hosts
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent

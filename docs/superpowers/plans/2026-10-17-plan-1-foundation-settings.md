@@ -94,7 +94,7 @@ No commit unless `reference-repos.md` changed.
 ### Task 3: HTTP client
 
 **Files:**
-- Create: `plugins/module_utils/client.py`
+- Create: `plugins/module_utils/_client.py`
 - Test: `tests/unit/plugins/module_utils/test_client.py`
 
 **Interfaces:**
@@ -137,7 +137,7 @@ def test_post_never_retries(monkeypatch): ...  # HTTPError 502 on POST -> OPNsen
 Run: `make units`
 Expected: FAIL, `ModuleNotFoundError` for `client`.
 
-- [ ] **Step 3: Implement `plugins/module_utils/client.py`**
+- [ ] **Step 3: Implement `plugins/module_utils/_client.py`**
 
 Use `ansible.module_utils.urls.open_url` and `ansible.module_utils.six.moves.urllib.error.HTTPError`; `json.loads` on the body; any `ValueError` or `HTTPError` becomes `OPNsenseError`. GET retries on `URLError` or HTTP 5xx, three attempts in total, one second apart; POST never retries (spec). `from __future__ import annotations` at the top of every `module_utils` and module file, because sanity compiles for every target Python the ansible-core version supports. Header: `# Copyright: routerops.opnsense contributors` and `# SPDX-License-Identifier: BSD-2-Clause` (module_utils); modules and tests use `GPL-3.0-or-later`.
 
@@ -149,14 +149,14 @@ Expected: PASS, sanity clean.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add plugins/module_utils/client.py tests/unit/plugins/module_utils/test_client.py
+git add plugins/module_utils/_client.py tests/unit/plugins/module_utils/test_client.py
 git commit -m "Add OPNsense API client with result checks"
 ```
 
 ### Task 4: Field normalisation and diff
 
 **Files:**
-- Create: `plugins/module_utils/fields.py`
+- Create: `plugins/module_utils/_fields.py`
 - Test: `tests/unit/plugins/module_utils/test_fields.py`
 
 **Interfaces:**
@@ -206,7 +206,7 @@ def test_nested_fields_diff_and_nest():
 Run: `make units`
 Expected: FAIL, `ModuleNotFoundError` for `fields`.
 
-- [ ] **Step 3: Implement the four functions in `plugins/module_utils/fields.py`**
+- [ ] **Step 3: Implement the four functions in `plugins/module_utils/_fields.py`**
 
 - [ ] **Step 4: Run to verify they pass**
 
@@ -216,23 +216,23 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add plugins/module_utils/fields.py tests/unit/plugins/module_utils/test_fields.py
+git add plugins/module_utils/_fields.py tests/unit/plugins/module_utils/test_fields.py
 git commit -m "Add field normalisation and diff"
 ```
 
 ### Task 5: `settings` module
 
 **Files:**
-- Create: `plugins/module_utils/common.py`, `plugins/modules/settings.py`
+- Create: `plugins/module_utils/_common.py`, `plugins/modules/settings.py`
 - Modify: `plugins/modules/.keep` (delete), `plugins/module_utils/.keep` (delete)
 - Test: `tests/unit/plugins/modules/conftest.py`, `tests/unit/plugins/modules/test_settings.py`
 
 **Interfaces:**
 - Consumes: Task 3 `OPNsenseClient`, `OPNsenseError`, `require_saved`, `require_ok`; Task 4 `normalize`, `field_diff`, `to_api`.
 - Produces:
-  - `common.CONNECTION_ARGSPEC: dict`: `url` (str, required), `api_key` (str, required, `no_log`), `api_secret` (str, required, `no_log`), `validate_certs` (bool, default `True`), `timeout` (int, default 30).
-  - `common.client_from_params(params: dict) -> OPNsenseClient`.
-  - `common.get_path(data: dict, key: str) -> dict` (follows a dotted key, `"unbound.general"`) and `common.nest(key: str, value: dict) -> dict` (inverse). Dotted keys are the assistant's call, for settings nested below the model's top level.
+  - `_common.CONNECTION_ARGSPEC: dict`: `url` (str, required), `api_key` (str, required, `no_log`), `api_secret` (str, required, `no_log`), `validate_certs` (bool, default `True`), `timeout` (int, default 30).
+  - `_common.client_from_params(params: dict) -> OPNsenseClient`.
+  - `_common.get_path(data: dict, key: str) -> dict` (follows a dotted key, `"unbound.general"`) and `_common.nest(key: str, value: dict) -> dict` (inverse). Dotted keys are the assistant's call, for settings nested below the model's top level.
   - Module `routerops.opnsense.settings` options: connection options, `path` (str, required, e.g. `nodeexporter/general`), `key` (str, required, e.g. `general`), `fields` (dict, required), `actions` (dict, default `{get: get, set: set}`, keys merged over the default), `apply` (str, optional, e.g. `nodeexporter/service/reconfigure`), `write_only` (dict in the shape of `fields`, `no_log=True`, default `{}`), `update_write_only` (`on_create` | `always`, default `on_create`), `ordered_fields` (list of str, default `[]`), `separators` (dict of str, default `{}`).
   - Returns: `changed`, `diff` (`{before: {field: value}, after: {field: value}}`, changed fields only), `settings` (the named fields as read before any write, normalised, write-only fields omitted; a playbook registers it to restore the original state).
 
@@ -273,7 +273,7 @@ def test_dotted_key(...):  # read {"unbound": {"general": {"enabled": "0"}}}, ke
 Run: `make units`
 Expected: FAIL, `settings` not importable.
 
-- [ ] **Step 4: Implement `common.py` and `plugins/modules/settings.py`**
+- [ ] **Step 4: Implement `_common.py` and `plugins/modules/settings.py`**
 
 `settings.main()` builds `AnsibleModule(argument_spec=<CONNECTION_ARGSPEC merged with the own options via dict(...)>, supports_check_mode=True)`, turns every `OPNsenseError` into `fail_json(msg=..., validations=...)` and a `KeyError` from `field_diff` or `get_path` into `fail_json(msg="field '<name>' not found in '<key>'")` (or `"key '<key>' not found in response"`). Full `DOCUMENTATION` (with `extends_documentation_fragment` not used in plan 1), `EXAMPLES` (node_exporter enable, an Unbound dotted key) and `RETURN`; the docs state that `--diff` prints field values and list the known traps from the spec.
 
@@ -326,7 +326,7 @@ Expected: the `CI` workflow is green for both matrix entries (`gh run watch`).
 Needs the test VM (owner step). Steps 1 and 2 run without it.
 
 **Files:**
-- Create: `tests/integration/settings_nodeexporter.yml`, `docs/testing.md`
+- Create: `tests/integration/test-nodeexporter-settings.yml`, `docs/testing.md`
 
 **Interfaces:**
 - Consumes: Task 5 module and `module_defaults` group `group/routerops.opnsense.opnsense`.
@@ -335,7 +335,7 @@ Needs the test VM (owner step). Steps 1 and 2 run without it.
 
 One table each for: the VM (Proxmox, WAN and LAN on bridges without `bridge-ports`, test host on the LAN bridge, plugins `os-acme-client`, `os-node_exporter`, `os-mdns-repeater` installed, snapshot `clean`), the run (`qm rollback <vmid> clean` by hand, then `OPNSENSE_INTEGRATION=1 OPNSENSE_URL=... OPNSENSE_API_KEY=... OPNSENSE_API_SECRET=... make integration`), and the API user's privileges per test, read from the ACL files: `.references/opnsense-plugins/sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/ACL/ACL.xml`. Note that `validate_certs: false` is only for the self-signed test VM.
 
-- [ ] **Step 2: Write `tests/integration/settings_nodeexporter.yml`**
+- [ ] **Step 2: Write `tests/integration/test-nodeexporter-settings.yml`**
 
 Play on `localhost`, `gather_facts: false`, `module_defaults` for the group with URL, key and secret from `lookup('ansible.builtin.env', ...)`. Tasks, each named in the imperative:
 
@@ -352,12 +352,12 @@ Expected-fail check (kickoff rule: a check counts only after it failed once): ru
 
 - [ ] **Step 3: Run against the VM**
 
-Run: `qm rollback <vmid> clean` (owner), then `OPNSENSE_INTEGRATION=1 ... make integration TARGET=settings_nodeexporter`
+Run: `qm rollback <vmid> clean` (owner), then `OPNSENSE_INTEGRATION=1 ... make integration TARGET=test-nodeexporter-settings`
 Expected: `failed=0`; `make integration` without `OPNSENSE_INTEGRATION=1` exits non-zero with `set OPNSENSE_INTEGRATION=1`.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add tests/integration/settings_nodeexporter.yml docs/testing.md
+git add tests/integration/test-nodeexporter-settings.yml docs/testing.md
 git commit -m "Add integration harness and node_exporter settings test"
 ```

@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import pytest
 
-from ansible_collections.routerops.opnsense.plugins.module_utils.fields import (
+from ansible_collections.routerops.opnsense.plugins.module_utils._fields import (
+    check_names,
     field_diff,
+    flatten,
     nest_fields,
     normalize,
     to_api,
@@ -92,3 +94,21 @@ def test_float_wanted_compares_as_string():
 
 def test_string_wanted_against_list_read():
     assert normalize(["a", "b"], "a,b") == "a,b"
+
+
+def test_flatten_nested():
+    assert flatten({"source": {"network": "x", "port": 1}, "a": 2}) == {"source.network": "x", "source.port": 1, "a": 2}
+
+
+def test_check_names_overlap():
+    with pytest.raises(ValueError, match="field 's' is in both fields and write_only"):
+        check_names({"a": 1, "s": ""}, {"s": "x"}, [], {})
+
+
+def test_check_names_unknown_ordered():
+    with pytest.raises(ValueError, match="unknown field 'nope' in ordered_fields"):
+        check_names({"a": 1}, {}, ["nope"], {})
+
+
+def test_check_names_accepts_write_only_separator():
+    check_names({"a": 1}, {"s": "x"}, [], {"s": "\n"})

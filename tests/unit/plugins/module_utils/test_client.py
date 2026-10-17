@@ -10,10 +10,11 @@ import urllib.error
 
 import pytest
 
-from ansible_collections.routerops.opnsense.plugins.module_utils import client
-from ansible_collections.routerops.opnsense.plugins.module_utils.client import (
+from ansible_collections.routerops.opnsense.plugins.module_utils import _client as client
+from ansible_collections.routerops.opnsense.plugins.module_utils._client import (
     OPNsenseClient,
     OPNsenseError,
+    require_deleted,
     require_ok,
     require_saved,
 )
@@ -40,8 +41,8 @@ class FakeOpenUrl:
         return FakeResponse(outcome)
 
 
-def http_error(code):
-    return urllib.error.HTTPError("https://fw.example/api/x", code, "err", {}, io.BytesIO(b""))
+def http_error(code, body=b""):
+    return urllib.error.HTTPError("https://fw.example/api/x", code, "err", {}, io.BytesIO(body))
 
 
 @pytest.fixture(autouse=True)
@@ -189,3 +190,43 @@ def test_require_saved_rejects_non_dict():
 def test_require_ok_rejects_non_dict():
     with pytest.raises(OPNsenseError):
         require_ok("done")
+
+
+def test_http_error_shows_error_message(monkeypatch):
+    body = b'{"errorMessage": "Cannot delete alias a. Currently in use by x", "errorTitle": "Alias in use"}'
+    install(monkeypatch, http_error(500, body))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").post("firewall/alias/del_item/u1")
+    assert "Cannot delete alias a" in e.value.msg
+    assert e.value.status == 500
+
+
+def test_http_error_without_json_body_keeps_code(monkeypatch):
+    install(monkeypatch, http_error(500, b"<html>"))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").post("firewall/alias/del_item/u1")
+    assert "HTTP 500" in e.value.msg
+
+
+def test_require_deleted_accepts_deleted_and_not_found():
+    require_deleted({"result": "deleted"})
+    require_deleted({"result": "not found"})
+
+
+def test_require_deleted_raises_on_failed():
+    with pytest.raises(OPNsenseError) as e:
+        require_deleted({"result": "failed"})
+    assert "failed" in e.value.msg
+
+
+def test_http_error_with_broken_body_keeps_code(monkeypatch):
+    error = http_error(500)
+
+    def broken_read(*args):
+        raise http.client.IncompleteRead(b"")
+
+    error.read = broken_read
+    install(monkeypatch, error)
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").post("firewall/alias/del_item/u1")
+    assert "HTTP 500" in e.value.msg
