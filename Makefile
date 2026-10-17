@@ -46,3 +46,23 @@ integration: collection-tree
 	@for f in tests/integration/$(or $(TARGET),*).yml; do \
 		ANSIBLE_COLLECTIONS_PATH=$(CURDIR)/build $(BIN)/ansible-playbook "$$f" || exit 1; \
 	done
+
+-include integration.local.mk
+TUNNEL_PORT ?= 18443
+BW_ITEM := routerops-opnsense-test
+
+.PHONY: integration-local integration-reset
+
+integration-local: collection-tree
+	@test -n "$(PROXMOX_HOST)" || { echo "set PROXMOX_HOST, for example in integration.local.mk" >&2; exit 1; }
+	@socat TCP-LISTEN:$(TUNNEL_PORT),bind=127.0.0.1,reuseaddr,fork EXEC:"ssh -o BatchMode=yes root@$(PROXMOX_HOST) nc 10.250.1.1 443" & \
+	pid=$$!; trap 'kill $$pid 2>/dev/null' EXIT; \
+	for i in $$(seq 60); do curl -sk -o /dev/null https://127.0.0.1:$(TUNNEL_PORT)/ && break; sleep 2; done; \
+	bw sync >/dev/null; \
+	OPNSENSE_INTEGRATION=1 OPNSENSE_URL=https://127.0.0.1:$(TUNNEL_PORT) OPNSENSE_VALIDATE_CERTS=false \
+	OPNSENSE_API_KEY="$$(bw get username $(BW_ITEM))" OPNSENSE_API_SECRET="$$(bw get password $(BW_ITEM))" \
+	$(MAKE) --no-print-directory integration TARGET="$(TARGET)"
+
+integration-reset:
+	@test -n "$(PROXMOX_HOST)" || { echo "set PROXMOX_HOST, for example in integration.local.mk" >&2; exit 1; }
+	@ssh -o BatchMode=yes root@$(PROXMOX_HOST) 'qm rollback 9090 clean && qm start 9090'

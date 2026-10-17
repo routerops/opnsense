@@ -32,6 +32,18 @@ Omit `TARGET` to run every test. Reset the VM between runs on the Proxmox node: 
 
 A new check counts only after it failed once against a real fault: copy the test playbook outside the repository, change one wanted value in the idempotency task, run it with `ANSIBLE_COLLECTIONS_PATH=$PWD/build .venv/bin/ansible-playbook <copy>` and see the assert fail, then roll the VM back.
 
+## Unattended local run
+
+`make integration-local` opens the tunnel itself, reads the credentials, runs `make integration` and closes the tunnel again; an agent can run it without help.
+
+| Input | Source |
+|---|---|
+| `PROXMOX_HOST` | set in the untracked `integration.local.mk` (gitignored), which the Makefile includes |
+| Tunnel | `socat` on `127.0.0.1:18443` (`TUNNEL_PORT`) forwarding through `ssh -o BatchMode=yes root@$PROXMOX_HOST nc 10.250.1.1 443` |
+| API key and secret | the Bitwarden login item `routerops-opnsense-test` (username = key, password = secret), read with `bw get` in a silent recipe line; `bw` must be unlocked |
+
+Nothing is printed or written to a file; the values exist only in the environment of the test run.
+
 ## API privileges
 
 The API user gets only the privileges the tests need, read from each area's `ACL.xml`.
