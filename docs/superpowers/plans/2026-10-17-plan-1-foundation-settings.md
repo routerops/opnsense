@@ -61,7 +61,7 @@
 
 - [ ] **Step 3: Write the agent and reference files**
 
-`CLAUDE.md` holds the standards: the Global Constraints above, the gate (`make check`), the spec path, "confirm before publishing to Galaxy or pushing tags", "integration tests only against the dedicated test VM", the tables "Ansible lessons" and "Working agreements to keep" from `docs/kickoff.md` (bracket notation for key access, `| int`/`| bool` before comparing, health checks match an expected answer, a check counts only after it failed once, `no_log`/`diff: false` for secrets, chat in the owner's language, human review of every change). `AGENTS.md` says in two lines that `CLAUDE.md` is the standard and repeats the two confirm rules. The skill file is copied verbatim from `docs/kickoff.md`, section "Reference repositories". `reference-repos.md` holds the four-row table from the same section plus a "Local path" column (`.references/<name>`). `.pre-commit-config.yaml` runs `gitleaks` at `v8.30.1` and `ansible-lint` at `v26.10.1`.
+`AGENTS.md` holds the standards: the Global Constraints above, the gate (`make check`), the spec path, "confirm before publishing to Galaxy or pushing tags", "integration tests only against the dedicated test VM", the tables "Ansible lessons" and "Working agreements to keep" from `docs/kickoff.md` (bracket notation for key access, `| int`/`| bool` before comparing, health checks match an expected answer, a check counts only after it failed once, `no_log`/`diff: false` for secrets, chat in the owner's language, human review of every change). `CLAUDE.md` holds only `@AGENTS.md`. The skill file is copied verbatim from `docs/kickoff.md`, section "Reference repositories". `reference-repos.md` holds the four-row table from the same section plus a "Local path" column (`.references/<name>`). `.pre-commit-config.yaml` runs `gitleaks` at `v8.30.1` and `ansible-lint` at `v26.10.1`.
 
 - [ ] **Step 4: Run the gate**
 
@@ -233,7 +233,7 @@ git commit -m "Add field normalisation and diff"
   - `common.CONNECTION_ARGSPEC: dict`: `url` (str, required), `api_key` (str, required, `no_log`), `api_secret` (str, required, `no_log`), `validate_certs` (bool, default `True`), `timeout` (int, default 30).
   - `common.client_from_params(params: dict) -> OPNsenseClient`.
   - `common.get_path(data: dict, key: str) -> dict` (follows a dotted key, `"unbound.general"`) and `common.nest(key: str, value: dict) -> dict` (inverse). Dotted keys are the assistant's call, for settings nested below the model's top level.
-  - Module `routerops.opnsense.settings` options: connection options, `path` (str, required, e.g. `nodeexporter/general`), `key` (str, required, e.g. `general`), `fields` (dict, required), `actions` (dict, default `{get: get, set: set}`, keys merged over the default), `apply` (str, optional, e.g. `nodeexporter/service/reconfigure`), `write_only_fields` (list of str, default `[]`), `update_write_only` (`on_create` | `always`, default `on_create`), `ordered_fields` (list of str, default `[]`), `separators` (dict of str, default `{}`).
+  - Module `routerops.opnsense.settings` options: connection options, `path` (str, required, e.g. `nodeexporter/general`), `key` (str, required, e.g. `general`), `fields` (dict, required), `actions` (dict, default `{get: get, set: set}`, keys merged over the default), `apply` (str, optional, e.g. `nodeexporter/service/reconfigure`), `write_only` (dict in the shape of `fields`, `no_log=True`, default `{}`), `update_write_only` (`on_create` | `always`, default `on_create`), `ordered_fields` (list of str, default `[]`), `separators` (dict of str, default `{}`).
   - Returns: `changed`, `diff` (`{before: {field: value}, after: {field: value}}`, changed fields only), `settings` (the named fields as read before any write, normalised, write-only fields omitted; a playbook registers it to restore the original state).
 
 Behaviour (assistant's call for singletons): write-only fields are not compared; they are sent along with any write, and they force a write only when `update_write_only: always`. The `set` payload holds the changed fields plus the write-only fields, nested under `key`.
@@ -259,7 +259,7 @@ def test_unknown_field_fails(...):  # fields {enabeld: True} -> failed True, "en
 def test_missing_key_fails(...):  # key "nope" -> failed True, "nope" in msg
 def test_no_apply_path_skips_apply(...):  # apply omitted -> only GET and set POST
 def test_diff_contains_only_changed_fields(...):  # diff == {"before": {"enabled": False}, "after": {"enabled": True}}
-def test_write_only_not_compared(...):  # fields {listenport: 9100, secret: "x"}, write_only_fields [secret] -> changed False, no POST
+def test_write_only_not_compared(...):  # fields {listenport: 9100, secret: "x"}, write_only {secret: ...} -> changed False, no POST
 def test_write_only_sent_with_other_change(...):  # fields {enabled: True, secret: "x"} -> payload {"general": {"enabled": "1", "secret": "x"}}
 def test_write_only_always_forces_write(...):  # update_write_only always, nothing else changed -> changed True, payload {"general": {"secret": "x"}}
 def test_write_only_absent_from_diff_and_result(...):  # "secret" not in diff before/after, not in result["settings"]

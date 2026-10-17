@@ -1,0 +1,3 @@
+---
+major_changes:
+  - settings - new module to manage OPNsense settings singletons through the MVC API.

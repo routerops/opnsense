@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+ansible-core==2.21.5
+ansible-lint==26.10.1
+pre-commit==4.7.0
+antsibull-changelog==0.35.1
+reuse[charset-normalizer]==6.2.0

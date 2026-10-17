@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+requires_ansible: ">=2.20.0"
+action_groups:
+  opnsense:
+    - settings

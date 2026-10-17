@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the settings module against node_exporter
+  hosts: localhost
+  gather_facts: false
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      url: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}"
+      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS', default='true') | bool }}"
+      path: nodeexporter/general
+      key: general
+      apply: nodeexporter/service/reconfigure
+  vars:
+    opnsense_test_wanted:
+      enabled: true
+      listenport: 9101
+      cpu: true
+  tasks:
+    - name: Read the original settings
+      routerops.opnsense.settings:
+        fields: "{{ opnsense_test_wanted }}"
+      check_mode: true
+      register: opnsense_test_original
+
+    - name: Set the wanted settings
+      routerops.opnsense.settings:
+        fields: "{{ opnsense_test_wanted }}"
+      register: opnsense_test_first
+
+    - name: Set the same settings again
+      routerops.opnsense.settings:
+        fields: "{{ opnsense_test_wanted }}"
+      register: opnsense_test_second
+
+    - name: Set the same settings in check mode
+      routerops.opnsense.settings:
+        fields: "{{ opnsense_test_wanted }}"
+      check_mode: true
+      register: opnsense_test_check
+
+    - name: Set an invalid port
+      routerops.opnsense.settings:
+        fields:
+          listenport: 70000
+      register: opnsense_test_invalid
+      ignore_errors: true
+
+    - name: Assert the results
+      ansible.builtin.assert:
+        that:
+          - opnsense_test_first['changed'] == (opnsense_test_original['settings'] != opnsense_test_wanted)
+          - not opnsense_test_second['changed']
+          - not opnsense_test_check['changed']
+          - opnsense_test_invalid['failed']
+          - opnsense_test_invalid['validations'] is defined
+
+    - name: Restore the original settings
+      routerops.opnsense.settings:
+        fields: "{{ opnsense_test_original['settings'] }}"

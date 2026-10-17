@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+name: CI
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible-core: ["2.20.10", "2.21.5"]
+    defaults:
+      run:
+        working-directory: ansible_collections/routerops/opnsense
+    steps:
+      - name: Check out the collection
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: ansible_collections/routerops/opnsense
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install the tools
+        run: pip install "ansible-core==${{ matrix.ansible-core }}" ansible-lint==26.10.1 antsibull-changelog==0.35.1
+      - name: Run ansible-lint
+        if: matrix.ansible-core == '2.21.5'
+        run: ansible-lint
+      - name: Lint the changelog fragments
+        run: antsibull-changelog lint
+      - name: Run sanity tests
+        run: ansible-test sanity --docker default
+      - name: Run unit tests
+        run: ansible-test units --docker default
+
+  secrets-and-licences:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository with history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Scan for secrets
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.30.1 git /repo --no-banner
+      - name: Check licence headers
+        run: pip install "reuse[charset-normalizer]==6.2.0" && reuse lint

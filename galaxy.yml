@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+namespace: routerops
+name: opnsense
+version: 0.1.0
+readme: README.md
+authors:
+  - routerops.opnsense contributors
+description: Generic modules for the OPNsense MVC API
+license:
+  - GPL-3.0-or-later
+  - BSD-2-Clause
+tags:
+  - opnsense
+  - firewall
+  - networking
+repository: https://github.com/routerops/opnsense
+issues: https://github.com/routerops/opnsense/issues
+build_ignore:
+  - build
+  - .references
+  - .venv
+  - .agents
+  - .claude
+  - .superpowers
+  - docs/superpowers
+  - mise.toml
