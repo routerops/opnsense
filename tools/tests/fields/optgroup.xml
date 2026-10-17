@@ -1,0 +1,22 @@
+<!-- node: rules.rule -->
+<model>
+    <items>
+        <rules>
+            <rule type="ArrayField">
+                <icmp type="OptionField">
+                    <Multiple>Y</Multiple>
+                    <OptionValues>
+                        <Common>
+                            <echoreq>Echo request</echoreq>
+                            <unreach value="3">Unreachable</unreach>
+                        </Common>
+                        <Deprecated>
+                            <alt>Alternate</alt>
+                        </Deprecated>
+                        <other>Other</other>
+                    </OptionValues>
+                </icmp>
+            </rule>
+        </rules>
+    </items>
+</model>

@@ -5,13 +5,15 @@
 
 from __future__ import annotations
 
+from ansible.module_utils.basic import env_fallback
+
 from ansible_collections.routerops.opnsense.plugins.module_utils._client import OPNsenseClient
 
 CONNECTION_ARGSPEC = dict(
-    url=dict(type="str", required=True),
-    api_key=dict(type="str", required=True, no_log=True),
-    api_secret=dict(type="str", required=True, no_log=True),
-    validate_certs=dict(type="bool", default=True),
+    url=dict(type="str", required=True, fallback=(env_fallback, ["OPNSENSE_URL"])),
+    api_key=dict(type="str", required=True, no_log=True, fallback=(env_fallback, ["OPNSENSE_API_KEY"])),
+    api_secret=dict(type="str", required=True, no_log=True, fallback=(env_fallback, ["OPNSENSE_API_SECRET"])),
+    validate_certs=dict(type="bool", default=True, fallback=(env_fallback, ["OPNSENSE_VALIDATE_CERTS"])),
     timeout=dict(type="int", default=30),
 )
 

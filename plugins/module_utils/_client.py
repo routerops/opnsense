@@ -9,6 +9,7 @@ import http.client
 import json
 import time
 import urllib.error
+import urllib.parse
 
 from ansible.module_utils.urls import open_url
 
@@ -58,6 +59,7 @@ class OPNsenseClient:
     def _request(self, method, path, payload=None):
         """Send one request and return the decoded JSON, turning every failure into an OPNsenseError."""
         url = self.base + path
+        shown = _without_userinfo(url)
         kwargs = dict(
             method=method,
             url_username=self.api_key,
@@ -74,22 +76,38 @@ class OPNsenseClient:
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 raise _not_found(path)
-            msg = "%s %s failed with HTTP %s" % (method, url, e.code)
+            if e.code == 401:
+                raise OPNsenseError("authentication failed for %s %s; check api_key and api_secret" % (method, shown), status=401)
+            if e.code == 403:
+                raise OPNsenseError(
+                    "%s %s is forbidden; the API user lacks the privilege for %s; docs/areas lists the privileges each area needs"
+                    % (method, shown, path),
+                    status=403,
+                )
+            msg = "%s %s failed with HTTP %s" % (method, shown, e.code)
             detail = _error_message(e)
             if detail:
                 msg += ": %s" % detail
             raise OPNsenseError(msg, status=e.code)
         except urllib.error.URLError as e:
-            raise OPNsenseError("%s %s failed: %s" % (method, url, e.reason))
+            raise OPNsenseError("%s %s failed: %s" % (method, shown, e.reason))
         except (OSError, http.client.HTTPException) as e:
-            raise OPNsenseError("%s %s failed: %s" % (method, url, e))
+            raise OPNsenseError("%s %s failed: %s" % (method, shown, e))
         try:
             data = json.loads(body)
         except ValueError:
-            raise OPNsenseError("%s %s did not return JSON" % (method, url), status=0)
+            raise OPNsenseError("%s %s did not return JSON" % (method, shown), status=0)
         if isinstance(data, dict) and data.get("errorMessage") == "Endpoint not found":
             raise _not_found(path)
         return data
+
+
+def _without_userinfo(url):
+    """Return a URL without any user name or password, for messages."""
+    parts = urllib.parse.urlsplit(url)
+    if "@" not in parts.netloc:
+        return url
+    return urllib.parse.urlunsplit(parts._replace(netloc=parts.netloc.rsplit("@", 1)[1]))
 
 
 def _not_found(path):
@@ -98,14 +116,16 @@ def _not_found(path):
 
 
 def _error_message(http_error):
-    """Return the errorMessage from an HTTP error's JSON body, or None when the body has none."""
+    """Return the errorMessage from an HTTP error's JSON body, prefixed by its errorTitle, or None when the body has none."""
     try:
         data = json.loads(http_error.read())
     except (ValueError, OSError, http.client.HTTPException):
         return None
-    if isinstance(data, dict):
-        return data.get("errorMessage")
-    return None
+    if not isinstance(data, dict) or not data.get("errorMessage"):
+        return None
+    if data.get("errorTitle"):
+        return "%s: %s" % (data["errorTitle"], data["errorMessage"])
+    return data["errorMessage"]
 
 
 def require_deleted(response):

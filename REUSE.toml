@@ -1,7 +1,7 @@
 version = 1
 
 [[annotations]]
-path = ["**/*.md", "**/.keep", "renovate.json", "mise.toml", ".claude/skills", "changelogs/**"]
+path = ["**/*.md", "**/.keep", "renovate.json", "mise.toml", ".claude/skills", "changelogs/**", "tools/tests/**"]
 precedence = "override"
 SPDX-FileCopyrightText = "routerops.opnsense contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"

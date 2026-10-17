@@ -1,0 +1,371 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Validates meta/areas.yml and renders the generated docs into opnsense_docs_out.
+# Run through `make docs` or `make docs-check`; touches only the output tree.
+---
+- name: Generate the docs from the area catalog
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    opnsense_docs_root: "{{ playbook_dir ~ '/..' }}"
+    opnsense_docs_catalog: "{{ opnsense_docs_root ~ '/meta/areas.yml' }}"
+    opnsense_docs_out: "{{ opnsense_docs_root ~ '/build/docs' }}"
+    opnsense_docs_spliced: [README.md, docs/testing.md, plugins/modules/item.py, plugins/modules/settings.py]
+    opnsense_docs_spec:
+      area:
+        type: str
+        required: true
+      title:
+        type: str
+        required: true
+      module:
+        type: str
+        required: true
+        choices: [item, settings]
+      path:
+        type: str
+        required: true
+      key:
+        type: str
+        required: true
+      actions:
+        type: dict
+        default: {}
+      lookup:
+        type: list
+        elements: str
+      apply:
+        type: str
+      write_only:
+        type: list
+        elements: str
+        default: []
+      always_send:
+        type: list
+        elements: str
+        default: []
+      secret_fields:
+        type: list
+        elements: str
+        default: []
+      ordered_fields:
+        type: list
+        elements: str
+        default: []
+      separators:
+        type: dict
+        default: {}
+      privileges:
+        type: list
+        elements: dict
+        required: true
+        options:
+          name:
+            type: str
+            required: true
+          title:
+            type: str
+            required: true
+          pattern:
+            type: str
+            required: true
+          acl:
+            type: str
+            required: true
+      min_version:
+        type: str
+      tested:
+        type: list
+        elements: str
+        required: true
+      plugin:
+        type: str
+      stage:
+        type: str
+        required: true
+        choices: [v0, 0.x, v1]
+      model:
+        type: dict
+        required: true
+        options:
+          repo:
+            type: str
+            required: true
+            choices: [core, plugins]
+          file:
+            type: str
+            required: true
+          node:
+            type: str
+      examples:
+        type: list
+        elements: dict
+        required: true
+        options:
+          name:
+            type: str
+            required: true
+          purge:
+            type: bool
+          return_fields:
+            type: list
+            elements: str
+          items:
+            type: list
+            elements: dict
+            options:
+              fields:
+                type: dict
+                required: true
+              state:
+                type: str
+                choices: [present, absent, query]
+          fields:
+            type: dict
+    opnsense_docs_entries: "{{ opnsense_areas | dict2items | sort(attribute='key') }}"
+  tasks:
+    - name: Check that the output tree does not hold the repository
+      ansible.builtin.assert:
+        that:
+          - not ((opnsense_docs_root | realpath) ~ '/').startswith((opnsense_docs_out | realpath) ~ '/')
+        fail_msg: "opnsense_docs_out '{{ opnsense_docs_out }}' would delete the repository; pick a directory below it, such as build/docs"
+        quiet: true
+
+    - name: Check that the catalog holds no Jinja
+      ansible.builtin.assert:
+        that:
+          - lookup('ansible.builtin.file', opnsense_docs_catalog) is not search(opnsense_docs_jinja)
+        fail_msg: "{{ opnsense_docs_catalog }} must hold literal values only; Jinja would be evaluated when the catalog loads"
+        quiet: true
+      vars:
+        opnsense_docs_jinja: '\{(\{|%|#)'
+
+    - name: Load the area catalog
+      ansible.builtin.include_vars:
+        file: "{{ opnsense_docs_catalog }}"
+
+    - name: Check the entry ids
+      ansible.builtin.assert:
+        that:
+          - item['key'] is match('^[a-z0-9]+(_[a-z0-9]+)+$')
+        fail_msg: "catalog entry id '{{ item['key'] }}' must match <area>_<type> in lowercase"
+        quiet: true
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Check the entries against the catalog schema
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ opnsense_docs_spec }}"
+        provided_arguments: "{{ item['value'] }}"
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Check the module-specific keys
+      ansible.builtin.assert:
+        that:
+          - (item['value']['module'] == 'item') == ('lookup' in item['value'])
+          - item['value']['examples'] | length > 0
+          - item['value']['examples'] | reject('contains', opnsense_docs_own) | list | length == 0
+          - item['value']['examples'] | select('contains', opnsense_docs_other) | list | length == 0
+          - item['value']['module'] == 'item' or item['value']['examples'] | select('contains', 'purge') | list | length == 0
+        fail_msg: >-
+          catalog entry '{{ item['key'] }}': needs at least one example; an item entry needs lookup and items in every example,
+          a settings entry fields in every example and neither lookup nor purge
+        quiet: true
+      vars:
+        opnsense_docs_own: "{{ 'items' if item['value']['module'] == 'item' else 'fields' }}"
+        opnsense_docs_other: "{{ 'fields' if item['value']['module'] == 'item' else 'items' }}"
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Check the entry names
+      ansible.builtin.assert:
+        that:
+          - item['key'].startswith(item['value']['area'] ~ '_')
+          - item['value']['examples'] | map(attribute='name') | reject('match', '^[A-Z][^:#]*[^.:#]$') | list | length == 0
+          - opnsense_docs_field_names | reject('string') | list | length == 0
+        fail_msg: >-
+          catalog entry '{{ item['key'] }}': the id must start with its area '{{ item['value']['area'] }}_',
+          every example name must start with a capital and hold no ':', '#' or trailing period,
+          and every example field name must be a string (quote YAML words such as on, off, yes, no and null)
+        quiet: true
+      vars:
+        opnsense_docs_field_names: >-
+          {{ (item['value']['examples'] | map(attribute='fields') if item['value']['module'] == 'settings'
+              else item['value']['examples'] | map(attribute='items') | flatten(levels=1) | map(attribute='fields'))
+             | map('dict2items') | flatten(levels=1) | map(attribute='key') | list }}
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Find the field files
+      ansible.builtin.find:
+        paths: "{{ opnsense_docs_root ~ '/meta/fields' }}"
+        patterns: "*.yml"
+      register: opnsense_docs_field_files
+
+    - name: Check that every entry has its field file
+      ansible.builtin.assert:
+        that:
+          - (item['key'] ~ '.yml') in opnsense_docs_field_files['files'] | map(attribute='path') | map('basename')
+        fail_msg: "catalog entry '{{ item['key'] }}' needs meta/fields/{{ item['key'] }}.yml; run make fields ID={{ item['key'] }}"
+        quiet: true
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Check that every field file has a catalog entry
+      ansible.builtin.assert:
+        that:
+          - (item | basename | splitext | first) in opnsense_docs_entries | map(attribute='key')
+        fail_msg: "meta/fields/{{ item | basename }} matches no catalog entry"
+        quiet: true
+      loop: "{{ opnsense_docs_field_files['files'] | map(attribute='path') | sort }}"
+      loop_control:
+        label: "{{ item | basename }}"
+
+    - name: Check the field files against the catalog
+      ansible.builtin.assert:
+        that:
+          - opnsense_docs_entry_fields['version'] == item['value']['tested'][-1]
+          - opnsense_docs_unknown | length == 0
+        fail_msg: >-
+          catalog entry '{{ item['key'] }}': {{
+          ('meta/fields/' ~ item['key'] ~ '.yml is for ' ~ opnsense_docs_entry_fields['version'] ~ ', the newest tested version is '
+           ~ item['value']['tested'][-1] ~ '; run make fields ID=' ~ item['key'])
+          if opnsense_docs_entry_fields['version'] != item['value']['tested'][-1] else
+          ('example, write-only, always_send or secret fields not in the model: ' ~ opnsense_docs_unknown | join(', ')) }}
+        quiet: true
+      vars:
+        opnsense_docs_entry_fields: "{{ lookup('ansible.builtin.file', opnsense_docs_root ~ '/meta/fields/' ~ item['key'] ~ '.yml') | from_yaml }}"
+        opnsense_docs_unknown: >-
+          {{ lookup('ansible.builtin.template', 'templates/example-field-names.j2',
+                    template_vars={'opnsense_docs_entry': item['value']}).splitlines() | map('trim') | select
+             | reject('in', opnsense_docs_entry_fields['fields'] | map(attribute='name')) | unique | list }}
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Check that each rendered example parses back to its catalog values
+      ansible.builtin.assert:
+        that:
+          - opnsense_docs_task['name'] == item[1]['name']
+          - opnsense_docs_args['path'] == item[0]['value']['path']
+          - opnsense_docs_args['key'] == item[0]['value']['key']
+          - opnsense_docs_args.get('lookup') == item[0]['value'].get('lookup')
+          - opnsense_docs_args.get('actions', {}) == item[0]['value'].get('actions', {})
+          - opnsense_docs_args.get('separators', {}) == item[0]['value'].get('separators', {})
+          - opnsense_docs_args.get('ordered_fields', []) == item[0]['value'].get('ordered_fields', [])
+          - opnsense_docs_args.get('always_send', []) == item[0]['value'].get('always_send', [])
+          - opnsense_docs_args.get('secret_fields', []) == item[0]['value'].get('secret_fields', [])
+          - opnsense_docs_args.get('apply') == item[0]['value'].get('apply')
+          - opnsense_docs_args.get('purge', false) == item[1].get('purge', false)
+          - opnsense_docs_args.get('return_fields', []) == item[1].get('return_fields', [])
+          - opnsense_docs_args.get('items') == item[1].get('items')
+          - opnsense_docs_args.get('fields') == item[1].get('fields')
+        fail_msg: "catalog entry '{{ item[0]['key'] }}', example '{{ item[1]['name'] }}': the rendered example does not parse back to the catalog values"
+        quiet: true
+      vars:
+        opnsense_docs_task: >-
+          {{ (lookup('ansible.builtin.template', 'templates/example-check.yml.j2',
+              template_vars={'opnsense_docs_entry': item[0]['value'], 'opnsense_docs_example': item[1]}) | from_yaml)[0] }}
+        opnsense_docs_args: "{{ opnsense_docs_task['routerops.opnsense.' ~ item[0]['value']['module']] }}"
+      loop: "{{ opnsense_docs_entries | subelements('value.examples') }}"
+      loop_control:
+        label: "{{ item[0]['key'] }}: {{ item[1]['name'] }}"
+
+    - name: Find the integration test playbooks
+      ansible.builtin.find:
+        paths: "{{ opnsense_docs_root ~ '/tests/integration' }}"
+        patterns: test-*.yml
+      register: opnsense_docs_tests
+
+    - name: Check that every catalog entry has its integration test
+      ansible.builtin.assert:
+        that:
+          - opnsense_docs_test in opnsense_docs_test_names
+          - >-
+            (lookup('ansible.builtin.file', opnsense_docs_root ~ '/tests/integration/' ~ opnsense_docs_test)
+            if opnsense_docs_test in opnsense_docs_test_names else '') is search("opnsense_areas\['" ~ item['key'] ~ "'\]")
+        fail_msg: >-
+          catalog entry '{{ item['key'] }}' needs tests/integration/{{ opnsense_docs_test }}
+          reading opnsense_areas['{{ item['key'] }}']
+        quiet: true
+      vars:
+        opnsense_docs_test: "{{ 'test-' ~ (item['key'] | replace('_', '-')) ~ '-' ~ item['value']['module'] ~ '.yml' }}"
+        opnsense_docs_test_names: "{{ opnsense_docs_tests['files'] | map(attribute='path') | map('basename') | list }}"
+      loop: "{{ opnsense_docs_entries }}"
+      loop_control:
+        label: "{{ item['key'] }}"
+
+    - name: Check that every integration test has a catalog entry
+      ansible.builtin.assert:
+        that:
+          - item in opnsense_docs_expected_tests
+        fail_msg: "tests/integration/{{ item }} matches no catalog entry"
+        quiet: true
+      vars:
+        opnsense_docs_expected_tests: >-
+          {{ opnsense_docs_entries | map(attribute='key') | map('replace', '_', '-')
+             | zip(opnsense_docs_entries | map(attribute='value') | map(attribute='module'))
+             | map('join', '-') | map('regex_replace', '^(.*)$', 'test-\1.yml') | list }}
+      loop: "{{ opnsense_docs_tests['files'] | map(attribute='path') | map('basename') | sort }}"
+
+    - name: Remove the previous output tree
+      ansible.builtin.file:
+        path: "{{ opnsense_docs_out }}"
+        state: absent
+
+    - name: Create the output directories
+      ansible.builtin.file:
+        path: "{{ opnsense_docs_out ~ '/' ~ item }}"
+        state: directory
+        mode: "0755"
+      loop: [docs/areas, plugins/modules]
+
+    - name: Copy the files the generator splices into
+      ansible.builtin.copy:
+        src: "{{ opnsense_docs_root ~ '/' ~ item }}"
+        dest: "{{ opnsense_docs_out ~ '/' ~ item }}"
+        mode: "0644"
+      loop: "{{ opnsense_docs_spliced }}"
+
+    - name: Render the area pages
+      ansible.builtin.template:
+        src: templates/area.md.j2
+        dest: "{{ opnsense_docs_out ~ '/docs/areas/' ~ opnsense_docs_area ~ '.md' }}"
+        mode: "0644"
+      loop: "{{ opnsense_docs_entries | map(attribute='value') | map(attribute='area') | unique }}"
+      loop_control:
+        loop_var: opnsense_docs_area
+
+    - name: Render the area overview
+      ansible.builtin.template:
+        src: templates/areas-index.md.j2
+        dest: "{{ opnsense_docs_out ~ '/docs/areas/README.md' }}"
+        mode: "0644"
+
+    - name: Render the README area table
+      ansible.builtin.blockinfile:
+        path: "{{ opnsense_docs_out ~ '/README.md' }}"
+        marker: "<!-- {mark} areas: generated from meta/areas.yml by make docs -->"
+        block: "{{ lookup('ansible.builtin.template', 'templates/readme-areas.md.j2') | trim }}"
+
+    - name: Render the privileges table
+      ansible.builtin.blockinfile:
+        path: "{{ opnsense_docs_out ~ '/docs/testing.md' }}"
+        marker: "<!-- {mark} privileges: generated from meta/areas.yml by make docs -->"
+        block: "{{ lookup('ansible.builtin.template', 'templates/testing-privileges.md.j2') | trim }}"
+
+    - name: Render the module examples
+      ansible.builtin.blockinfile:
+        path: "{{ opnsense_docs_out ~ '/plugins/modules/' ~ item ~ '.py' }}"
+        marker: "# {mark} EXAMPLES: generated from meta/areas.yml by make docs"
+        block: >-
+          {{ lookup('ansible.builtin.template', 'templates/examples.py.j2',
+             template_vars={'opnsense_docs_module': item}) | trim }}
+      loop: [item, settings]

@@ -1,0 +1,10 @@
+<!-- node: -->
+<model>
+    <items>
+        <charon>
+            <syslog>
+                <level type="IntegerField"/>
+            </syslog>
+        </charon>
+    </items>
+</model>

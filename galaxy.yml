@@ -21,8 +21,10 @@ build_ignore:
   - build
   - .references
   - .venv
+  - .venv-oldest
   - .agents
   - .claude
   - .superpowers
   - docs/superpowers
   - mise.toml
+  - tools

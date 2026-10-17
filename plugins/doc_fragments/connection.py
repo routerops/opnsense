@@ -11,19 +11,21 @@ class ModuleDocFragment:
     DOCUMENTATION = r"""
 options:
   url:
-    description: Base URL of the OPNsense web interface, for example C(https://fw.example).
+    description: Base URL of the OPNsense web interface, for example C(https://fw.example). Falls back to the E(OPNSENSE_URL) environment variable.
     type: str
     required: true
   api_key:
-    description: API key of the OPNsense user.
+    description: API key of the OPNsense user. Falls back to the E(OPNSENSE_API_KEY) environment variable.
     type: str
     required: true
   api_secret:
-    description: API secret of the OPNsense user.
+    description: API secret of the OPNsense user. Falls back to the E(OPNSENSE_API_SECRET) environment variable.
     type: str
     required: true
   validate_certs:
-    description: Verify the TLS certificate. Set to V(false) only for a test system with a self-signed certificate.
+    description:
+      - Verify the TLS certificate. Set to V(false) only for a test system with a self-signed certificate.
+      - Falls back to the E(OPNSENSE_VALIDATE_CERTS) environment variable.
     type: bool
     default: true
   timeout:

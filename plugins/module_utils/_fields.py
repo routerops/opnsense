@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 SELECTED = (1, "1", True)
+SECRET_MASK = "********"
 
 
 def _is_option_map(value):
@@ -76,8 +77,11 @@ def _comparable(wanted, ordered):
     return str(wanted)
 
 
-def field_diff(current, wanted, ordered_fields=(), separators=None, _prefix=""):
-    """Return {field: (before, after)} for every wanted field whose read value differs; raise KeyError for an unknown field."""
+def field_diff(current, wanted, ordered_fields=(), separators=None, _prefix="", secrets=()):
+    """Return {field: (before, after)} for every wanted field whose read value differs; raise KeyError for an unknown field.
+
+    A ValueError for a field named in secrets leaves both values out of its message.
+    """
     separators = separators or {}
     changes = {}
     for name, want in wanted.items():
@@ -85,12 +89,14 @@ def field_diff(current, wanted, ordered_fields=(), separators=None, _prefix=""):
         if not isinstance(current, dict) or name not in current:
             raise KeyError(full)
         if isinstance(want, dict):
-            changes.update(field_diff(current[name], want, ordered_fields, separators, full + "."))
+            changes.update(field_diff(current[name], want, ordered_fields, separators, full + ".", secrets))
             continue
         ordered = full in ordered_fields
         try:
             before = normalize(current[name], want, ordered, separators.get(full, ","))
         except (TypeError, ValueError):
+            if full in secrets:
+                raise ValueError("field '%s': cannot compare the stored secret with the wanted value" % full)
             raise ValueError("field '%s': cannot compare %r with %r" % (full, current[name], want))
         if before != _comparable(want, ordered):
             changes[full] = (before, want)
@@ -131,3 +137,49 @@ def check_names(compared, write_only, ordered_fields, separators):
         unknown = sorted(set(given) - known)
         if unknown:
             raise ValueError("unknown field '%s' in %s" % ("', '".join(unknown), option))
+
+
+def mask_secrets(values, names, prefix=""):
+    """Return a copy of a nested or flat field dict with the values of the named dotted fields replaced by SECRET_MASK."""
+    masked = {}
+    for key, value in values.items():
+        name = prefix + key
+        if name in names:
+            masked[key] = SECRET_MASK
+        elif isinstance(value, dict):
+            masked[key] = mask_secrets(value, names, name + ".")
+        else:
+            masked[key] = value
+    return masked
+
+
+def secret_values(values, names):
+    """Return the string forms of the values a flat field dict holds for the named secret fields and the fields below them, for no_log_values."""
+    found = set()
+    for key, value in values.items():
+        if key not in names and not any(key.startswith(name + ".") for name in names):
+            continue
+        if value in (None, ""):
+            continue
+        if isinstance(value, list):
+            found.update(str(v) for v in value)
+        else:
+            found.add(str(value))
+    return found
+
+
+def stored_secret_values(section, names):
+    """Return the string forms of the stored values of the named dotted secret fields in a read section, for no_log_values."""
+    found = {}
+    for name in names:
+        value = section
+        for part in name.split("."):
+            value = value.get(part) if isinstance(value, dict) else None
+        if value is not None:
+            found[name] = normalize(value, "")
+    return secret_values(found, names)
+
+
+def is_container(value):
+    """Tell whether a read value is a nested object of fields rather than a single field or an option map."""
+    return isinstance(value, dict) and bool(value) and not _is_option_map(value)

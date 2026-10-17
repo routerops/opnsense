@@ -1,0 +1,49 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{% from 'example.yml.j2' import example_task %}
+{% macro codes(values) %}{{ values | map('regex_replace', '^(.*)$', '`\\1`') | join(', ') if values else '-' }}{% endmacro %}
+<!-- Generated from meta/areas.yml by make docs; do not edit. -->
+# Area `{{ opnsense_docs_area }}`
+{% for entry in opnsense_docs_entries if entry['value']['area'] == opnsense_docs_area %}
+{% set e = entry['value'] %}
+
+## {{ e['title'] }}
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.{{ e['module'] }}` |
+| Path | `{{ e['path'] }}` |
+| Key | `{{ e['key'] }}` |
+| Actions | {{ codes(e['actions'] | dictsort | map('join', ': ')) if e.get('actions') else 'default' }} |
+| Lookup | {{ codes(e.get('lookup', [])) }} |
+| Apply | {{ codes([e['apply']] if e.get('apply') else []) }} |
+| Write-only fields | {{ codes(e.get('write_only', [])) }} |
+| Ordered fields | {{ codes(e.get('ordered_fields', [])) }} |
+| Always sent | {{ codes(e.get('always_send', [])) }} |
+| Secret fields | {{ codes(e.get('secret_fields', [])) }} |
+| Separators | {% for k, v in e.get('separators', {}) | dictsort %}`{{ k }}`: `{{ v | to_json(ensure_ascii=False) }}`{{ ', ' if not loop.last }}{% else %}-{% endfor %} |
+| Privileges | {% for p in e['privileges'] %}`{{ p['name'] }}` ("{{ p['title'] }}", `{{ p['pattern'] }}`){{ ', ' if not loop.last }}{% endfor %} |
+| Minimum OPNsense | {{ e.get('min_version', '-') }} |
+| Tested on | {{ e['tested'] | join(', ') }} |
+| Plugin | {{ codes([e['plugin']] if e.get('plugin') else []) }} |
+| Stage | {{ e['stage'] }} |
+
+{% set f = lookup('ansible.builtin.file', opnsense_docs_root ~ '/meta/fields/' ~ entry['key'] ~ '.yml') | from_yaml %}
+### Fields
+
+Read from `{{ f['source'] }}`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+{% for x in f['fields'] %}
+| `{{ x['name'] }}`{{ ' (write-only)' if x['name'] in e.get('write_only', []) }}{{ ' (secret)' if x['name'] in e.get('secret_fields', []) }} | {{ x['type'] }}{{ ', multiple' if x['multiple'] }}{{ ', not stored' if x['volatile'] }} | {{ 'yes' if x['required'] }} | {{ ('`' ~ x['default'] | replace('|', '\\|') ~ '`') if x['default'] is defined and x['default'] != '' }} | {{ x['options'] | map('replace', '|', '\\|') | map('regex_replace', '^(.*)$', '`\\1`') | join(', ') }} |
+{% endfor %}
+
+### {{ 'Examples' if e['examples'] | length > 1 else 'Example' }}
+
+```yaml
+{% for x in e['examples'] %}
+{{ '\n' if not loop.first }}{{ example_task(e, x) | trim }}
+{% endfor %}
+```
+{% endfor %}

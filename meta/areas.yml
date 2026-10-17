@@ -1,0 +1,121 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+opnsense_areas:
+  dnsmasq_host:
+    area: dnsmasq
+    title: Dnsmasq host
+    module: item
+    path: dnsmasq/settings
+    key: host
+    lookup: [host, domain]
+    actions:
+      search: searchHost
+      get: getHost
+      add: addHost
+      set: setHost
+      del: delHost
+    apply: dnsmasq/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml
+      node: hosts
+    privileges:
+      - name: page-services-dnsforwarder
+        title: "Services: Dnsmasq DNS/DHCP: Settings"
+        pattern: api/dnsmasq/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    examples:
+      - name: Add a Dnsmasq host
+        items:
+          - fields:
+              host: printer
+              domain: example.test
+              ip: 192.0.2.10
+      - name: Keep only the listed Dnsmasq hosts
+        purge: true
+        items:
+          - fields:
+              host: printer
+              domain: example.test
+              ip: 192.0.2.10
+          - fields:
+              host: scanner
+              domain: example.test
+              ip: 192.0.2.11
+      - name: Remove a Dnsmasq host
+        items:
+          - fields:
+              host: scanner
+              domain: example.test
+            state: absent
+
+  firewall_alias:
+    area: firewall
+    title: Firewall alias
+    module: item
+    path: firewall/alias
+    key: alias
+    lookup: [name]
+    secret_fields: [password]
+    separators:
+      content: "\n"
+    apply: firewall/alias/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Firewall/Alias.xml
+      node: aliases.alias
+    privileges:
+      - name: page-firewall-alias-edit
+        title: "Firewall: Alias: Edit"
+        pattern: api/firewall/alias/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    examples:
+      - name: Keep a host alias
+        items:
+          - fields:
+              name: web_servers
+              type: host
+              content: [192.0.2.21, 192.0.2.22]
+              description: Web servers
+      - name: Keep a port alias
+        items:
+          - fields:
+              name: web_ports
+              type: port
+              content: ["80", "443"]
+              description: Web ports
+      - name: Read a built-in alias
+        return_fields: [type]
+        items:
+          - fields:
+              name: bogons
+            state: query
+
+  nodeexporter_general:
+    area: nodeexporter
+    title: node_exporter general
+    module: settings
+    path: nodeexporter/general
+    key: general
+    apply: nodeexporter/service/reconfigure
+    model:
+      repo: plugins
+      file: sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/General.xml
+    privileges:
+      - name: page-services-nodeexporter
+        title: "Services: Prometheus Exporter"
+        pattern: api/nodeexporter/*
+        acl: opnsense-plugins/sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/ACL/ACL.xml
+    tested: ["26.7.7"]
+    plugin: os-node_exporter
+    stage: v0
+    examples:
+      - name: Enable node_exporter on port 9100
+        fields:
+          enabled: true
+          listenport: 9100

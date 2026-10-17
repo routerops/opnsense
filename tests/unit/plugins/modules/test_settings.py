@@ -6,6 +6,9 @@ from __future__ import annotations
 import copy
 import json
 
+import pytest
+from ansible.module_utils.testing import patch_module_args
+
 from ansible_collections.routerops.opnsense.plugins.modules import settings
 
 from .conftest import FakeClient
@@ -187,3 +190,84 @@ def test_field_in_fields_and_write_only_fails(run_module):
     assert result["failed"] is True
     assert "secret" in result["msg"]
     assert posts(client) == []
+
+
+def test_settings_apply_failure_reports_saved(run_module):
+    client = fake({"nodeexporter/service/reconfigure": {"status": "failed", "status_msg": "x"}})
+    result = run_module(settings, dict(BASE_ARGS, fields={"enabled": True}), client)
+    assert result["failed"] is True
+    assert result["changed"] is True
+    assert "saved but not applied" in result["msg"]
+
+
+def run_capturing_params(monkeypatch, capsys, module_args):
+    seen = {}
+
+    def build(params):
+        seen.update(params)
+        return fake()
+
+    monkeypatch.setattr(settings, "client_from_params", build)
+    with patch_module_args(dict(module_args, _ansible_check_mode=True)):
+        with pytest.raises(SystemExit):
+            settings.main()
+    capsys.readouterr()
+    return seen
+
+
+def test_connection_from_environment(monkeypatch, capsys):
+    monkeypatch.setenv("OPNSENSE_URL", "https://env.example")
+    monkeypatch.setenv("OPNSENSE_API_KEY", "env-api-key")
+    monkeypatch.setenv("OPNSENSE_API_SECRET", "env-api-secret")
+    monkeypatch.setenv("OPNSENSE_VALIDATE_CERTS", "false")
+    module_args = {k: v for k, v in BASE_ARGS.items() if k not in CONNECTION}
+    seen = run_capturing_params(monkeypatch, capsys, dict(module_args, fields={"enabled": False}))
+    assert seen["url"] == "https://env.example"
+    assert seen["api_key"] == "env-api-key"
+    assert seen["api_secret"] == "env-api-secret"
+    assert seen["validate_certs"] is False
+
+
+def test_argument_wins_over_environment(monkeypatch, capsys):
+    monkeypatch.setenv("OPNSENSE_URL", "https://env.example")
+    seen = run_capturing_params(monkeypatch, capsys, dict(BASE_ARGS, fields={"enabled": False}))
+    assert seen["url"] == "https://fw.example"
+
+
+def test_settings_secret_masked_in_settings_return(run_module):
+    read = {"general": {"enabled": "0", "listenport": "9100", "cpu": "1", "secret": "EXAMPLE-old"}}
+    client = fake(read=read)
+    result = run_module(settings, dict(BASE_ARGS, fields={"secret": "EXAMPLE-new"}, secret_fields=["secret"]), client)
+    assert result["changed"] is True
+    assert result["settings"]["secret"] == "********"
+    assert result["diff"]["before"]["secret"] == "********"
+    assert "EXAMPLE-old" not in json.dumps(result)
+    assert "EXAMPLE-new" not in json.dumps(result)
+
+
+def test_settings_stored_secret_stays_out_of_error_messages(run_module):
+    read = {"general": {"enabled": "0", "listenport": "9100", "cpu": "1", "secret": "EXAMPLE-raw"}}
+    result = run_module(settings, dict(BASE_ARGS, fields={"secret": 5}, secret_fields=["secret"]), fake(read=read))
+    assert result["failed"] is True
+    assert "EXAMPLE-raw" not in json.dumps(result)
+
+
+def test_settings_secret_with_backslash_stays_out_of_error_messages(run_module):
+    read = {"general": {"enabled": "0", "listenport": "9100", "cpu": "1", "secret": "EXAMPLE\\raw"}}
+    result = run_module(settings, dict(BASE_ARGS, fields={"secret": 5}, secret_fields=["secret"]), fake(read=read))
+    assert result["failed"] is True
+    assert "EXAMPLE" not in result["msg"]
+
+
+def test_validate_certs_zero_from_environment(monkeypatch, capsys):
+    monkeypatch.setenv("OPNSENSE_VALIDATE_CERTS", "0")
+    seen = run_capturing_params(monkeypatch, capsys, dict(BASE_ARGS, fields={"enabled": False}))
+    assert seen["validate_certs"] is False
+
+
+def test_settings_secret_field_naming_a_container_fails(run_module):
+    read = {"general": {"enabled": "0", "tunnel": {"psk": "EXAMPLE-old"}}}
+    result = run_module(settings, dict(BASE_ARGS, fields={"tunnel": {"psk": "EXAMPLE-new"}}, secret_fields=["tunnel"]), fake(read=read))
+    assert result["failed"] is True
+    assert "'tunnel'" in result["msg"]
+    assert "EXAMPLE" not in json.dumps(result)

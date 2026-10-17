@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - item, settings - report ``changed`` when the apply fails after a write OPNsense already saved; ``settings`` now says that the values were saved.

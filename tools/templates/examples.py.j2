@@ -1,0 +1,8 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{% from 'example.yml.j2' import example_task %}
+EXAMPLES = r"""
+{% for pair in opnsense_docs_entries | selectattr('value.module', '==', opnsense_docs_module) | subelements('value.examples') %}
+{{ '\n' if not loop.first }}{{ example_task(pair[0]['value'], pair[1]) | trim }}
+{% endfor %}
+"""

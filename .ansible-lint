@@ -6,6 +6,7 @@ exclude_paths:
   - build/
   - .references/
   - .venv/
+  - .venv-oldest/
   - .superpowers/
 skip_list:
   - meta-runtime[unsupported-version]

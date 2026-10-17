@@ -1,0 +1,16 @@
+<!-- node: rules.rule -->
+<model>
+    <items>
+        <rules>
+            <rule type="ArrayField">
+                <icmp type="OptionField">
+                    <OptionValues>
+                        <unreach value="1">Unreachable</unreach>
+                        <toobig value="2">Too big</toobig>
+                        <echo>Echo</echo>
+                    </OptionValues>
+                </icmp>
+            </rule>
+        </rules>
+    </items>
+</model>

@@ -1,0 +1,60 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{%- macro yaml_key(k) -%}
+{{ k | to_json(ensure_ascii=False) if (k | lower) in ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off', 'null', '~', '']
+   or k is match('^[-+.0-9]') or k is search('[:#{}\\[\\],&*!|>\'"%@`]') else k }}
+{%- endmacro -%}
+{%- macro yaml_value(v, indent) -%}
+{%- if v is mapping and v -%}
+{%- for k, x in v.items() -%}
+{{ '\n' ~ ' ' * indent ~ yaml_key(k) ~ ':' ~ yaml_value(x, indent + 2) }}
+{%- endfor -%}
+{%- else -%}
+{{ ' ' ~ (v | to_json(ensure_ascii=False)) }}
+{%- endif -%}
+{%- endmacro -%}
+{% macro example_task(e, x) -%}
+- name: {{ x['name'] }}
+  routerops.opnsense.{{ e['module'] }}:
+    url: https://fw.example
+{% raw %}    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+{% endraw %}
+    path:{{ yaml_value(e['path'], 6) }}
+    key:{{ yaml_value(e['key'], 6) }}
+{% if e['module'] == 'item' %}
+    lookup:{{ yaml_value(e['lookup'], 6) }}
+{% endif %}
+{% for opt in ['actions', 'separators'] if e.get(opt) %}
+    {{ opt }}:{{ yaml_value(e[opt] | dictsort | items2dict(key_name=0, value_name=1), 6) }}
+{% endfor %}
+{% if e.get('ordered_fields') %}
+    ordered_fields:{{ yaml_value(e['ordered_fields'], 6) }}
+{% endif %}
+{% if e.get('secret_fields') %}
+    secret_fields:{{ yaml_value(e['secret_fields'], 6) }}
+{% endif %}
+{% if e.get('always_send') %}
+    always_send:{{ yaml_value(e['always_send'], 6) }}
+{% endif %}
+{% if e.get('apply') %}
+    apply:{{ yaml_value(e['apply'], 6) }}
+{% endif %}
+{% if e['module'] == 'item' %}
+{% if x.get('purge') %}
+    purge: true
+{% endif %}
+{% if x.get('return_fields') %}
+    return_fields:{{ yaml_value(x['return_fields'], 6) }}
+{% endif %}
+    items:
+{% for i in x['items'] %}
+      - fields:{{ yaml_value(i['fields'], 10) }}
+{% if i.get('state') %}
+        state:{{ yaml_value(i['state'], 8) }}
+{% endif %}
+{% endfor %}
+{% else %}
+    fields:{{ yaml_value(x['fields'], 6) }}
+{% endif %}
+{%- endmacro %}

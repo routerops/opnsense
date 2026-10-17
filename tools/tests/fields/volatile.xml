@@ -1,0 +1,11 @@
+<!-- node: entries.entry -->
+<model>
+    <items>
+        <entries>
+            <entry type="ArrayField">
+                <label type="TextField"/>
+                <counter type="IntegerField" volatile="true"/>
+            </entry>
+        </entries>
+    </items>
+</model>

@@ -1,0 +1,19 @@
+<!-- node: rules.rule -->
+<model>
+    <items>
+        <rules>
+            <rule type="ArrayField">
+                <description type="TextField"/>
+                <source>
+                    <network type="NetworkField">
+                        <Default>any</Default>
+                    </network>
+                    <port type="PortField"/>
+                </source>
+                <targets type="ArrayField">
+                    <host type="TextField"/>
+                </targets>
+            </rule>
+        </rules>
+    </items>
+</model>

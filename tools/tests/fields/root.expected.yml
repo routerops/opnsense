@@ -1,0 +1,2 @@
+- {name: enabled, type: BooleanField, required: true, default: "0", multiple: false, volatile: false, options: []}
+- {name: port, type: PortField, required: false, default: "9100", multiple: false, volatile: false, options: []}

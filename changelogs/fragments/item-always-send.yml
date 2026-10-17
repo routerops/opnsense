@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - item - new option ``always_send`` sends named fields on every update, for controllers that read them on every set.

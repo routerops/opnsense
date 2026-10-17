@@ -6,7 +6,7 @@ Spec: `docs/superpowers/specs/2026-10-17-routerops-opnsense-design.md`. Plans: `
 
 ## Gate
 
-`make venv` once, then `make check` before every commit: `ansible-lint` (production profile), `ansible-test sanity`, `ansible-test units`, gitleaks, `antsibull-changelog lint`, `reuse lint`. `make integration` runs only against the dedicated test VM (`docs/testing.md`), never against a production router.
+`make venv` once, then `make check` before every commit: `ansible-lint` (production profile), `ansible-test sanity` and `ansible-test units` on the newest and the oldest supported ansible-core (`requirements-dev.txt`, `requirements-oldest.txt`), gitleaks, `antsibull-changelog lint`, `reuse lint`. `make integration` runs only against the dedicated test VM (`docs/testing.md`), never against a production router.
 
 ## Rules
 
@@ -42,7 +42,7 @@ Every module, playbook and role follows Tier A (the official Ansible documentati
 | Modules are idempotent and declarative (`present`/`absent`), return useful data even when nothing changed, and keep the return structure stable | A | unit and integration tests |
 | Errors fail with a clear `msg` naming the field, path or value at fault; no traceback, no catch-all `except`, no `print`, `sys.exit()` or stderr | A, B | review |
 | Every entry in `tests/sanity/ignore-*.txt` carries a reason; the `validate-modules` checks Tier A forbids ignoring are never ignored | A | review |
-| Sanity and units run against every supported ansible-core release (`requires_ansible`) | A | CI matrix |
+| Sanity and units run against every supported ansible-core release (`requires_ansible`) | A | CI matrix; `make check` runs the newest and the oldest |
 | SemVer: a patch release only fixes bugs, a minor release may add features and deprecations, only a major release breaks; the README states this, the supported ansible-core versions and the licences | A | review |
 
 ### Playbooks, tasks and roles

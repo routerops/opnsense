@@ -1,0 +1,25 @@
+<!-- node: things.thing -->
+<model>
+    <mount>//Test/Flat</mount>
+    <items>
+        <things>
+            <thing type=".\ThingField">
+                <enabled type="BooleanField">
+                    <Default>1</Default>
+                    <Required>Y</Required>
+                </enabled>
+                <proto type="OptionField">
+                    <Multiple>Y</Multiple>
+                    <OptionValues>
+                        <IPv4/>
+                        <IPv6/>
+                    </OptionValues>
+                </proto>
+                <name type=".\NameField">
+                    <Required>Y</Required>
+                </name>
+                <note type="TextField"/>
+            </thing>
+        </things>
+    </items>
+</model>

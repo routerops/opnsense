@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - Documentation - add one page per OPNsense area under ``docs/areas/``, generated from the area catalog ``meta/areas.yml``.

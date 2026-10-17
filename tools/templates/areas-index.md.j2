@@ -1,0 +1,11 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+<!-- Generated from meta/areas.yml by make docs; do not edit. -->
+# Areas
+
+| Area | Item type | Module | Path | Plugin | Minimum OPNsense | Stage | Tested on |
+|---|---|---|---|---|---|---|---|
+{% for entry in opnsense_docs_entries %}
+{% set e = entry['value'] %}
+| [{{ e['area'] }}]({{ e['area'] }}.md) | [{{ e['title'] }}]({{ e['area'] }}.md#{{ e['title'] | lower | regex_replace('[^a-z0-9 _-]', '') | replace(' ', '-') }}) | `{{ e['module'] }}` | `{{ e['path'] }}` | {{ ('`' ~ e['plugin'] ~ '`') if e.get('plugin') else '-' }} | {{ e.get('min_version', '-') }} | {{ e['stage'] }} | {{ e['tested'] | join(', ') }} |
+{% endfor %}
