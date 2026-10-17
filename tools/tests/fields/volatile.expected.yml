@@ -1,0 +1,2 @@
+- {name: label, type: TextField, required: false, multiple: false, volatile: false, options: []}
+- {name: counter, type: IntegerField, required: false, multiple: false, volatile: true, options: []}

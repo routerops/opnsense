@@ -24,6 +24,7 @@ attributes:
     description: Shows the changed fields before and after. Field values are printed, so personal data such as hostnames or MAC addresses can appear.
 extends_documentation_fragment:
   - routerops.opnsense.connection
+  - routerops.opnsense.fields
 options:
   path:
     description: Controller base path below C(/api/), for example C(nodeexporter/general).
@@ -80,30 +81,21 @@ notes:
   - Settings configured through legacy PHP pages (system general settings, NTP, PPPoE) have no MVC API and cannot be managed.
 """
 
+# BEGIN EXAMPLES: generated from meta/areas.yml by make docs
 EXAMPLES = r"""
 - name: Enable node_exporter on port 9100
   routerops.opnsense.settings:
     url: https://fw.example
     api_key: "{{ opnsense_api_key }}"
     api_secret: "{{ opnsense_api_secret }}"
-    path: nodeexporter/general
-    key: general
-    apply: nodeexporter/service/reconfigure
+    path: "nodeexporter/general"
+    key: "general"
+    apply: "nodeexporter/service/reconfigure"
     fields:
       enabled: true
       listenport: 9100
-
-- name: Switch off Unbound
-  routerops.opnsense.settings:
-    url: https://fw.example
-    api_key: "{{ opnsense_api_key }}"
-    api_secret: "{{ opnsense_api_secret }}"
-    path: unbound/settings
-    key: unbound.general
-    apply: unbound/service/reconfigure
-    fields:
-      enabled: false
 """
+# END EXAMPLES: generated from meta/areas.yml by make docs
 
 RETURN = r"""
 settings:
@@ -135,8 +127,11 @@ from ansible_collections.routerops.opnsense.plugins.module_utils._fields import 
     check_names,
     field_diff,
     flatten,
+    mask_secrets,
     nest_fields,
     normalize,
+    secret_values,
+    stored_secret_values,
     to_api,
 )
 
@@ -166,6 +161,7 @@ ARGUMENT_SPEC = dict(
     update_write_only=dict(type="str", choices=["on_create", "always"], default="on_create"),
     ordered_fields=dict(type="list", elements="str", default=[]),
     separators=dict(type="dict", default={}),
+    secret_fields=dict(type="list", elements="str", default=[], no_log=False),
 )
 
 
@@ -176,6 +172,11 @@ def main():
     actions = dict(DEFAULT_ACTIONS, **p["actions"])
     write_only = flatten(p["write_only"])
     compared = p["fields"]
+    secrets = set(p["secret_fields"])
+    module.no_log_values.update(secret_values(flatten(compared), secrets))
+    nested = sorted(s for s in secrets if any(n.startswith(s + ".") for n in flatten(compared)))
+    if nested:
+        module.fail_json(msg="secret field '%s' holds nested fields; name each nested secret field" % "', '".join(nested))
     separators = p["separators"]
     ordered = tuple(p["ordered_fields"])
     try:
@@ -184,20 +185,23 @@ def main():
         module.fail_json(msg=str(e))
 
     client = client_from_params(p)
+    saved = False
     try:
         response = client.get("%s/%s" % (p["path"], actions["get"]))
         try:
             section = get_path(response, p["key"])
         except KeyError:
             module.fail_json(msg="key '%s' not found in response" % p["key"])
+        module.no_log_values.update(stored_secret_values(section, secrets))
         for name in write_only:
             try:
                 get_path(section, name)
             except KeyError:
                 module.fail_json(msg="field '%s' not found in '%s'" % (name, p["key"]))
         try:
-            changes = field_diff(section, compared, ordered, separators)
+            changes = field_diff(section, compared, ordered, separators, secrets=secrets)
             current = snapshot(section, compared, ordered, separators)
+            module.no_log_values.update(secret_values(flatten(current), secrets))
         except KeyError as e:
             module.fail_json(msg="field '%s' not found in '%s'" % (e.args[0], p["key"]))
         except ValueError as e:
@@ -209,17 +213,19 @@ def main():
             payload = {name: to_api(flat_wanted[name], separators.get(name, ",")) for name in changes}
             payload.update({k: to_api(v, separators.get(k, ",")) for k, v in write_only.items()})
             require_saved(client.post("%s/%s" % (p["path"], actions["set"]), nest(p["key"], nest_fields(payload))))
+            saved = True
             if p["apply"]:
                 require_ok(client.post(p["apply"]))
     except OPNsenseError as e:
-        module.fail_json(msg=e.msg, validations=e.validations)
+        msg = e.msg + "; saved but not applied" if saved else e.msg
+        module.fail_json(msg=msg, validations=e.validations, changed=saved)
 
     module.exit_json(
         changed=write_needed,
-        settings=current,
+        settings=mask_secrets(current, secrets),
         diff=dict(
-            before={k: v[0] for k, v in changes.items()},
-            after={k: v[1] for k, v in changes.items()},
+            before=mask_secrets({k: v[0] for k, v in changes.items()}, secrets),
+            after=mask_secrets({k: v[1] for k, v in changes.items()}, secrets),
         ),
     )
 

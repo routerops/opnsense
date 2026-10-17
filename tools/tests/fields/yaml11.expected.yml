@@ -1,0 +1,2 @@
+- {name: "unique", type: "OptionField", required: false, default: "no", multiple: false, volatile: false, options: ["no", "never"]}
+- {name: "mode", type: "OptionField", required: false, multiple: false, volatile: false, options: ["on", "off"]}

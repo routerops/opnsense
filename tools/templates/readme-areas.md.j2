@@ -1,0 +1,9 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+| Area | Item types |
+|---|---|
+{% for area, group in opnsense_docs_entries | groupby('value.area') %}
+| [{{ area }}](docs/areas/{{ area }}.md) | {% for entry in group %}[{{ entry['value']['title'] }}](docs/areas/{{ area }}.md#{{ entry['value']['title'] | lower | regex_replace('[^a-z0-9 _-]', '') | replace(' ', '-') }}){{ ', ' if not loop.last }}{% endfor %} |
+{% endfor %}
+
+All item types with plugin, version and stage: [docs/areas/README.md](docs/areas/README.md).

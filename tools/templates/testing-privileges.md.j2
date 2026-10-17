@@ -1,0 +1,9 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+| Test | Privilege | Source |
+|---|---|---|
+{% for entry in opnsense_docs_entries %}
+{% for p in entry['value']['privileges'] %}
+| `test-{{ entry['key'] | replace('_', '-') }}-{{ entry['value']['module'] }}` | `{{ p['name'] }}` ("{{ p['title'] }}", `{{ p['pattern'] }}`) | `{{ p['acl'] }}` |
+{% endfor %}
+{% endfor %}

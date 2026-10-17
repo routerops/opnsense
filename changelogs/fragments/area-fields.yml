@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - Documentation - each area page lists the fields from the OPNsense model, and the module examples show delete and purge.

@@ -24,6 +24,7 @@ attributes:
     description: Shows the changed fields per item before and after. Field values are printed, so personal data such as hostnames or MAC addresses can appear.
 extends_documentation_fragment:
   - routerops.opnsense.connection
+  - routerops.opnsense.fields
 options:
   path:
     description: Controller base path below C(/api/), for example C(firewall/alias).
@@ -56,9 +57,12 @@ options:
         type: dict
         default: {}
       state:
-        description: Whether the item exists.
+        description:
+          - Whether the item exists.
+          - V(query) only looks the item up and never writes; its outcome reports C(queried), with C(uuid) null when no item matches.
+          - A queried item counts as listed for O(purge).
         type: str
-        choices: [present, absent]
+        choices: [present, absent, query]
         default: present
   lookup:
     description:
@@ -94,6 +98,24 @@ options:
     type: str
     choices: [on_create, always]
     default: on_create
+  return_fields:
+    description:
+      - Fields whose current values each outcome returns under C(fields).
+      - For example the C(refid) of a certificate authority that an OpenVPN instance refers to.
+      - Every name must be a single field of the item; name a nested field with dots, such as C(source.network).
+    type: list
+    elements: str
+    default: []
+    version_added: "0.1.0"
+  always_send:
+    description:
+      - Fields sent with their wanted values on every update of an item, next to the changed fields; they never cause a write on their own.
+      - For controllers that read a sibling field from the request on every set, such as the Dnsmasq DHCP option C(type).
+      - Every present item must list these fields in O(items[].fields).
+    type: list
+    elements: str
+    default: []
+    version_added: "0.1.0"
   ordered_fields:
     description: Multi-select fields whose order matters. Other lists compare regardless of order.
     type: list
@@ -113,46 +135,133 @@ notes:
   - Interface assignment items are keyed by the interface name, not a UUID, and are looked up by their device field.
 """
 
+# BEGIN EXAMPLES: generated from meta/areas.yml by make docs
 EXAMPLES = r"""
 - name: Add a Dnsmasq host
   routerops.opnsense.item:
     url: https://fw.example
     api_key: "{{ opnsense_api_key }}"
     api_secret: "{{ opnsense_api_secret }}"
-    path: dnsmasq/settings
-    key: host
-    lookup: [host, domain]
+    path: "dnsmasq/settings"
+    key: "host"
+    lookup: ["host", "domain"]
     actions:
-      search: searchHost
-      get: getHost
-      add: addHost
-      set: setHost
-      del: delHost
-    apply: dnsmasq/service/reconfigure
+      add: "addHost"
+      del: "delHost"
+      get: "getHost"
+      search: "searchHost"
+      set: "setHost"
+    apply: "dnsmasq/service/reconfigure"
     items:
       - fields:
-          host: printer
-          domain: example.test
-          ip: 192.0.2.10
+          host: "printer"
+          domain: "example.test"
+          ip: "192.0.2.10"
+
+- name: Keep only the listed Dnsmasq hosts
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "host"
+    lookup: ["host", "domain"]
+    actions:
+      add: "addHost"
+      del: "delHost"
+      get: "getHost"
+      search: "searchHost"
+      set: "setHost"
+    apply: "dnsmasq/service/reconfigure"
+    purge: true
+    items:
+      - fields:
+          host: "printer"
+          domain: "example.test"
+          ip: "192.0.2.10"
+      - fields:
+          host: "scanner"
+          domain: "example.test"
+          ip: "192.0.2.11"
+
+- name: Remove a Dnsmasq host
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "host"
+    lookup: ["host", "domain"]
+    actions:
+      add: "addHost"
+      del: "delHost"
+      get: "getHost"
+      search: "searchHost"
+      set: "setHost"
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          host: "scanner"
+          domain: "example.test"
+        state: "absent"
 
 - name: Keep a host alias
   routerops.opnsense.item:
     url: https://fw.example
     api_key: "{{ opnsense_api_key }}"
     api_secret: "{{ opnsense_api_secret }}"
-    path: firewall/alias
-    key: alias
-    lookup: [name]
+    path: "firewall/alias"
+    key: "alias"
+    lookup: ["name"]
     separators:
       content: "\n"
-    apply: firewall/alias/reconfigure
+    secret_fields: ["password"]
+    apply: "firewall/alias/reconfigure"
     items:
       - fields:
-          name: web_servers
-          type: host
-          content: [192.0.2.21, 192.0.2.22]
-          description: Web servers
+          name: "web_servers"
+          type: "host"
+          content: ["192.0.2.21", "192.0.2.22"]
+          description: "Web servers"
+
+- name: Keep a port alias
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/alias"
+    key: "alias"
+    lookup: ["name"]
+    separators:
+      content: "\n"
+    secret_fields: ["password"]
+    apply: "firewall/alias/reconfigure"
+    items:
+      - fields:
+          name: "web_ports"
+          type: "port"
+          content: ["80", "443"]
+          description: "Web ports"
+
+- name: Read a built-in alias
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/alias"
+    key: "alias"
+    lookup: ["name"]
+    separators:
+      content: "\n"
+    secret_fields: ["password"]
+    apply: "firewall/alias/reconfigure"
+    return_fields: ["type"]
+    items:
+      - fields:
+          name: "bogons"
+        state: "query"
 """
+# END EXAMPLES: generated from meta/areas.yml by make docs
 
 RETURN = r"""
 outcomes:
@@ -170,8 +279,16 @@ outcomes:
     action:
       description: What happened to the item.
       type: str
-      choices: [added, updated, deleted, unchanged]
-  sample: [{"uuid": "5e5b5c62-7a7b-4e0e-9e4c-0a1b2c3d4e5f", "lookup": {"name": "web_servers"}, "action": "added"}]
+      choices: [added, updated, deleted, unchanged, queried]
+    fields:
+      description:
+        - The values of O(return_fields) in the form OPNsense stores them, after any write.
+        - A select gives its selected key, several keys joined by the field's separator (O(separators), default a comma).
+        - Empty when O(return_fields) is empty, for an absent item, for an item added in check mode and for a query that matched nothing.
+        - Values of O(secret_fields) are masked.
+      type: dict
+      version_added: "0.1.0"
+  sample: [{"uuid": "5e5b5c62-7a7b-4e0e-9e4c-0a1b2c3d4e5f", "lookup": {"name": "web_servers"}, "action": "added", "fields": {}}]
 purged:
   description: UUIDs of the items O(purge) deleted or, in check mode, would delete.
   returned: success
@@ -202,7 +319,12 @@ from ansible_collections.routerops.opnsense.plugins.module_utils._fields import 
     check_names,
     field_diff,
     flatten,
+    is_container,
+    mask_secrets,
     nest_fields,
+    normalize,
+    secret_values,
+    stored_secret_values,
     to_api,
 )
 
@@ -219,7 +341,7 @@ ARGUMENT_SPEC = dict(
         options=dict(
             fields=dict(type="dict", required=True),
             write_only=dict(type="dict", default={}, no_log=True),
-            state=dict(type="str", choices=["present", "absent"], default="present"),
+            state=dict(type="str", choices=["present", "absent", "query"], default="present"),
         ),
     ),
     lookup=dict(type="list", elements="str", default=["description"]),
@@ -227,6 +349,9 @@ ARGUMENT_SPEC = dict(
     apply=dict(type="str"),
     purge=dict(type="bool", default=False),
     update_write_only=dict(type="str", choices=["on_create", "always"], default="on_create"),
+    always_send=dict(type="list", elements="str", default=[]),
+    secret_fields=dict(type="list", elements="str", default=[], no_log=False),
+    return_fields=dict(type="list", elements="str", default=[]),
     ordered_fields=dict(type="list", elements="str", default=[]),
     separators=dict(type="dict", default={}),
 )
@@ -244,6 +369,8 @@ class Run:
         self.lookup = p["lookup"]
         self.ordered = tuple(p["ordered_fields"])
         self.separators = p["separators"]
+        self.secrets = set(p["secret_fields"])
+        self.returns = p["return_fields"]
         self.actions = dict(DEFAULT_ACTIONS, **p["actions"])
         self.wrote = False
         self.purged = []
@@ -252,8 +379,10 @@ class Run:
         self.after = {}
 
     def fail(self, msg):
-        """Fail the task with a message."""
-        self.module.fail_json(msg=msg)
+        """Fail the task with a message that names the items already saved, and report changed when there are any."""
+        if self.saved:
+            msg += "; already saved but not applied: %s" % "; ".join(self.saved)
+        self.module.fail_json(msg=msg, changed=bool(self.saved))
 
     def sep(self, name):
         """Return the list separator of a field."""
@@ -290,13 +419,14 @@ class Run:
 
     def check_fields(self, current, entry, write_only):
         """Fail on an unknown field or write-only name, else return the changed fields."""
+        self.module.no_log_values.update(stored_secret_values(current, self.secrets))
         for name in write_only:
             try:
                 get_path(current, name)
             except KeyError:
                 self.fail("field '%s' not found in '%s'" % (name, self.key))
         try:
-            return field_diff(current, entry["fields"], self.ordered, self.separators)
+            return field_diff(current, entry["fields"], self.ordered, self.separators, secrets=self.secrets)
         except KeyError as e:
             self.fail("field '%s' not found in '%s'" % (e.args[0], self.key))
         except ValueError as e:
@@ -308,6 +438,10 @@ class Run:
         if unknown:
             self.fail("unknown action role '%s' in actions; roles are search, get, add, set, del" % "', '".join(unknown))
         for entry in entries:
+            self.module.no_log_values.update(secret_values(flatten(entry["fields"]), self.secrets))
+            nested = sorted(s for s in self.secrets if any(n.startswith(s + ".") for n in flatten(entry["fields"])))
+            if nested:
+                self.fail("secret field '%s' holds nested fields; name each nested secret field" % "', '".join(nested))
             try:
                 check_names(entry["fields"], flatten(entry["write_only"]), [], {})
             except ValueError as e:
@@ -315,6 +449,9 @@ class Run:
             missing = [name for name in self.lookup if name not in flatten(entry["fields"])]
             if missing:
                 self.fail("lookup field '%s' missing from the fields of an item" % "', '".join(missing))
+            unsent = [name for name in self.module.params["always_send"] if name not in flatten(entry["fields"])]
+            if unsent and entry["state"] == "present":
+                self.fail("always_send field '%s' missing from the fields of an item" % "', '".join(unsent))
         for i, entry in enumerate(entries):
             wanted = self.wanted_lookup(entry)
             for other in entries[i + 1:]:
@@ -335,7 +472,7 @@ class Run:
         for row in rows:
             self.check_row(row)
             try:
-                if not field_diff(row, wanted, self.ordered, self.separators):
+                if not field_diff(row, wanted, self.ordered, self.separators, secrets=self.secrets):
                     found.append(row)
             except ValueError as e:
                 self.fail("lookup %s" % e)
@@ -343,10 +480,18 @@ class Run:
             self.fail("lookup '%s' matches several items: %s" % (self.label(wanted), ", ".join(r["uuid"] for r in found)))
         return found[0] if found else None
 
-    def read_changes(self, entry, uuid):
-        """Read a matched item and return its changed fields."""
-        current = self.section(self.client.get("%s/%s/%s" % (self.path, self.actions["get"], uuid)), uuid)
-        return self.check_fields(current, entry, flatten(entry["write_only"]))
+    def read(self, uuid):
+        """Read one item by its UUID and return its fields."""
+        return self.section(self.client.get("%s/%s/%s" % (self.path, self.actions["get"], uuid)), uuid)
+
+    def returned(self, current, entry=None, changes=None):
+        """Return the return_fields of an item in the form OPNsense stores them, with written values applied and secrets masked."""
+        values = {name: normalize(get_path(current, name), "", separator=self.sep(name)) for name in self.returns}
+        if entry is not None and changes:
+            flat = flatten(entry["fields"])
+            values.update({name: to_api(flat[name], self.sep(name)) for name in self.returns if name in changes})
+        self.module.no_log_values.update(secret_values(values, self.secrets))
+        return mask_secrets(values, self.secrets)
 
     def update(self, entry, uuid, label, changes):
         """Write the changed fields and write-only values of a matched item; return its action."""
@@ -355,14 +500,16 @@ class Run:
             return "unchanged"
         flat = flatten(entry["fields"])
         values = {name: flat[name] for name in changes}
+        values.update({name: flat[name] for name in self.module.params["always_send"]})
         values.update(write_only)
         if not self.module.check_mode:
             require_saved(self.client.post("%s/%s/%s" % (self.path, self.actions["set"], uuid), self.payload(values)))
             self.saved.append(label)
         self.wrote = True
         if changes:
-            self.before[label] = {name: change[0] for name, change in changes.items()}
-            self.after[label] = {name: change[1] for name, change in changes.items()}
+            self.module.no_log_values.update(secret_values({name: change[0] for name, change in changes.items()}, self.secrets))
+            self.before[label] = mask_secrets({name: change[0] for name, change in changes.items()}, self.secrets)
+            self.after[label] = mask_secrets({name: change[1] for name, change in changes.items()}, self.secrets)
         return "updated"
 
     def add(self, entry, label):
@@ -376,7 +523,7 @@ class Run:
             uuid = response.get("uuid")
             self.saved.append(label)
         self.wrote = True
-        self.after[label] = entry["fields"]
+        self.after[label] = mask_secrets(entry["fields"], self.secrets)
         return uuid
 
     def delete(self, uuid, label, lookup):
@@ -401,19 +548,37 @@ class Run:
             self.fail("unexpected search response from '%s'" % self.path)
         matched = [self.find(search["rows"], entry) for entry in entries]
         to_add = [entry for entry, row in zip(entries, matched) if row is None and entry["state"] == "present"]
-        if to_add:
+        if to_add or self.returns:
             template = self.section(self.client.get("%s/%s" % (self.path, self.actions["get"])))
+            for name in self.returns:
+                try:
+                    value = get_path(template, name)
+                except KeyError:
+                    self.fail("return field '%s' not found in '%s'" % (name, self.key))
+                if is_container(value):
+                    self.fail("return field '%s' holds nested fields; name each field, for example '%s.%s'" % (name, name, sorted(value)[0]))
             for entry in to_add:
                 self.check_fields(template, entry, flatten(entry["write_only"]))
-        changes = [
-            self.read_changes(entry, row["uuid"]) if row is not None and entry["state"] == "present" else None
+        currents = [
+            self.read(row["uuid"])
+            if row is not None and (entry["state"] == "present" or (entry["state"] == "query" and self.returns))
+            else None
             for entry, row in zip(entries, matched)
         ]
+        changes = [
+            self.check_fields(current, entry, flatten(entry["write_only"])) if row is not None and entry["state"] == "present" else None
+            for entry, row, current in zip(entries, matched, currents)
+        ]
         results = []
-        for entry, row, change in zip(entries, matched, changes):
+        for entry, row, current, change in zip(entries, matched, currents, changes):
             wanted = self.wanted_lookup(entry)
             label = self.label(wanted)
-            if entry["state"] == "absent":
+            fields = {}
+            if entry["state"] == "query":
+                uuid, action = (row["uuid"] if row is not None else None), "queried"
+                if row is not None:
+                    fields = self.returned(current)
+            elif entry["state"] == "absent":
                 uuid, action = None, "unchanged"
                 if row is not None:
                     uuid = row["uuid"]
@@ -421,10 +586,13 @@ class Run:
                         action = "deleted"
             elif row is None:
                 uuid, action = self.add(entry, label), "added"
+                if uuid and self.returns:
+                    fields = self.returned(self.read(uuid))
             else:
                 uuid = row["uuid"]
                 action = self.update(entry, uuid, label, change)
-            results.append({"uuid": uuid, "lookup": wanted, "action": action})
+                fields = self.returned(current, entry, change)
+            results.append({"uuid": uuid, "lookup": wanted, "action": action, "fields": fields})
         if p["purge"]:
             listed = set(row["uuid"] for row in matched if row is not None)
             for row in search["rows"]:
@@ -448,7 +616,7 @@ def main():
         msg = e.msg
         if run.saved:
             msg += "; already saved but not applied: %s" % "; ".join(run.saved)
-        module.fail_json(msg=msg, validations=e.validations)
+        module.fail_json(msg=msg, validations=e.validations, changed=bool(run.saved))
     module.exit_json(changed=run.wrote, outcomes=results, purged=run.purged, diff=dict(before=run.before, after=run.after))
 
 

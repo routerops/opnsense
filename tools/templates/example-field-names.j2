@@ -1,0 +1,29 @@
+{# SPDX-FileCopyrightText: routerops.opnsense contributors #}
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{% set e = opnsense_docs_entry %}
+{% set maps = e['examples'] | map(attribute='fields') | list if e['module'] == 'settings' else e['examples'] | map(attribute='items') | flatten(levels=1) | map(attribute='fields') | list %}
+{% for m in maps %}
+{% for k, v in m.items() %}
+{% if v is mapping %}
+{% for sub in v %}
+{{ k }}.{{ sub }}
+{% endfor %}
+{% else %}
+{{ k }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% for x in e['examples'] %}
+{% for k in x.get('return_fields', []) %}
+{{ k }}
+{% endfor %}
+{% endfor %}
+{% for k in e.get('secret_fields', []) %}
+{{ k }}
+{% endfor %}
+{% for k in e.get('always_send', []) %}
+{{ k }}
+{% endfor %}
+{% for k in e.get('write_only', []) %}
+{{ k }}
+{% endfor %}

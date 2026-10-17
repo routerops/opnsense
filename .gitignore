@@ -5,6 +5,7 @@
 .superpowers/
 build/
 .venv/
+.venv-oldest/
 *.pyc
 tests/output/
 integration.local.mk

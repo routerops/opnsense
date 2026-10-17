@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - item, settings - the connection options fall back to the ``OPNSENSE_*`` environment variables named in their documentation.

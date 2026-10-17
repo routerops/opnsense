@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/plugins@26.7.7:sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/General.xml"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "listenaddress"
+    type: "NetworkField"
+    required: true
+    default: "0.0.0.0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "listenport"
+    type: "PortField"
+    required: true
+    default: "9100"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "cpu"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "exec"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "filesystem"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "loadavg"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "meminfo"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "netdev"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "time"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "devstat"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "interrupts"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ntp"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "zfs"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

@@ -230,3 +230,49 @@ def test_http_error_with_broken_body_keeps_code(monkeypatch):
     with pytest.raises(OPNsenseError) as e:
         OPNsenseClient("https://fw.example", "k", "s").post("firewall/alias/del_item/u1")
     assert "HTTP 500" in e.value.msg
+
+
+def test_401_names_the_credentials(monkeypatch):
+    install(monkeypatch, http_error(401, b'{"status": 401, "message": "Authentication Failed"}'))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").get("firewall/alias/search_item")
+    assert "authentication failed" in e.value.msg
+    assert "api_key and api_secret" in e.value.msg
+    assert e.value.status == 401
+
+
+def test_403_names_the_privilege(monkeypatch):
+    install(monkeypatch, http_error(403, b'{"status": 403, "message": "Forbidden"}'))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").get("firewall/alias/search_item")
+    assert "is forbidden" in e.value.msg
+    assert "privilege for firewall/alias/search_item" in e.value.msg
+
+
+def test_error_title_joins_message(monkeypatch):
+    body = b'{"errorMessage": "alias in use by: rule 1", "errorTitle": "Item in use by"}'
+    install(monkeypatch, http_error(500, body))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").post("firewall/alias/del_item/u1")
+    assert "Item in use by: alias in use by: rule 1" in e.value.msg
+
+
+def test_validations_list_passes_through():
+    with pytest.raises(OPNsenseError) as e:
+        require_saved({"result": "failed", "validations": {"alias.name": ["a", "b"]}})
+    assert e.value.validations == {"alias.name": ["a", "b"]}
+
+
+def test_error_messages_hide_url_credentials(monkeypatch):
+    install(monkeypatch, http_error(401, b'{"status": 401, "message": "Authentication Failed"}'))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://u:EXAMPLE-pw@fw.example", "k", "s").get("firewall/alias/search_item")
+    assert "EXAMPLE-pw" not in e.value.msg
+    assert "https://fw.example/api/firewall/alias/search_item" in e.value.msg
+
+
+def test_403_points_to_the_area_pages(monkeypatch):
+    install(monkeypatch, http_error(403, b'{"status": 403, "message": "Forbidden"}'))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").get("core/firmware/info")
+    assert "docs/areas" in e.value.msg

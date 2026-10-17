@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - item, settings - a 401 answer names the API key and secret, a 403 answer names the missing privilege, and an in-use error shows its title.

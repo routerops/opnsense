@@ -1,0 +1,190 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Alias.xml#aliases.alias"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "name"
+    type: "AliasNameField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "type"
+    type: "OptionField"
+    required: true
+    default: "alert"
+    multiple: false
+    volatile: false
+    options:
+      - "host"
+      - "network"
+      - "port"
+      - "url"
+      - "urltable"
+      - "urljson"
+      - "geoip"
+      - "networkgroup"
+      - "mac"
+      - "asn"
+      - "dynipv6host"
+      - "authgroup"
+      - "internal"
+      - "external"
+  - name: "path_expression"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "proto"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "IPv4"
+      - "IPv6"
+  - name: "interface"
+    type: "InterfaceField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "counters"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "updatefreq"
+    type: "NumericField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "content"
+    type: "AliasContentField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "password"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "username"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "authtype"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "Basic"
+      - "Bearer"
+      - "Header"
+  - name: "expire"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "categories"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "current_items"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "last_updated"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "eval_nomatch"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "eval_match"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "in_block_p"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "in_block_b"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "in_pass_p"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "in_pass_b"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "out_block_p"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "out_block_b"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "out_pass_p"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "out_pass_b"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

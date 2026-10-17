@@ -1,0 +1,13 @@
+<!-- node: -->
+<model>
+    <mount>//Test/Root</mount>
+    <items>
+        <enabled type="BooleanField">
+            <Default>0</Default>
+            <Required>Y</Required>
+        </enabled>
+        <port type="PortField">
+            <Default>9100</Default>
+        </port>
+    </items>
+</model>

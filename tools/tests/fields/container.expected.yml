@@ -1,0 +1,4 @@
+- {name: description, type: TextField, required: false, multiple: false, volatile: false, options: []}
+- {name: source.network, type: NetworkField, required: false, default: any, multiple: false, volatile: false, options: []}
+- {name: source.port, type: PortField, required: false, multiple: false, volatile: false, options: []}
+- {name: targets, type: ArrayField, required: false, multiple: false, volatile: false, options: []}

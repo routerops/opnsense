@@ -4,23 +4,21 @@
 - name: Test the item module against Dnsmasq hosts
   hosts: localhost
   gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
   module_defaults:
     group/routerops.opnsense.opnsense:
-      url: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}"
-      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
-      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
-      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS', default='true') | bool }}"
-      path: dnsmasq/settings
-      key: host
-      lookup: [host, domain]
-      actions:
-        search: searchHost
-        get: getHost
-        add: addHost
-        set: setHost
-        del: delHost
-      apply: dnsmasq/service/reconfigure
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
   vars:
+    opnsense_test_area: "{{ opnsense_areas['dnsmasq_host'] }}"
     opnsense_test_one:
       host: rt-one
       domain: example.test
@@ -127,6 +125,21 @@
               - opnsense_test_delete['outcomes'][0]['action'] == 'deleted'
               - opnsense_test_invalid['failed']
               - opnsense_test_invalid['validations'] is defined
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            purge: "{{ item[0]['purge'] | default(false) }}"
+            return_fields: "{{ item[0]['return_fields'] | default([]) }}"
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_area['examples'] | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
       always:
         - name: Remove both test hosts
           routerops.opnsense.item:
@@ -135,3 +148,29 @@
                 state: absent
               - fields: "{{ opnsense_test_two }}"
                 state: absent
+
+        - name: Remove the catalog examples
+          routerops.opnsense.item:
+            items: >-
+              {{ ((item['items'] | rejectattr('state', 'defined') | list)
+                  + (item['items'] | selectattr('state', 'defined') | rejectattr('state', 'equalto', 'query') | list))
+                 | map('combine', {'state': 'absent'}) | list }}
+          loop: "{{ opnsense_test_area['examples'] }}"
+          loop_control:
+            label: "{{ item['name'] }}"
+
+        - name: Look up the catalog examples after the cleanup
+          routerops.opnsense.item:
+            items: >-
+              {{ ((item['items'] | rejectattr('state', 'defined') | list)
+                  + (item['items'] | selectattr('state', 'defined') | rejectattr('state', 'equalto', 'query') | list))
+                 | map('combine', {'state': 'query'}) | list }}
+          loop: "{{ opnsense_test_area['examples'] }}"
+          loop_control:
+            label: "{{ item['name'] }}"
+          register: opnsense_test_examples_left
+
+        - name: Assert that the cleanup removed every catalog example
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples_left['results'] | map(attribute='outcomes') | flatten | map(attribute='uuid') | select | list | length == 0

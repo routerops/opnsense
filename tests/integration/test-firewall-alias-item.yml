@@ -4,23 +4,33 @@
 - name: Test the item module against firewall aliases
   hosts: localhost
   gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
   module_defaults:
     group/routerops.opnsense.opnsense:
-      url: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}"
-      api_key: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
-      api_secret: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
-      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS', default='true') | bool }}"
-      path: firewall/alias
-      key: alias
-      lookup: [name]
-      separators:
-        content: "\n"
-      apply: firewall/alias/reconfigure
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
   vars:
+    opnsense_test_area: "{{ opnsense_areas['firewall_alias'] }}"
     opnsense_test_alias:
       name: rt_test_hosts
       type: host
       content: [192.0.2.21, 192.0.2.22]
+      description: routerops test
+    opnsense_test_feed:
+      name: rt_test_feed
+      type: urltable
+      content: [https://feed.example.test/list.txt]
+      updatefreq: "1"
+      username: EXAMPLE-user
+      password: EXAMPLE-pass-1
       description: routerops test
   tasks:
     - name: Run the alias tests
@@ -86,10 +96,119 @@
               - opnsense_test_delete['changed']
               - opnsense_test_delete['outcomes'][0]['action'] == 'deleted'
               - not opnsense_test_delete_again['changed']
+
+        - name: Add a URL table alias with a password
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_feed }}"
+          register: opnsense_test_feed_add
+
+        - name: Add the URL table alias again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_feed }}"
+          register: opnsense_test_feed_again
+
+        - name: Change the password of the URL table alias
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_feed | combine({'password': 'EXAMPLE-pass-2'}) }}"
+          register: opnsense_test_feed_change
+
+        - name: Assert the secret results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_feed_add['changed']
+              - not opnsense_test_feed_again['changed']
+              - opnsense_test_feed_change['changed']
+              - >-
+                [opnsense_test_feed_add, opnsense_test_feed_again, opnsense_test_feed_change]
+                | to_json is not search('EXAMPLE-pass')
+
+        - name: Query a built-in alias
+          routerops.opnsense.item:
+            return_fields: [type]
+            items:
+              - fields:
+                  name: bogons
+                state: query
+          register: opnsense_test_query
+
+        - name: Query an alias that does not exist
+          routerops.opnsense.item:
+            return_fields: [type]
+            items:
+              - fields:
+                  name: rt_test_missing
+                state: query
+          register: opnsense_test_query_missing
+
+        - name: Add an alias and read its name back
+          routerops.opnsense.item:
+            return_fields: [name]
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          register: opnsense_test_return
+
+        - name: Assert the query and read-back results
+          ansible.builtin.assert:
+            that:
+              - not opnsense_test_query['changed']
+              - opnsense_test_query['outcomes'][0]['action'] == 'queried'
+              - opnsense_test_query['outcomes'][0]['uuid'] is not none
+              - opnsense_test_query['outcomes'][0]['fields']['type'] == 'external'
+              - not opnsense_test_query_missing['changed']
+              - opnsense_test_query_missing['outcomes'][0]['uuid'] is none
+              - opnsense_test_query_missing['outcomes'][0]['fields'] == {}
+              - opnsense_test_return['outcomes'][0]['fields']['name'] == 'rt_test_hosts'
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            purge: "{{ item[0]['purge'] | default(false) }}"
+            return_fields: "{{ item[0]['return_fields'] | default([]) }}"
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_area['examples'] | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
       always:
-        - name: Remove the test alias
+        - name: Remove the test aliases
           routerops.opnsense.item:
             items:
               - fields:
                   name: rt_test_hosts
                 state: absent
+              - fields:
+                  name: rt_test_feed
+                state: absent
+
+        - name: Remove the catalog examples
+          routerops.opnsense.item:
+            items: >-
+              {{ ((item['items'] | rejectattr('state', 'defined') | list)
+                  + (item['items'] | selectattr('state', 'defined') | rejectattr('state', 'equalto', 'query') | list))
+                 | map('combine', {'state': 'absent'}) | list }}
+          loop: "{{ opnsense_test_area['examples'] }}"
+          loop_control:
+            label: "{{ item['name'] }}"
+
+        - name: Look up the catalog examples after the cleanup
+          routerops.opnsense.item:
+            items: >-
+              {{ ((item['items'] | rejectattr('state', 'defined') | list)
+                  + (item['items'] | selectattr('state', 'defined') | rejectattr('state', 'equalto', 'query') | list))
+                 | map('combine', {'state': 'query'}) | list }}
+          loop: "{{ opnsense_test_area['examples'] }}"
+          loop_control:
+            label: "{{ item['name'] }}"
+          register: opnsense_test_examples_left
+
+        - name: Assert that the cleanup removed every catalog example
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples_left['results'] | map(attribute='outcomes') | flatten | map(attribute='uuid') | select | list | length == 0
