@@ -94,7 +94,7 @@ Known traps go in the module docs and are not worked around: descriptions reject
 - One integration test playbook per item type or settings singleton, plus a cleanup playbook (pattern from `oxlorg.opnsense` `tests/`). The interface assignment test touches only an extra VLAN interface, never WAN or LAN, so the test host keeps API access. VPN tests configure the tunnel without a peer; a tunnel coming up is not tested.
 - `make plugin-inventory` rebuilds the generated part of `docs/plugins.md` from the `opnsense/plugins` tree with `gh api` and `jq`; a scheduled GitHub workflow runs it monthly and opens a pull request when a plugin is added, removed or gains an MVC API; the owner also runs it with each RC (assistant's call: monthly matches the plugin release pace, and the RC run catches a change before a release).
 - `docs/testing.md` lists, for every tested area, the API privileges its test user needs, read from the area's `ACL.xml`.
-- `CLAUDE.md` is the standards document and carries the rules from `docs/kickoff.md`, "Ansible lessons" and "Working agreements to keep", including human review of every change; `AGENTS.md` points to it; skills live in `.agents/skills/` with `.claude/skills` as a symlink.
+- `AGENTS.md` is the standards document and carries the rules from `docs/kickoff.md`, "Ansible lessons" and "Working agreements to keep", including human review of every change; `CLAUDE.md` imports it with `@AGENTS.md` (owner's decision); skills live in `.agents/skills/` with `.claude/skills` as a symlink.
 - Reference repositories under `.references/` (gitignored), listed in `reference-repos.md`, added with the `add-reference-repository` skill from the kickoff.
 - Every dependency pinned to an exact version; Renovate bumps them.
 
