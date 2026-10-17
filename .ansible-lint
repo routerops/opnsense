@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+profile: production
+exclude_paths:
+  - build/
+  - .references/
+  - .venv/
+  - .superpowers/
+skip_list:
+  - meta-runtime[unsupported-version]
