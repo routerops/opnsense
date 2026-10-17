@@ -67,13 +67,12 @@ options:
       - Action path below C(/api/) that applies the configuration after a write, for example C(nodeexporter/service/reconfigure).
       - Omit it to skip applying.
     type: str
-  write_only_fields:
+  write_only:
     description:
-      - Fields OPNsense accepts but never returns, such as passwords.
-      - They are not compared, never shown in the diff or the result, and are sent along with any write.
-    type: list
-    elements: str
-    default: []
+      - Values of fields OPNsense accepts but never returns, such as passwords, in the same shape as O(fields).
+      - They are not compared, never logged, shown in the diff or returned, and are sent along with any write.
+    type: dict
+    default: {}
   update_write_only:
     description: With V(always), the write-only fields force a write on every run.
     type: str
@@ -176,26 +175,26 @@ def flatten(wanted, prefix=""):
     return flat
 
 
+ARGUMENT_SPEC = dict(
+    CONNECTION_ARGSPEC,
+    path=dict(type="str", required=True),
+    key=dict(type="str", required=True, no_log=False),
+    fields=dict(type="dict", required=True),
+    actions=dict(type="dict", default={}),
+    apply=dict(type="str"),
+    write_only=dict(type="dict", default={}, no_log=True),
+    update_write_only=dict(type="str", choices=["on_create", "always"], default="on_create"),
+    ordered_fields=dict(type="list", elements="str", default=[]),
+    separators=dict(type="dict", default={}),
+)
+
+
 def main():
-    argument_spec = dict(
-        CONNECTION_ARGSPEC,
-        path=dict(type="str", required=True),
-        key=dict(type="str", required=True, no_log=False),
-        fields=dict(type="dict", required=True),
-        actions=dict(type="dict", default={}),
-        apply=dict(type="str"),
-        write_only_fields=dict(type="list", elements="str", default=[], no_log=False),
-        update_write_only=dict(type="str", choices=["on_create", "always"], default="on_create"),
-        ordered_fields=dict(type="list", elements="str", default=[]),
-        separators=dict(type="dict", default={}),
-    )
-    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    module = AnsibleModule(argument_spec=ARGUMENT_SPEC, supports_check_mode=True)
     p = module.params
     actions = dict(DEFAULT_ACTIONS, **p["actions"])
-    write_only = {k: v for k, v in p["fields"].items() if k in p["write_only_fields"]}
-    for value in write_only.values():
-        module.no_log_values.add(str(value))
-    compared = {k: v for k, v in p["fields"].items() if k not in write_only}
+    write_only = flatten(p["write_only"])
+    compared = p["fields"]
     separators = p["separators"]
     ordered = tuple(p["ordered_fields"])
 

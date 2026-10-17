@@ -11,7 +11,7 @@ The collection is public and meant for any user. v0 covers what operating an OPN
 ## Goals
 
 - v0: every item type and settings singleton in the v0 scope below has a passing integration test against OPNsense 26.7 (add, update, idempotent rerun with `changed=0`, delete; settings: set, idempotent rerun, restore).
-- No area-specific code in the collection; area differences are expressed through caller options (`actions`, `lookup`, `write_only_fields`, apply path).
+- No area-specific code in the collection; area differences are expressed through caller options (`actions`, `lookup`, `write_only`, apply path).
 - Each new OPNsense RC is tested before its release, so a break shows up before consumers upgrade.
 
 ## Scope
@@ -80,7 +80,7 @@ Both modules:
 - `--diff` shows before and after per field.
 - `changed` only on a real write; one apply per call, skipped when nothing changed or when the caller passes no apply path.
 - Return values include the identifier of every added or matched item.
-- Fields OPNsense accepts but never returns (passwords, pre-shared keys, private keys, ACME DNS provider tokens) go in `write_only_fields`: they are left out of the compare and the diff, carry `no_log`, and are written only when an item is created, unless `update_write_only: always` (after Ansible's `update_password`) (assistant's call).
+- Fields OPNsense accepts but never returns (passwords, pre-shared keys, private keys, ACME DNS provider tokens) go with their values in a separate `write_only` option (a dict in the shape of `fields`, declared `no_log=True` so Ansible masks every value before it logs the arguments): they are left out of the compare and the diff, and are written only when an item is created, unless `update_write_only: always` (after Ansible's `update_password`) (assistant's call).
 - A reference to another item (an OpenVPN instance's certificate, an IPsec child's connection) is a UUID the caller takes from an earlier task's return value; the modules do not resolve references.
 - The modules never reorder items; the caller sets `sequence` where order matters (filter rules, NAT).
 
@@ -104,7 +104,7 @@ With generic modules, a user cannot guess an area's path, key or action names; t
 
 | Part | Content |
 |---|---|
-| `meta/areas.yml` | one entry per tested item type or settings singleton: OPNsense area, `module` (`item` or `settings`), `path`, `key`, `actions`, default lookup, apply path, `write_only_fields`, `ordered_fields`, `separators`, required API privileges, minimum OPNsense version where it is above the release (interface assignment: 26.7.6), OPNsense versions tested, plugin package if any, stage (v0, 0.x, v1) |
+| `meta/areas.yml` | one entry per tested item type or settings singleton: OPNsense area, `module` (`item` or `settings`), `path`, `key`, `actions`, default lookup, apply path, write-only field names, `ordered_fields`, `separators`, required API privileges, minimum OPNsense version where it is above the release (interface assignment: 26.7.6), OPNsense versions tested, plugin package if any, stage (v0, 0.x, v1) |
 | `docs/areas/<area>.md` | generated from the catalog: one section per item type with the values above and one example task; generated, never edited by hand |
 | README module and area table | generated from the catalog |
 | `docs/migration-oxlorg.md` | which `oxlorg.opnsense` module maps to which `item` or `settings` call, with the matching catalog entry |

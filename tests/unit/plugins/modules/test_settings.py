@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import json
 
 from ansible_collections.routerops.opnsense.plugins.modules import settings
 
@@ -90,14 +91,14 @@ def test_diff_contains_only_changed_fields(run_module):
 
 def test_write_only_not_compared(run_module):
     client = fake()
-    result = run_module(settings, dict(BASE_ARGS, fields={"listenport": 9100, "secret": "s3cr3t-value"}, write_only_fields=["secret"]), client)
+    result = run_module(settings, dict(BASE_ARGS, fields={"listenport": 9100}, write_only={"secret": "s3cr3t-value"}), client)
     assert result["changed"] is False
     assert posts(client) == []
 
 
 def test_write_only_sent_with_other_change(run_module):
     client = fake()
-    run_module(settings, dict(BASE_ARGS, fields={"enabled": True, "secret": "s3cr3t-value"}, write_only_fields=["secret"]), client)
+    run_module(settings, dict(BASE_ARGS, fields={"enabled": True}, write_only={"secret": "s3cr3t-value"}), client)
     assert posts(client)[0][2] == {"general": {"enabled": "1", "secret": "s3cr3t-value"}}
 
 
@@ -105,7 +106,7 @@ def test_write_only_always_forces_write(run_module):
     client = fake()
     result = run_module(
         settings,
-        dict(BASE_ARGS, fields={"listenport": 9100, "secret": "s3cr3t-value"}, write_only_fields=["secret"], update_write_only="always"),
+        dict(BASE_ARGS, fields={"listenport": 9100}, write_only={"secret": "s3cr3t-value"}, update_write_only="always"),
         client,
     )
     assert result["changed"] is True
@@ -113,7 +114,7 @@ def test_write_only_always_forces_write(run_module):
 
 
 def test_write_only_absent_from_diff_and_result(run_module):
-    result = run_module(settings, dict(BASE_ARGS, fields={"enabled": True, "secret": "s3cr3t-value"}, write_only_fields=["secret"]), fake())
+    result = run_module(settings, dict(BASE_ARGS, fields={"enabled": True}, write_only={"secret": "s3cr3t-value"}), fake())
     assert "secret" not in result["diff"]["before"]
     assert "secret" not in result["diff"]["after"]
     assert "secret" not in result["settings"]
@@ -135,3 +136,19 @@ def test_dotted_key(run_module):
     args = dict(CONNECTION, path="unbound/settings", key="unbound.general", fields={"enabled": True})
     run_module(settings, args, client)
     assert posts(client)[0] == ("POST", "unbound/settings/set", {"unbound": {"general": {"enabled": "1"}}})
+
+
+def test_write_only_option_is_no_log():
+    assert settings.ARGUMENT_SPEC["write_only"]["no_log"] is True
+
+
+def test_write_only_value_never_in_output(run_module):
+    result = run_module(settings, dict(BASE_ARGS, fields={"enabled": True}, write_only={"secret": "s3cr3t-value"}), fake())
+    assert "s3cr3t-value" not in json.dumps(result)
+
+
+def test_nested_write_only_merges_into_payload(run_module):
+    client = fake(read={"general": {"enabled": "0", "auth": {"user": "u", "password": ""}}})
+    args = dict(BASE_ARGS, fields={"enabled": True, "auth": {"user": "u"}}, write_only={"auth": {"password": "s3cr3t-value"}})
+    run_module(settings, args, client)
+    assert posts(client)[0][2] == {"general": {"enabled": "1", "auth": {"password": "s3cr3t-value"}}}
