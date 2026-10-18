@@ -85,7 +85,7 @@ integration: collection-tree
 	@for v in OPNSENSE_URL OPNSENSE_API_KEY OPNSENSE_API_SECRET; do \
 		if [ -z "$${!v}" ]; then echo "set $$v" >&2; exit 1; fi; \
 	done
-	@for f in tests/integration/$(or $(TARGET),test-*).yml; do \
+	@for f in tests/integration/$(or $(TARGET),test-*).yml $(if $(TARGET),,$(wildcard tests/integration/scenario-*.yml)); do \
 		ANSIBLE_COLLECTIONS_PATH=$(CURDIR)/build $(BIN)/ansible-playbook "$$f" || exit 1; \
 	done
 

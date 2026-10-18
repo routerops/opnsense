@@ -1,0 +1,188 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#snatrules.rule"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nonat"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nosync"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "sequence"
+    type: "FilterSequenceField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "sort_order"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "prio_group"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "interface"
+    type: "InterfaceField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ipprotocol"
+    type: "OptionField"
+    required: true
+    default: "inet"
+    multiple: false
+    volatile: false
+    options:
+      - "inet"
+      - "inet6"
+  - name: "protocol"
+    type: "ProtocolField"
+    required: true
+    default: "any"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source_net"
+    type: "NetworkAliasField"
+    required: true
+    default: "any"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source_not"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source_port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination_net"
+    type: "NetworkAliasField"
+    required: true
+    default: "any"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination_not"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination_port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "target"
+    type: "NetworkAliasField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "target_port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "poolopts"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "round-robin"
+      - "round-robin sticky-address"
+      - "random"
+      - "random sticky-address"
+      - "source-hash"
+      - "bitmask"
+  - name: "poolopts_sourcehashkey"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "staticnatport"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "log"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "categories"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "tag"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tagged"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "endpoint-independent"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "audit"
+    type: "JsonAuditField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

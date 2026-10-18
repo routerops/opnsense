@@ -81,6 +81,8 @@
         required: true
       plugin:
         type: str
+      note:
+        type: str
       stage:
         type: str
         required: true

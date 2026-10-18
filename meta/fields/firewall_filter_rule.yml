@@ -1,0 +1,492 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#rules.rule"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "statetype"
+    type: "OptionField"
+    required: true
+    default: "keep"
+    multiple: false
+    volatile: false
+    options:
+      - "keep"
+      - "sloppy"
+      - "modulate"
+      - "synproxy"
+      - "none"
+  - name: "state-policy"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "if-bound"
+      - "floating"
+  - name: "sequence"
+    type: "FilterSequenceField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "sort_order"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "prio_group"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "action"
+    type: "OptionField"
+    required: true
+    default: "pass"
+    multiple: false
+    volatile: false
+    options:
+      - "pass"
+      - "block"
+      - "reject"
+  - name: "quick"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "interfacenot"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "interface"
+    type: "InterfaceField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "received-on-not"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "received-on"
+    type: "InterfaceField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "direction"
+    type: "OptionField"
+    required: true
+    default: "in"
+    multiple: false
+    volatile: false
+    options:
+      - "in"
+      - "out"
+      - "any"
+  - name: "ipprotocol"
+    type: "OptionField"
+    required: true
+    default: "inet"
+    multiple: false
+    volatile: false
+    options:
+      - "inet"
+      - "inet6"
+      - "inet46"
+  - name: "protocol"
+    type: "ProtocolField"
+    required: true
+    default: "any"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "icmptype"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "echoreq"
+      - "echorep"
+      - "unreach"
+      - "redir"
+      - "routeradv"
+      - "routersol"
+      - "timex"
+      - "paramprob"
+      - "timereq"
+      - "timerep"
+      - "photuris"
+      - "squench"
+      - "althost"
+      - "inforeq"
+      - "inforep"
+      - "maskreq"
+      - "maskrep"
+      - "trace"
+      - "dataconv"
+      - "mobredir"
+      - "ipv6-where"
+      - "ipv6-here"
+      - "mobregreq"
+      - "mobregrep"
+      - "skip"
+  - name: "icmp6type"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "128"
+      - "129"
+      - "130"
+      - "131"
+      - "132"
+      - "133"
+      - "134"
+      - "135"
+      - "136"
+      - "137"
+      - "138"
+      - "139"
+      - "140"
+      - "200"
+      - "201"
+  - name: "source_net"
+    type: "NetworkAliasField"
+    required: true
+    default: "any"
+    multiple: true
+    volatile: false
+    options: []
+  - name: "source_not"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source_port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination_net"
+    type: "NetworkAliasField"
+    required: true
+    default: "any"
+    multiple: true
+    volatile: false
+    options: []
+  - name: "destination_not"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination_port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "divert-to"
+    type: "JsonKeyValueStoreField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "gateway"
+    type: "JsonKeyValueStoreField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "replyto"
+    type: "JsonKeyValueStoreField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disablereplyto"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "log"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "allowopts"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nosync"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nopfsync"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "statetimeout"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "udp-first"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "udp-multiple"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "udp-single"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-src-nodes"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-src-states"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-src-conn"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-src-conn-rate"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-src-conn-rates"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-pkt-rate-number"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "max-pkt-rate-seconds"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "overload"
+    type: "ModelRelationField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "adaptivestart"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "adaptiveend"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "prio"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "0"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+  - name: "set-prio"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "0"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+  - name: "set-prio-low"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "0"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+  - name: "tag"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tagged"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tcpflags1"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "syn"
+      - "ack"
+      - "fin"
+      - "rst"
+      - "psh"
+      - "urg"
+      - "ece"
+      - "cwr"
+  - name: "tcpflags2"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "syn"
+      - "ack"
+      - "fin"
+      - "rst"
+      - "psh"
+      - "urg"
+      - "ece"
+      - "cwr"
+  - name: "tcpflags_any"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "categories"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "sched"
+    type: "ScheduleField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tos"
+    type: "TosField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "shaper1"
+    type: "ModelRelationField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "shaper2"
+    type: "ModelRelationField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "audit"
+    type: "JsonAuditField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

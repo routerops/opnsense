@@ -27,6 +27,10 @@
 | Tested on | {{ e['tested'] | join(', ') }} |
 | Plugin | {{ codes([e['plugin']] if e.get('plugin') else []) }} |
 | Stage | {{ e['stage'] }} |
+{% if e.get('note') %}
+
+{{ e['note'] }}
+{% endif %}
 
 {% set f = lookup('ansible.builtin.file', opnsense_docs_root ~ '/meta/fields/' ~ entry['key'] ~ '.yml') | from_yaml %}
 ### Fields

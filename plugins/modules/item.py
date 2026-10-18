@@ -60,6 +60,8 @@ options:
         description:
           - Whether the item exists.
           - V(query) only looks the item up and never writes; its outcome reports C(queried), with C(uuid) null when no item matches.
+          - V(query) also matches search rows whose C(uuid) is not a UUID, such as the built-in alias C(bogons).
+          - O(return_fields) fails on such a row when OPNsense cannot read it.
           - A queried item counts as listed for O(purge).
         type: str
         choices: [present, absent, query]
@@ -87,6 +89,8 @@ options:
     description:
       - Delete every item the search returns that no listed item matches, after handling the listed items.
       - Some areas list items the caller did not create; the firewall alias search lists the built-in aliases, so O(purge) is unusable there.
+      - Search rows whose C(uuid) is not a UUID, such as automatic filter rules or generated gateways, are not MVC items.
+      - O(purge) and the lookup for V(present) and V(absent) ignore them.
       - Run it in check mode first; RV(purged) lists what would be deleted.
       - A row OPNsense answers C(not found) for, such as a built-in entry, counts as already gone; check mode lists it in RV(purged).
     type: bool
@@ -260,6 +264,334 @@ EXAMPLES = r"""
       - fields:
           name: "bogons"
         state: "query"
+
+- name: Forward port 8080 on WAN to a LAN web server
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/d_nat"
+    key: "rule"
+    lookup: ["descr"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/d_nat/apply"
+    items:
+      - fields:
+          interface: "wan"
+          protocol: "tcp"
+          destination:
+            network: "wanip"
+            port: "8080"
+          target: "10.250.1.50"
+          local-port: "80"
+          descr: "routerops example web"
+
+- name: Remove a port forward
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/d_nat"
+    key: "rule"
+    lookup: ["descr"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/d_nat/apply"
+    items:
+      - fields:
+          descr: "routerops example web"
+        state: "absent"
+
+- name: Allow HTTPS to the firewall from LAN
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/filter"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/filter/apply"
+    items:
+      - fields:
+          interface: "lan"
+          protocol: "TCP"
+          source_net: "lan"
+          destination_net: "(self)"
+          destination_port: "443"
+          description: "routerops example https"
+
+- name: Block a host on LAN
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/filter"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/filter/apply"
+    items:
+      - fields:
+          action: "block"
+          source_net: "10.250.1.99"
+          description: "routerops example block"
+
+- name: Remove a filter rule
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/filter"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/filter/apply"
+    items:
+      - fields:
+          description: "routerops example block"
+        state: "absent"
+
+- name: Map a LAN host to a WAN address
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/one_to_one"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/one_to_one/apply"
+    items:
+      - fields:
+          source_net: "10.250.1.50"
+          external: "10.250.0.50"
+          description: "routerops example one"
+
+- name: Keep only the listed one-to-one rules
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/one_to_one"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/one_to_one/apply"
+    purge: true
+    items:
+      - fields:
+          source_net: "10.250.1.50"
+          external: "10.250.0.50"
+          description: "routerops example one"
+      - fields:
+          source_net: "10.250.1.51"
+          external: "10.250.0.51"
+          description: "routerops example two"
+
+- name: Remove a one-to-one rule
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/one_to_one"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/one_to_one/apply"
+    items:
+      - fields:
+          description: "routerops example two"
+        state: "absent"
+
+- name: Translate a LAN subnet on WAN
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/source_nat"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/source_nat/apply"
+    items:
+      - fields:
+          interface: "wan"
+          source_net: "10.250.1.0/24"
+          description: "routerops example lan"
+
+- name: Remove a source NAT rule
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/source_nat"
+    key: "rule"
+    lookup: ["description"]
+    actions:
+      add: "addRule"
+      del: "delRule"
+      get: "getRule"
+      search: "searchRule"
+      set: "setRule"
+    apply: "firewall/source_nat/apply"
+    items:
+      - fields:
+          description: "routerops example lan"
+        state: "absent"
+
+- name: Route a remote network through a LAN gateway
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "routes/routes"
+    key: "route"
+    lookup: ["network"]
+    actions:
+      add: "addroute"
+      del: "delroute"
+      get: "getroute"
+      search: "searchroute"
+      set: "setroute"
+    apply: "routes/routes/reconfigure"
+    items:
+      - fields:
+          network: "10.99.0.0/24"
+          gateway: "RT_EXAMPLE_GW"
+          descr: "routerops example"
+
+- name: Keep only the listed static routes
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "routes/routes"
+    key: "route"
+    lookup: ["network"]
+    actions:
+      add: "addroute"
+      del: "delroute"
+      get: "getroute"
+      search: "searchroute"
+      set: "setroute"
+    apply: "routes/routes/reconfigure"
+    purge: true
+    items:
+      - fields:
+          network: "10.99.0.0/24"
+          gateway: "RT_EXAMPLE_GW"
+          descr: "routerops example"
+      - fields:
+          network: "10.99.1.0/24"
+          gateway: "RT_EXAMPLE_GW"
+          descr: "routerops example"
+
+- name: Remove a static route
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "routes/routes"
+    key: "route"
+    lookup: ["network"]
+    actions:
+      add: "addroute"
+      del: "delroute"
+      get: "getroute"
+      search: "searchroute"
+      set: "setroute"
+    apply: "routes/routes/reconfigure"
+    items:
+      - fields:
+          network: "10.99.1.0/24"
+        state: "absent"
+
+- name: Add a LAN gateway
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "routing/settings"
+    key: "gateway_item"
+    lookup: ["name"]
+    actions:
+      add: "addGateway"
+      del: "delGateway"
+      get: "getGateway"
+      search: "searchGateway"
+      set: "setGateway"
+    apply: "routing/settings/reconfigure"
+    items:
+      - fields:
+          name: "RT_EXAMPLE_GW"
+          interface: "lan"
+          gateway: "10.250.1.254"
+          descr: "routerops example"
+
+- name: Remove a gateway
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "routing/settings"
+    key: "gateway_item"
+    lookup: ["name"]
+    actions:
+      add: "addGateway"
+      del: "delGateway"
+      get: "getGateway"
+      search: "searchGateway"
+      set: "setGateway"
+    apply: "routing/settings/reconfigure"
+    items:
+      - fields:
+          name: "RT_EXAMPLE_GW"
+        state: "absent"
 """
 # END EXAMPLES: generated from meta/areas.yml by make docs
 
@@ -301,6 +633,8 @@ validations:
   sample: {"alias.name": "An alias with this name already exists."}
 """
 
+import re
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.routerops.opnsense.plugins.module_utils._client import (
@@ -328,6 +662,7 @@ from ansible_collections.routerops.opnsense.plugins.module_utils._fields import 
     to_api,
 )
 
+MVC_UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE)
 DEFAULT_ACTIONS = {"search": "search_item", "get": "get_item", "add": "add_item", "set": "set_item", "del": "del_item"}
 
 ARGUMENT_SPEC = dict(
@@ -413,6 +748,8 @@ class Run:
         try:
             return get_path(response, self.key)
         except KeyError:
+            if uuid and not MVC_UUID.match(uuid):
+                self.fail("search row '%s' is not an MVC item; its fields cannot be read" % uuid)
             if uuid:
                 self.fail("item %s disappeared during the run" % uuid)
             self.fail("key '%s' not found in response" % self.key)
@@ -458,6 +795,11 @@ class Run:
                 stored = {name: to_api(v, self.sep(name)) for name, v in self.wanted_lookup(other).items()}
                 if self.matches(stored, wanted):
                     self.fail("duplicate lookup value '%s' in items" % self.label(wanted))
+
+    @staticmethod
+    def mvc_rows(rows):
+        """Return the search rows that are MVC items, leaving out rows such as automatic rules whose uuid is not a UUID."""
+        return [row for row in rows if isinstance(row, dict) and MVC_UUID.match(str(row.get("uuid", "")))]
 
     def check_row(self, row):
         """Fail when a search row lacks a lookup field."""
@@ -546,7 +888,15 @@ class Run:
         search = self.client.get("%s/%s?rowCount=-1" % (self.path, self.actions["search"]))
         if not isinstance(search, dict) or not isinstance(search.get("rows"), list):
             self.fail("unexpected search response from '%s'" % self.path)
-        matched = [self.find(search["rows"], entry) for entry in entries]
+        rows = self.mvc_rows(search["rows"])
+        other_rows = [
+            row for row in search["rows"]
+            if isinstance(row, dict) and not MVC_UUID.match(str(row.get("uuid", ""))) and all(name in row for name in self.lookup)
+        ]
+        matched = [
+            (self.find(rows, entry) or self.find(other_rows, entry)) if entry["state"] == "query" else self.find(rows, entry)
+            for entry in entries
+        ]
         to_add = [entry for entry, row in zip(entries, matched) if row is None and entry["state"] == "present"]
         if to_add or self.returns:
             template = self.section(self.client.get("%s/%s" % (self.path, self.actions["get"])))
@@ -595,7 +945,7 @@ class Run:
             results.append({"uuid": uuid, "lookup": wanted, "action": action, "fields": fields})
         if p["purge"]:
             listed = set(row["uuid"] for row in matched if row is not None)
-            for row in search["rows"]:
+            for row in rows:
                 if row["uuid"] not in listed:
                     self.check_row(row)
                     lookup = {name: row[name] for name in self.lookup}
