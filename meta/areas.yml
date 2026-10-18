@@ -1029,6 +1029,7 @@ opnsense_areas:
       set: set
       del: del
     write_only: [action, key_type, digest, lifetime, commonname, country, city, state, organization, organizationalunit, email]
+    secret_fields: [prv, prv_payload]
     model:
       repo: core
       file: src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xml
@@ -1046,7 +1047,7 @@ opnsense_areas:
       OPNsense applies a CA as soon as it is saved; there is nothing to apply.
       Read the `refid` that certificates and OpenVPN instances refer to with `return_fields: [refid]`.
       OPNsense deletes a CA even while certificates or instances use it.
-      The private key is readable through the API.
+      The private key is readable through the API; it is masked in the diff and the return values, and an imported key (`prv_payload`) belongs in `write_only`.
       Descriptions identify a CA; keep them unique.
     examples:
       - name: Create an internal CA
@@ -1079,6 +1080,7 @@ opnsense_areas:
     write_only:
       [action, key_type, digest, lifetime, cert_type, private_key_location, commonname, country, city, state, organization, organizationalunit, email,
        altnames_dns, altnames_ip, altnames_uri, altnames_email]
+    secret_fields: [prv, prv_payload]
     model:
       repo: core
       file: src/opnsense/mvc/app/models/OPNsense/Trust/Cert.xml
@@ -1097,7 +1099,7 @@ opnsense_areas:
       Separate several `altnames_dns` with a newline.
       Every update reissues the certificate with the same key.
       A certificate an OpenVPN instance uses cannot be deleted; OPNsense answers HTTP 500 "Item in use by".
-      The private key is readable through the API.
+      The private key is readable through the API; it is masked in the diff and the return values, and an imported key (`prv_payload`) belongs in `write_only`.
       Descriptions identify a certificate; keep them unique.
       In the examples, replace `CA_REFID` with the `refid` the example in the Certificate authority section returns.
     examples:
