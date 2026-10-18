@@ -85,6 +85,7 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 | `test-unbound-general-settings` | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml` |
 | `test-unbound-host-alias-item` | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml` |
 | `test-unbound-host-override-item` | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml` |
+| `test-wireguard-server-item` | `page-wireguard-config` ("VPN: WireGuard: Configuration", `api/wireguard/server/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Wireguard/ACL/ACL.xml` |
 <!-- END privileges: generated from meta/areas.yml by make docs -->
 
 ## Verified runs
@@ -148,3 +149,4 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 | 18.10.2026 | 26.7.7 | `test-openvpn-cso-item` | passed (`failed=0`, one ignored expected failure: `tunnel_network: 10.250.80.300/24` answers "Please specify a valid network segment or IP address." on `cso.tunnel_network`); the fault-injected copy failed on the idempotency assert as intended |
 | 18.10.2026 | 26.7.7 | `scenario-ca-cert-openvpn` | passed (`failed=0`, one ignored expected failure: deleting the certificate the instance uses answers HTTP 500 "Item in use by: OpenVPN - routerops scenario {OpenVPN.Instances.Instance.<uuid>}"); a copy that deletes the instance first failed on the "in use" assert as intended |
 | 18.10.2026 | 26.7.7 | all `test-*` and `scenario-*` in one `make integration-local` after plan 4d.1 | all 35 plays passed (`failed=0`) |
+| 18.10.2026 | 26.7.7 | `test-wireguard-server-item` | passed (`failed=0`, one ignored expected failure: a tunnel address without a mask answers "Please specify a valid network segment or IP address." on `server.tunneladdress`); the apply answers `result: ok` with WireGuard disabled; a copy without `secret_fields` failed on the masking assert, and the fault-injected copy failed on the idempotency assert, as intended |

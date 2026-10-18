@@ -1,0 +1,130 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/Server.xml#servers.server"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "name"
+    type: "TextField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "instance"
+    type: "AutoNumberField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "pubkey"
+    type: "Base64Field"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "privkey"
+    type: "Base64Field"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "mtu"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tunneladdress"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disableroutes"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "gateway"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "carp_depend_on"
+    type: "VirtualIPField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "peers"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "debug"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "cnfFilename"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "statFilename"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "interface"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "endpoint"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "peer_dns"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "allowed_ips"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
