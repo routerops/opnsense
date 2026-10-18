@@ -1318,6 +1318,54 @@ EXAMPLES = r"""
           rr: "A"
         state: "absent"
 
+- name: Add a WireGuard peer
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "wireguard/client"
+    key: "client"
+    lookup: ["name"]
+    actions:
+      add: "addClient"
+      del: "delClient"
+      get: "getClient"
+      search: "searchClient"
+      set: "setClient"
+    ordered_fields: ["tunneladdress"]
+    secret_fields: ["psk"]
+    always_send: ["servers"]
+    apply: "wireguard/service/reconfigure"
+    items:
+      - fields:
+          name: "rt-example-peer"
+          pubkey: "EXAMPLE_PEER_PUBKEY"
+          tunneladdress: ["10.250.92.2/32"]
+          servers: ["SERVER_UUID"]
+
+- name: Remove a WireGuard peer
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "wireguard/client"
+    key: "client"
+    lookup: ["name"]
+    actions:
+      add: "addClient"
+      del: "delClient"
+      get: "getClient"
+      search: "searchClient"
+      set: "setClient"
+    ordered_fields: ["tunneladdress"]
+    secret_fields: ["psk"]
+    always_send: ["servers"]
+    apply: "wireguard/service/reconfigure"
+    items:
+      - fields:
+          name: "rt-example-peer"
+        state: "absent"
+
 - name: Add a WireGuard server
   routerops.opnsense.item:
     url: https://fw.example

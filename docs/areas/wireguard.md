@@ -1,6 +1,100 @@
 <!-- Generated from meta/areas.yml by make docs; do not edit. -->
 # Area `wireguard`
 
+## WireGuard peer
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `wireguard/client` |
+| Key | `client` |
+| Actions | `add: addClient`, `del: delClient`, `get: getClient`, `search: searchClient`, `set: setClient` |
+| Lookup | `name` |
+| Item ids | `uuid` |
+| Apply | `wireguard/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | `tunneladdress` |
+| Always sent | `servers` |
+| Secret fields | `psk` |
+| Separators | - |
+| Privileges | `page-wireguard-config` ("VPN: WireGuard: Configuration", `api/wireguard/client/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+`servers` lists the uuids of the servers the peer belongs to. OPNsense reads it on every write and drops the peer from every server when it is missing, so the module always sends it; list it in every present item. `tunneladdress` keeps the order you send. `keepalive` takes 1 to 65535; leave it out for none. The pre-shared key is readable through the API; it is masked in the diff and the return values. Names identify a peer; keep them unique. In the examples, replace `EXAMPLE_PEER_PUBKEY` with the peer's public key and `SERVER_UUID` with the `uuid` the example in the WireGuard server section returns.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/Client.xml#clients.client`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `enabled` | BooleanField | yes | `1` |  |
+| `name` | TextField | yes |  |  |
+| `pubkey` | Base64Field | yes |  |  |
+| `psk` (secret) | Base64Field |  |  |  |
+| `tunneladdress` | NetworkField | yes |  |  |
+| `serveraddress` | HostnameField |  |  |  |
+| `serverport` | PortField |  |  |  |
+| `endpoint` | IPPortField, not stored |  |  |  |
+| `keepalive` | IntegerField |  |  |  |
+| `servers` | ModelRelationField, multiple, not stored |  |  |  |
+| `privkey` | Base64Field |  |  |  |
+
+### Examples
+
+```yaml
+- name: Add a WireGuard peer
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "wireguard/client"
+    key: "client"
+    lookup: ["name"]
+    actions:
+      add: "addClient"
+      del: "delClient"
+      get: "getClient"
+      search: "searchClient"
+      set: "setClient"
+    ordered_fields: ["tunneladdress"]
+    secret_fields: ["psk"]
+    always_send: ["servers"]
+    apply: "wireguard/service/reconfigure"
+    items:
+      - fields:
+          name: "rt-example-peer"
+          pubkey: "EXAMPLE_PEER_PUBKEY"
+          tunneladdress: ["10.250.92.2/32"]
+          servers: ["SERVER_UUID"]
+
+- name: Remove a WireGuard peer
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "wireguard/client"
+    key: "client"
+    lookup: ["name"]
+    actions:
+      add: "addClient"
+      del: "delClient"
+      get: "getClient"
+      search: "searchClient"
+      set: "setClient"
+    ordered_fields: ["tunneladdress"]
+    secret_fields: ["psk"]
+    always_send: ["servers"]
+    apply: "wireguard/service/reconfigure"
+    items:
+      - fields:
+          name: "rt-example-peer"
+        state: "absent"
+```
+
 ## WireGuard server
 
 | Setting | Value |

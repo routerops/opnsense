@@ -33,4 +33,5 @@
 | [unbound](unbound.md) | [Unbound general](unbound.md#unbound-general) | `settings` | `unbound/settings` | - | - | v0 | 26.7.7 |
 | [unbound](unbound.md) | [Host alias](unbound.md#host-alias) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
 | [unbound](unbound.md) | [Host override](unbound.md#host-override) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
+| [wireguard](wireguard.md) | [WireGuard peer](wireguard.md#wireguard-peer) | `item` | `wireguard/client` | - | - | v0 | 26.7.7 |
 | [wireguard](wireguard.md) | [WireGuard server](wireguard.md#wireguard-server) | `item` | `wireguard/server` | - | - | v0 | 26.7.7 |
