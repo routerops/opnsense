@@ -1,0 +1,186 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test a virtual IP on an assigned VLAN
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  vars:
+    opnsense_test_vlan_area: "{{ opnsense_areas['interfaces_vlan'] }}"
+    opnsense_test_assignment_area: "{{ opnsense_areas['interfaces_assignment'] }}"
+    opnsense_test_vip_area: "{{ opnsense_areas['interfaces_vip'] }}"
+    opnsense_test_vlan:
+      if: vtnet1
+      tag: 4003
+      vlanif: vlan0.4003
+      descr: routerops test scenario
+    opnsense_test_assignment:
+      if: vlan0.4003
+      descr: rt_scenario
+      enable: true
+      lock: false
+      type4: staticv4
+      ipaddr: 10.250.42.1/24
+      type6: ""
+    opnsense_test_vip:
+      mode: ipalias
+      network: 10.250.42.10/24
+      descr: routerops test scenario
+  tasks:
+    - name: Run the VLAN, assignment and virtual IP scenario
+      block:
+        - name: Add the VLAN
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vlan_area['path'] }}"
+            key: "{{ opnsense_test_vlan_area['key'] }}"
+            lookup: "{{ opnsense_test_vlan_area['lookup'] }}"
+            apply: "{{ opnsense_test_vlan_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vlan }}"
+
+        - name: Assign the VLAN
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_assignment_area['path'] }}"
+            key: "{{ opnsense_test_assignment_area['key'] }}"
+            lookup: "{{ opnsense_test_assignment_area['lookup'] }}"
+            id_format: "{{ opnsense_test_assignment_area['id_format'] }}"
+            apply: "{{ opnsense_test_assignment_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_assignment }}"
+          register: opnsense_test_assignment_add
+
+        - name: Add the virtual IP on the assigned VLAN
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vip_area['path'] }}"
+            key: "{{ opnsense_test_vip_area['key'] }}"
+            lookup: "{{ opnsense_test_vip_area['lookup'] }}"
+            secret_fields: "{{ opnsense_test_vip_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_vip_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vip | combine({'interface': opnsense_test_assignment_add['outcomes'][0]['uuid']}) }}"
+
+        - name: Add the VLAN again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vlan_area['path'] }}"
+            key: "{{ opnsense_test_vlan_area['key'] }}"
+            lookup: "{{ opnsense_test_vlan_area['lookup'] }}"
+            apply: "{{ opnsense_test_vlan_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vlan }}"
+          register: opnsense_test_vlan_again
+
+        - name: Assign the VLAN again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_assignment_area['path'] }}"
+            key: "{{ opnsense_test_assignment_area['key'] }}"
+            lookup: "{{ opnsense_test_assignment_area['lookup'] }}"
+            id_format: "{{ opnsense_test_assignment_area['id_format'] }}"
+            apply: "{{ opnsense_test_assignment_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_assignment }}"
+          register: opnsense_test_assignment_again
+
+        - name: Add the virtual IP again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vip_area['path'] }}"
+            key: "{{ opnsense_test_vip_area['key'] }}"
+            lookup: "{{ opnsense_test_vip_area['lookup'] }}"
+            secret_fields: "{{ opnsense_test_vip_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_vip_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vip | combine({'interface': opnsense_test_assignment_add['outcomes'][0]['uuid']}) }}"
+          register: opnsense_test_vip_again
+
+        - name: Remove the VLAN while it is assigned
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vlan_area['path'] }}"
+            key: "{{ opnsense_test_vlan_area['key'] }}"
+            lookup: "{{ opnsense_test_vlan_area['lookup'] }}"
+            apply: "{{ opnsense_test_vlan_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vlan }}"
+                state: absent
+          register: opnsense_test_vlan_in_use
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_assignment_add['outcomes'][0]['uuid'] is match('^opt[0-9]+$')
+              - not opnsense_test_vlan_again['changed']
+              - not opnsense_test_assignment_again['changed']
+              - not opnsense_test_vip_again['changed']
+              - opnsense_test_vlan_in_use['failed']
+              - not opnsense_test_vlan_in_use['changed']
+              - "'assigned as an interface' in opnsense_test_vlan_in_use['msg']"
+      always:
+        - name: Remove the virtual IP
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vip_area['path'] }}"
+            key: "{{ opnsense_test_vip_area['key'] }}"
+            lookup: "{{ opnsense_test_vip_area['lookup'] }}"
+            secret_fields: "{{ opnsense_test_vip_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_vip_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vip }}"
+                state: absent
+
+        - name: Remove the assignment
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_assignment_area['path'] }}"
+            key: "{{ opnsense_test_assignment_area['key'] }}"
+            lookup: "{{ opnsense_test_assignment_area['lookup'] }}"
+            id_format: "{{ opnsense_test_assignment_area['id_format'] }}"
+            apply: "{{ opnsense_test_assignment_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_assignment }}"
+                state: absent
+
+        - name: Remove the VLAN
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vlan_area['path'] }}"
+            key: "{{ opnsense_test_vlan_area['key'] }}"
+            lookup: "{{ opnsense_test_vlan_area['lookup'] }}"
+            apply: "{{ opnsense_test_vlan_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_vlan }}"
+                state: absent
+
+        - name: Look up the virtual IP after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vip_area['path'] }}"
+            key: "{{ opnsense_test_vip_area['key'] }}"
+            lookup: "{{ opnsense_test_vip_area['lookup'] }}"
+            items:
+              - fields: "{{ opnsense_test_vip }}"
+                state: query
+          register: opnsense_test_vip_left
+
+        - name: Look up the assignment after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_assignment_area['path'] }}"
+            key: "{{ opnsense_test_assignment_area['key'] }}"
+            lookup: "{{ opnsense_test_assignment_area['lookup'] }}"
+            id_format: "{{ opnsense_test_assignment_area['id_format'] }}"
+            items:
+              - fields: "{{ opnsense_test_assignment }}"
+                state: query
+          register: opnsense_test_assignment_left
+
+        - name: Look up the VLAN after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_vlan_area['path'] }}"
+            key: "{{ opnsense_test_vlan_area['key'] }}"
+            lookup: "{{ opnsense_test_vlan_area['lookup'] }}"
+            items:
+              - fields: "{{ opnsense_test_vlan }}"
+                state: query
+          register: opnsense_test_vlan_left
+
+        - name: Assert that the cleanup removed all three items
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_vip_left['outcomes'][0]['uuid'] is none
+              - opnsense_test_assignment_left['outcomes'][0]['uuid'] is none
+              - opnsense_test_vlan_left['outcomes'][0]['uuid'] is none

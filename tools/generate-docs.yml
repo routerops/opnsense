@@ -49,6 +49,12 @@
         type: list
         elements: str
         default: []
+      api_fields:
+        type: dict
+        default: {}
+      id_format:
+        type: str
+        choices: [uuid, name]
       ordered_fields:
         type: list
         elements: str
@@ -247,7 +253,8 @@
         opnsense_docs_unknown: >-
           {{ lookup('ansible.builtin.template', 'templates/example-field-names.j2',
                     template_vars={'opnsense_docs_entry': item['value']}).splitlines() | map('trim') | select
-             | reject('in', opnsense_docs_entry_fields['fields'] | map(attribute='name')) | unique | list }}
+             | reject('in', opnsense_docs_entry_fields['fields'] | map(attribute='name'))
+             | reject('in', item['value'].get('api_fields', {}) | list) | unique | list }}
       loop: "{{ opnsense_docs_entries }}"
       loop_control:
         label: "{{ item['key'] }}"
@@ -265,6 +272,7 @@
           - opnsense_docs_args.get('always_send', []) == item[0]['value'].get('always_send', [])
           - opnsense_docs_args.get('secret_fields', []) == item[0]['value'].get('secret_fields', [])
           - opnsense_docs_args.get('apply') == item[0]['value'].get('apply')
+          - opnsense_docs_args.get('id_format') == item[0]['value'].get('id_format')
           - opnsense_docs_args.get('purge', false) == item[1].get('purge', false)
           - opnsense_docs_args.get('return_fields', []) == item[1].get('return_fields', [])
           - opnsense_docs_args.get('items') == item[1].get('items')

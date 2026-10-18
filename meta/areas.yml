@@ -298,6 +298,125 @@ opnsense_areas:
       - name: Use hybrid outbound NAT
         fields:
           snat_mode: hybrid
+  interfaces_vlan:
+    area: interfaces
+    title: VLAN
+    module: item
+    path: interfaces/vlan_settings
+    key: vlan
+    lookup: [descr]
+    apply: interfaces/vlan_settings/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Interfaces/Vlan.xml
+      node: vlan
+    privileges:
+      - name: page-interfaces-vlan-edit
+        title: "Interfaces: VLAN"
+        pattern: api/interfaces/vlan_settings/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Interfaces/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Set `vlanif` (`vlan0.<tag>`) so the device name is known before the VLAN is assigned;
+      OPNsense refuses to delete a VLAN that is assigned as an interface.
+    examples:
+      - name: Add a VLAN on the LAN port
+        items:
+          - fields:
+              if: vtnet1
+              tag: 4009
+              vlanif: vlan0.4009
+              descr: routerops example
+      - name: Remove a VLAN
+        items:
+          - fields:
+              descr: routerops example
+            state: absent
+  interfaces_vip:
+    area: interfaces
+    title: Virtual IP
+    module: item
+    path: interfaces/vip_settings
+    key: vip
+    lookup: [descr]
+    secret_fields: [password]
+    api_fields:
+      network: address and prefix length (`10.250.1.240/24`), which OPNsense stores as `subnet` and `subnet_bits`
+    apply: interfaces/vip_settings/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Interfaces/Vip.xml
+      node: vip
+    privileges:
+      - name: page-firewall-virtualipaddress-edit
+        title: "Interfaces: Virtual IPs: Settings"
+        pattern: api/interfaces/vip_settings/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Interfaces/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Send the address as `network`; OPNsense reads and returns it in that form, not as `subnet` and `subnet_bits`.
+      Descriptions identify a virtual IP; keep them unique.
+      A CARP `password` is returned in clear, so name it in `secret_fields`.
+    examples:
+      - name: Add an IP alias on LAN
+        items:
+          - fields:
+              mode: ipalias
+              interface: lan
+              network: 10.250.1.250/24
+              descr: routerops example
+      - name: Remove a virtual IP
+        items:
+          - fields:
+              descr: routerops example
+            state: absent
+  interfaces_assignment:
+    area: interfaces
+    title: Assignment
+    module: item
+    path: interfaces/assignment
+    key: interface
+    lookup: [descr]
+    id_format: name
+    apply: interfaces/assignment/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Interfaces/NetworkInterface.xml
+      node: interface
+    privileges:
+      - name: page-interfaces-assignnetworkports
+        title: "Interfaces: Assign network ports"
+        pattern: api/interfaces/assignment/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    min_version: "26.7.6"
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Items are keyed by the interface name (`opt1`); the outcome `uuid` is that name, which a virtual IP takes as `interface`.
+      The apply runs `interface apply` for every pending interface change, including ones made in the GUI,
+      and can cut the management connection when it touches the interface you connect through.
+      Set `lock: false`, or OPNsense refuses the delete.
+      A deleted assignment takes its firewall and NAT rules with it and leaves its virtual IPs behind; delete those first.
+      `type6: ""` means no IPv6.
+      The examples assign the VLAN from the VLAN example, which must exist first.
+    examples:
+      - name: Assign a VLAN with a static address
+        items:
+          - fields:
+              if: vlan0.4009
+              descr: rt_example
+              enable: true
+              lock: false
+              type4: staticv4
+              ipaddr: 10.250.49.1/24
+              type6: ""
+      - name: Remove an assignment
+        items:
+          - fields:
+              descr: rt_example
+            state: absent
 
   nodeexporter_general:
     area: nodeexporter

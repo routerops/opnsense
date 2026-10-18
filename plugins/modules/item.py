@@ -92,9 +92,19 @@ options:
       - Search rows whose C(uuid) is not a UUID, such as automatic filter rules or generated gateways, are not MVC items.
       - O(purge) and the lookup for V(present) and V(absent) ignore them.
       - Run it in check mode first; RV(purged) lists what would be deleted.
+      - O(purge) cannot be combined with O(id_format=name).
       - A row OPNsense answers C(not found) for, such as a built-in entry, counts as already gone; check mode lists it in RV(purged).
     type: bool
     default: false
+  id_format:
+    description:
+      - How the search names its items.
+      - V(uuid) takes only rows whose C(uuid) is a UUID.
+      - V(name) takes every row and suits areas keyed by name, such as interface assignment (C(lan), C(opt1)).
+    type: str
+    choices: [uuid, name]
+    default: uuid
+    version_added: "0.1.0"
   update_write_only:
     description:
       - With V(on_create), write-only values are sent only when an item is added.
@@ -134,9 +144,9 @@ options:
 notes:
   - Success is the API's C(result) of C(saved) or C(deleted), never the HTTP status; a failed write shows the C(validations) returned by OPNsense.
   - The module never reorders items; set C(sequence) where order matters, such as filter rules and NAT.
-  - Descriptions reject C(-); interface C(type6) must be C(none), not an empty string; numeric fields where C(0) is rejected take V(null) to unset.
+  - Descriptions reject C(-); interface C(type6) takes an empty string, not C(none), for no IPv6; numeric fields where C(0) is rejected take V(null) to unset.
   - A C(set) action the controller does not define answers C(saved) and changes nothing; override the action name in O(actions).
-  - Interface assignment items are keyed by the interface name, not a UUID, and are looked up by their device field.
+  - Interface assignment items are keyed by the interface name, not a UUID; set O(id_format=name).
 """
 
 # BEGIN EXAMPLES: generated from meta/areas.yml by make docs
@@ -484,6 +494,103 @@ EXAMPLES = r"""
           description: "routerops example lan"
         state: "absent"
 
+- name: Assign a VLAN with a static address
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "interfaces/assignment"
+    key: "interface"
+    lookup: ["descr"]
+    id_format: "name"
+    apply: "interfaces/assignment/reconfigure"
+    items:
+      - fields:
+          if: "vlan0.4009"
+          descr: "rt_example"
+          enable: true
+          lock: false
+          type4: "staticv4"
+          ipaddr: "10.250.49.1/24"
+          type6: ""
+
+- name: Remove an assignment
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "interfaces/assignment"
+    key: "interface"
+    lookup: ["descr"]
+    id_format: "name"
+    apply: "interfaces/assignment/reconfigure"
+    items:
+      - fields:
+          descr: "rt_example"
+        state: "absent"
+
+- name: Add an IP alias on LAN
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "interfaces/vip_settings"
+    key: "vip"
+    lookup: ["descr"]
+    secret_fields: ["password"]
+    apply: "interfaces/vip_settings/reconfigure"
+    items:
+      - fields:
+          mode: "ipalias"
+          interface: "lan"
+          network: "10.250.1.250/24"
+          descr: "routerops example"
+
+- name: Remove a virtual IP
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "interfaces/vip_settings"
+    key: "vip"
+    lookup: ["descr"]
+    secret_fields: ["password"]
+    apply: "interfaces/vip_settings/reconfigure"
+    items:
+      - fields:
+          descr: "routerops example"
+        state: "absent"
+
+- name: Add a VLAN on the LAN port
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "interfaces/vlan_settings"
+    key: "vlan"
+    lookup: ["descr"]
+    apply: "interfaces/vlan_settings/reconfigure"
+    items:
+      - fields:
+          if: "vtnet1"
+          tag: 4009
+          vlanif: "vlan0.4009"
+          descr: "routerops example"
+
+- name: Remove a VLAN
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "interfaces/vlan_settings"
+    key: "vlan"
+    lookup: ["descr"]
+    apply: "interfaces/vlan_settings/reconfigure"
+    items:
+      - fields:
+          descr: "routerops example"
+        state: "absent"
+
 - name: Route a remote network through a LAN gateway
   routerops.opnsense.item:
     url: https://fw.example
@@ -683,6 +790,7 @@ ARGUMENT_SPEC = dict(
     actions=dict(type="dict", default={}),
     apply=dict(type="str"),
     purge=dict(type="bool", default=False),
+    id_format=dict(type="str", choices=["uuid", "name"], default="uuid"),
     update_write_only=dict(type="str", choices=["on_create", "always"], default="on_create"),
     always_send=dict(type="list", elements="str", default=[]),
     secret_fields=dict(type="list", elements="str", default=[], no_log=False),
@@ -707,6 +815,7 @@ class Run:
         self.secrets = set(p["secret_fields"])
         self.returns = p["return_fields"]
         self.actions = dict(DEFAULT_ACTIONS, **p["actions"])
+        self.by_name = p["id_format"] == "name"
         self.wrote = False
         self.purged = []
         self.saved = []
@@ -748,7 +857,7 @@ class Run:
         try:
             return get_path(response, self.key)
         except KeyError:
-            if uuid and not MVC_UUID.match(uuid):
+            if uuid and not self.by_name and not MVC_UUID.match(uuid):
                 self.fail("search row '%s' is not an MVC item; its fields cannot be read" % uuid)
             if uuid:
                 self.fail("item %s disappeared during the run" % uuid)
@@ -771,6 +880,8 @@ class Run:
 
     def check_options(self, entries):
         """Fail on bad options before any request: unknown action roles, field overlaps, missing or duplicate lookup values."""
+        if self.by_name and self.module.params["purge"]:
+            self.fail("purge cannot be combined with id_format name")
         unknown = sorted(set(self.module.params["actions"]) - set(DEFAULT_ACTIONS))
         if unknown:
             self.fail("unknown action role '%s' in actions; roles are search, get, add, set, del" % "', '".join(unknown))
@@ -796,10 +907,18 @@ class Run:
                 if self.matches(stored, wanted):
                     self.fail("duplicate lookup value '%s' in items" % self.label(wanted))
 
-    @staticmethod
-    def mvc_rows(rows):
-        """Return the search rows that are MVC items, leaving out rows such as automatic rules whose uuid is not a UUID."""
-        return [row for row in rows if isinstance(row, dict) and MVC_UUID.match(str(row.get("uuid", "")))]
+    def is_item(self, row):
+        """Tell whether a search row is an item of the area: a UUID row, or with id_format name any row with a uuid."""
+        if not isinstance(row, dict):
+            return False
+        uuid = row.get("uuid")
+        if self.by_name:
+            return isinstance(uuid, str) and uuid != ""
+        return bool(MVC_UUID.match(str(uuid or "")))
+
+    def item_rows(self, rows):
+        """Return the search rows that are items, leaving out rows such as automatic rules whose uuid is not a UUID."""
+        return [row for row in rows if self.is_item(row)]
 
     def check_row(self, row):
         """Fail when a search row lacks a lookup field."""
@@ -888,10 +1007,10 @@ class Run:
         search = self.client.get("%s/%s?rowCount=-1" % (self.path, self.actions["search"]))
         if not isinstance(search, dict) or not isinstance(search.get("rows"), list):
             self.fail("unexpected search response from '%s'" % self.path)
-        rows = self.mvc_rows(search["rows"])
+        rows = self.item_rows(search["rows"])
         other_rows = [
             row for row in search["rows"]
-            if isinstance(row, dict) and not MVC_UUID.match(str(row.get("uuid", ""))) and all(name in row for name in self.lookup)
+            if isinstance(row, dict) and not self.is_item(row) and all(name in row for name in self.lookup)
         ]
         matched = [
             (self.find(rows, entry) or self.find(other_rows, entry)) if entry["state"] == "query" else self.find(rows, entry)

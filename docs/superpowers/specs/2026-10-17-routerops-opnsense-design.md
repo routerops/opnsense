@@ -85,7 +85,7 @@ Both modules:
 - `always_send` names fields `item` sends on every update next to the changed ones, for controllers that read a sibling field from the request (the Dnsmasq DHCP option reads `type`).
 - The modules never reorder items; the caller sets `sequence` where order matters (filter rules, NAT).
 
-Known traps go in the module docs and are not worked around: descriptions reject `-`; `destination_port` takes one port, range or alias; `type6` must be `none`, not `""`; a `set_item` the controller does not define answers `saved` and changes nothing (the caller overrides the action name); interface assignment items are keyed by the interface name (`setItem($ifname)`), not a UUID, and are looked up by their device field; its `reconfigure` runs `interface apply` and can cut the management connection.
+Known traps go in the module docs and are not worked around: descriptions reject `-`; `destination_port` takes one port, range or alias; `type6` takes `""` for no IPv6, there is no `none`; a `set_item` the controller does not define answers `saved` and changes nothing (the caller overrides the action name); interface assignment items are keyed by the interface name (`setItem($ifname)`), not a UUID (`id_format: name`), and are looked up by `descr`, because a search row's `if` is the device name and the built-in interfaces have an empty `descr`; its `reconfigure` runs `interface apply` and can cut the management connection.
 
 ## Repository and tooling
 
@@ -105,7 +105,7 @@ With generic modules, a user cannot guess an area's path, key or action names; t
 
 | Part | Content |
 |---|---|
-| `meta/areas.yml` | one entry per tested item type or settings singleton: OPNsense area, `module` (`item` or `settings`), `path`, `key`, `actions`, default lookup, apply path, write-only field names, `ordered_fields`, `separators`, required API privileges, minimum OPNsense version where it is above the release (interface assignment: 26.7.6), OPNsense versions tested, plugin package if any, stage (v0, 0.x, v1), the model XML file and node the area's fields are read from, an optional note for the area page, one or more example tasks |
+| `meta/areas.yml` | one entry per tested item type or settings singleton: OPNsense area, `module` (`item` or `settings`), `path`, `key`, `actions`, default lookup, apply path, write-only field names, fields only the controller knows and not the model (`api_fields`, such as the virtual IP `network`), `ordered_fields`, `separators`, required API privileges, minimum OPNsense version where it is above the release (interface assignment: 26.7.6), OPNsense versions tested, plugin package if any, stage (v0, 0.x, v1), the model XML file and node the area's fields are read from, an optional note for the area page, one or more example tasks |
 | `meta/fields/<id>.yml` | the area's fields (name, type, required, default, multiple, option values, whether OPNsense stores the field) read from the model XML in `opnsense/core` or `opnsense/plugins` at the newest tested version; written by `make fields`, which needs network and runs locally whenever an entry gains a tested version; facts only, no prose from the XML |
 | `docs/areas/<area>.md` | generated from the catalog: one section per item type with the values above, the field table from `meta/fields/<id>.yml` and the example tasks; generated, never edited by hand |
 | `docs/areas/README.md` | generated: every item type with area, module, path, plugin, minimum OPNsense version, stage and tested versions |

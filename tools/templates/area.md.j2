@@ -16,6 +16,9 @@
 | Key | `{{ e['key'] }}` |
 | Actions | {{ codes(e['actions'] | dictsort | map('join', ': ')) if e.get('actions') else 'default' }} |
 | Lookup | {{ codes(e.get('lookup', [])) }} |
+{% if e['module'] == 'item' %}
+| Item ids | {{ codes([e.get('id_format', 'uuid')]) }} |
+{% endif %}
 | Apply | {{ codes([e['apply']] if e.get('apply') else []) }} |
 | Write-only fields | {{ codes(e.get('write_only', [])) }} |
 | Ordered fields | {{ codes(e.get('ordered_fields', [])) }} |
@@ -41,6 +44,9 @@ Read from `{{ f['source'] }}`.
 |---|---|---|---|---|
 {% for x in f['fields'] %}
 | `{{ x['name'] }}`{{ ' (write-only)' if x['name'] in e.get('write_only', []) }}{{ ' (secret)' if x['name'] in e.get('secret_fields', []) }} | {{ x['type'] }}{{ ', multiple' if x['multiple'] }}{{ ', not stored' if x['volatile'] }} | {{ 'yes' if x['required'] }} | {{ ('`' ~ x['default'] | replace('|', '\\|') ~ '`') if x['default'] is defined and x['default'] != '' }} | {{ x['options'] | map('replace', '|', '\\|') | map('regex_replace', '^(.*)$', '`\\1`') | join(', ') }} |
+{% endfor %}
+{% for name, description in e.get('api_fields', {}) | dictsort %}
+| `{{ name }}` | API only: {{ description }} | | | |
 {% endfor %}
 
 ### {{ 'Examples' if e['examples'] | length > 1 else 'Example' }}

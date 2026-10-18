@@ -37,6 +37,9 @@
 {% if e.get('always_send') %}
     always_send:{{ yaml_value(e['always_send'], 6) }}
 {% endif %}
+{% if e.get('id_format') %}
+    id_format:{{ yaml_value(e['id_format'], 6) }}
+{% endif %}
 {% if e.get('apply') %}
     apply:{{ yaml_value(e['apply'], 6) }}
 {% endif %}

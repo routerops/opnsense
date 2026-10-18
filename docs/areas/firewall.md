@@ -10,6 +10,7 @@
 | Key | `alias` |
 | Actions | default |
 | Lookup | `name` |
+| Item ids | `uuid` |
 | Apply | `firewall/alias/reconfigure` |
 | Write-only fields | - |
 | Ordered fields | - |
@@ -125,6 +126,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Al
 | Key | `rule` |
 | Actions | `add: addRule`, `del: delRule`, `get: getRule`, `search: searchRule`, `set: setRule` |
 | Lookup | `descr` |
+| Item ids | `uuid` |
 | Apply | `firewall/d_nat/apply` |
 | Write-only fields | - |
 | Ordered fields | - |
@@ -232,6 +234,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/DN
 | Key | `rule` |
 | Actions | `add: addRule`, `del: delRule`, `get: getRule`, `search: searchRule`, `set: setRule` |
 | Lookup | `description` |
+| Item ids | `uuid` |
 | Apply | `firewall/filter/apply` |
 | Write-only fields | - |
 | Ordered fields | - |
@@ -390,6 +393,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Fi
 | Key | `rule` |
 | Actions | `add: addRule`, `del: delRule`, `get: getRule`, `search: searchRule`, `set: setRule` |
 | Lookup | `description` |
+| Item ids | `uuid` |
 | Apply | `firewall/one_to_one/apply` |
 | Write-only fields | - |
 | Ordered fields | - |
@@ -505,6 +509,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Fi
 | Key | `rule` |
 | Actions | `add: addRule`, `del: delRule`, `get: getRule`, `search: searchRule`, `set: setRule` |
 | Lookup | `description` |
+| Item ids | `uuid` |
 | Apply | `firewall/source_nat/apply` |
 | Write-only fields | - |
 | Ordered fields | - |

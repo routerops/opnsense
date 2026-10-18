@@ -1,0 +1,404 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/NetworkInterface.xml#interface"
+fields:
+  - name: "descr"
+    type: "IfDescField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "identifier"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "pending_action"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "icon"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "optgroup"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "if"
+    type: "DeviceField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "lock"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "enable"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "blockpriv"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "blockbogons"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "spoofmac"
+    type: "MacAddressField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "promisc"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "media"
+    type: "MediaTypesField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "hw_settings_overwrite"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disablechecksumoffloading"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disablesegmentationoffloading"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disablelargereceiveoffloading"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disablevlanhwfilter"
+    type: "OptionField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options:
+      - "0"
+      - "1"
+      - "2"
+  - name: "gateway_interface"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "mtu"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "mss"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "type4"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "staticv4"
+      - "dhcp"
+      - "pppoe"
+      - "ppp"
+      - "pptp"
+      - "l2tp"
+  - name: "type6"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "staticv6"
+      - "dhcp6"
+      - "linklocal"
+      - "slaac"
+      - "6rd"
+      - "6to4"
+      - "idassoc6"
+      - "track6"
+      - "pppoev6"
+  - name: "ipaddr"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ipaddrv6"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "alias-address"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "alias-subnet"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcprejectfrom"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcphostname"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcphonourmtu"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcpvlanprio"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "0"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+  - name: "dhcp_send_options"
+    type: "Dhcp4SendOptionsField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp_request_options"
+    type: "Dhcp4RequestOptionsField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6vlanprio"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "0"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+  - name: "dhcp6-ia-pd-len"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+      - "8"
+      - "9"
+      - "10"
+      - "11"
+      - "12"
+      - "13"
+      - "14"
+      - "15"
+      - "16"
+      - "none"
+  - name: "dhcp6prefixonly"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6_request_dns"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6-information-only"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6-ia-pd-send-hint"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6_rapid_commit"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6-prefix-id"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6_ifid"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6_assoc_pd"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6_send_options"
+    type: "Dhcp6SendOptionsField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp6_request_options"
+    type: "Dhcp6RequestOptionsField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "prefix-6rd"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "gateway-6rd"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "prefix-6rd-v4plen"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "prefix-6rd-v4addr"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "track6-interface"
+    type: "InterfaceField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "track6-prefix-id"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "track6_ifid"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "track6_prefix_range"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "track6_assoc_pd"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcpd6track6allowoverride"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "gateway"
+    type: "GatewayField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "gatewayv6"
+    type: "GatewayField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

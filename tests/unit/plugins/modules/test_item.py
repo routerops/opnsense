@@ -662,3 +662,31 @@ def test_lookup_matches_uppercase_uuid(run_module):
     result = run_module(item, args(present(name="web")), client)
     assert result["changed"] is False
     assert result["outcomes"][0]["uuid"] == upper
+
+
+def test_id_format_name_matches_name_rows(run_module):
+    client = fake(rows=[row("lan", "lan"), row("opt1", "opt1")], items={"lan": alias("lan"), "opt1": alias("opt1")})
+    result = run_module(item, args(present(name="opt1", description="New"), id_format="name"), client)
+    assert posts(client) == [("POST", "firewall/alias/set_item/opt1", {"alias": {"description": "New"}}), ("POST", APPLY, None)]
+    assert result["outcomes"][0]["action"] == "updated"
+    assert result["outcomes"][0]["uuid"] == "opt1"
+
+
+def test_id_format_name_add_returns_name(run_module):
+    client = fake(rows=[row("lan", "lan")], items={"lan": alias("lan")}, post_responses={"firewall/alias/add_item": {"result": "saved", "uuid": "opt2"}})
+    result = run_module(item, args(present(name="rt_test_two"), id_format="name"), client)
+    assert result["outcomes"] == [{"uuid": "opt2", "lookup": {"name": "rt_test_two"}, "action": "added", "fields": {}}]
+
+
+def test_id_format_name_rejects_purge(run_module):
+    client = fake(rows=[row("lan", "lan")], items={"lan": alias("lan")})
+    result = run_module(item, args(present(name="lan"), id_format="name", purge=True), client)
+    assert result["failed"] is True
+    assert result["msg"] == "purge cannot be combined with id_format name"
+    assert client.calls == []
+
+
+def test_id_format_uuid_still_ignores_name_rows(run_module):
+    client = fake(rows=[row("opt1", "opt1")], items={"opt1": alias("opt1")}, post_responses={"firewall/alias/add_item": {"result": "saved", "uuid": U9}})
+    result = run_module(item, args(present(name="opt1")), client)
+    assert result["outcomes"][0]["action"] == "added"
