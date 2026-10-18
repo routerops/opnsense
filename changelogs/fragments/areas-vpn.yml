@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - >-
+    Documentation - the area catalog gains Trust (CA, certificate) and OpenVPN (instance, static key, client-specific override),
+    each tested against OPNsense 26.7.7.
