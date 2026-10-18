@@ -201,6 +201,15 @@ def test_http_error_shows_error_message(monkeypatch):
     assert e.value.status == 500
 
 
+def test_http_error_title_ending_in_colon_is_not_doubled(monkeypatch):
+    body = b'{"errorMessage": "dhcp4 - r1 {dhcp4.reservations.reservation.u2}", "errorTitle": "Item subnets.subnet4 {s1} in use by:"}'
+    install(monkeypatch, http_error(500, body))
+    with pytest.raises(OPNsenseError) as e:
+        OPNsenseClient("https://fw.example", "k", "s").post("kea/dhcpv4/delSubnet/u1")
+    assert "in use by: dhcp4 - r1" in e.value.msg
+    assert "::" not in e.value.msg
+
+
 def test_http_error_without_json_body_keeps_code(monkeypatch):
     install(monkeypatch, http_error(500, b"<html>"))
     with pytest.raises(OPNsenseError) as e:

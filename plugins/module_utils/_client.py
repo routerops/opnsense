@@ -124,7 +124,7 @@ def _error_message(http_error):
     if not isinstance(data, dict) or not data.get("errorMessage"):
         return None
     if data.get("errorTitle"):
-        return "%s: %s" % (data["errorTitle"], data["errorMessage"])
+        return "%s: %s" % (data["errorTitle"].rstrip(":"), data["errorMessage"])
     return data["errorMessage"]
 
 

@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - >-
+    item - an error whose OPNsense title already ends in a colon, such as "Item subnets.subnet4 {...} in use by:",
+    no longer shows a doubled colon; this applies to every module of the collection.
