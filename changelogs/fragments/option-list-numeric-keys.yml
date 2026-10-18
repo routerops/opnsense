@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - >-
+    item, settings - a select whose options have the keys 0 to n, such as the OpenVPN instance ``verb``, no longer shows a change on every run;
+    OPNsense sends it as a JSON list instead of a map.

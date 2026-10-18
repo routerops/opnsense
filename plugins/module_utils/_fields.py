@@ -14,6 +14,13 @@ def _is_option_map(value):
     return isinstance(value, dict) and all(isinstance(v, dict) for v in value.values())
 
 
+def _as_option_map(read):
+    """Return an option list as an option map keyed by position; PHP sends an option map with keys 0..n as a JSON list."""
+    if isinstance(read, list) and read and all(isinstance(v, dict) and "selected" in v for v in read):
+        return {str(i): v for i, v in enumerate(read)}
+    return read
+
+
 def _selected_keys(option_map):
     """Return the selected, non-empty keys of an option map."""
     return [k for k, v in option_map.items() if k != "" and v.get("selected") in SELECTED]
@@ -32,6 +39,7 @@ def _as_list(read, separator):
 
 def normalize(read, wanted, ordered=False, separator=","):
     """Convert a read value to the plain form of the wanted value, so the two can be compared."""
+    read = _as_option_map(read)
     if isinstance(wanted, bool):
         return read in SELECTED
     if isinstance(wanted, int):
