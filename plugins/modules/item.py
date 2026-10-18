@@ -740,7 +740,7 @@ EXAMPLES = r"""
     apply: "kea/service/reconfigure"
     items:
       - fields:
-          subnet: "EXAMPLE_SUBNET_UUID"
+          subnet: "SUBNET_UUID"
           hw_address: "02:00:00:00:69:01"
           client_id: ""
           ip_address: "10.250.69.10"
@@ -764,7 +764,7 @@ EXAMPLES = r"""
     apply: "kea/service/reconfigure"
     items:
       - fields:
-          subnet: "EXAMPLE_SUBNET_UUID"
+          subnet: "SUBNET_UUID"
           hw_address: "02:00:00:00:69:01"
           client_id: ""
         state: "absent"
@@ -1026,7 +1026,7 @@ EXAMPLES = r"""
     apply: "unbound/service/reconfigure"
     items:
       - fields:
-          host: "EXAMPLE_HOST_UUID"
+          host: "HOST_OVERRIDE_UUID"
           hostname: "rt-example-alias"
           domain: ""
           description: "routerops example"
@@ -1048,7 +1048,7 @@ EXAMPLES = r"""
     apply: "unbound/service/reconfigure"
     items:
       - fields:
-          host: "EXAMPLE_HOST_UUID"
+          host: "HOST_OVERRIDE_UUID"
           hostname: "rt-example-alias"
           domain: ""
         state: "absent"

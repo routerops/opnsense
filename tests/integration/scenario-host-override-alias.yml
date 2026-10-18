@@ -79,14 +79,15 @@
                 state: absent
           register: opnsense_test_host_delete
 
-        - name: Look up the alias after the host override is gone
+        - name: Look up the alias by its host name after the host override is gone
           routerops.opnsense.item:
             path: "{{ opnsense_test_alias_area['path'] }}"
             key: "{{ opnsense_test_alias_area['key'] }}"
-            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            lookup: [hostname]
             actions: "{{ opnsense_test_alias_area['actions'] }}"
             items:
-              - fields: "{{ opnsense_test_alias }}"
+              - fields:
+                  hostname: "{{ opnsense_test_alias['hostname'] }}"
                 state: query
           register: opnsense_test_alias_after
 

@@ -105,7 +105,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 | Plugin | - |
 | Stage | v0 |
 
-Forward and DNS over TLS items share one list; the action name sets `type`, so never send it. An empty `domain` forwards every query. Every apply restarts Unbound.
+Forward and DNS over TLS items share one list; the action name sets `type` and overwrites a sent one, so never send it, or every run shows a change. An empty `domain` forwards every query. Every apply restarts Unbound.
 
 ### Fields
 
@@ -255,7 +255,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 | Plugin | - |
 | Stage | v0 |
 
-`host` is the uuid of a host override; register it from the host override's outcome. The lookup includes `domain`, because an alias may set only a domain. Send `domain: ""` to take the host's domain; the lookup needs the field. In the examples, replace `EXAMPLE_HOST_UUID` with the `uuid` the host override example returns.
+`host` is the uuid of a host override; register it from the host override's outcome. The lookup includes `domain`, because an alias may set only a domain. Send `domain: ""` to take the host's domain; the lookup needs the field. In the examples, replace `HOST_OVERRIDE_UUID` with the `uuid` the example in the Host override section returns.
 
 ### Fields
 
@@ -289,7 +289,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
     apply: "unbound/service/reconfigure"
     items:
       - fields:
-          host: "EXAMPLE_HOST_UUID"
+          host: "HOST_OVERRIDE_UUID"
           hostname: "rt-example-alias"
           domain: ""
           description: "routerops example"
@@ -311,7 +311,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
     apply: "unbound/service/reconfigure"
     items:
       - fields:
-          host: "EXAMPLE_HOST_UUID"
+          host: "HOST_OVERRIDE_UUID"
           hostname: "rt-example-alias"
           domain: ""
         state: "absent"

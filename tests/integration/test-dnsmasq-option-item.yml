@@ -88,6 +88,14 @@
               - fields: "{{ opnsense_test_two | combine({'set_tag': opnsense_test_tag_add['outcomes'][0]['uuid']}) }}"
           register: opnsense_test_set_tag_again
 
+        - name: Read the stored set_tag of the second option
+          routerops.opnsense.item:
+            return_fields: [set_tag]
+            items:
+              - fields: "{{ opnsense_test_two }}"
+                state: query
+          register: opnsense_test_set_tag_stored
+
         - name: Change the value of the first option
           routerops.opnsense.item:
             items:
@@ -109,7 +117,7 @@
                 state: absent
           register: opnsense_test_delete
 
-        - name: Add a option with an invalid value
+        - name: Add an option with an invalid value
           routerops.opnsense.item:
             items:
               - fields: "{{ opnsense_test_one | combine({'option': ''}) }}"
@@ -127,6 +135,7 @@
               - not opnsense_test_again['changed']
               - not opnsense_test_again_check['changed']
               - opnsense_test_set_tag['changed']
+              - opnsense_test_set_tag_stored['outcomes'][0]['fields']['set_tag'] == ''
               - opnsense_test_set_tag_again['changed']
               - opnsense_test_update['changed']
               - opnsense_test_update['outcomes'][0]['action'] == 'updated'
@@ -187,7 +196,20 @@
                  | map('combine', {'state': 'query'}) | list }}
           register: opnsense_test_left
 
-        - name: Assert that the cleanup removed every option
+        - name: Look up the set_tag test tag after the cleanup
+          routerops.opnsense.item:
+            path: dnsmasq/settings
+            key: tag
+            lookup: [tag]
+            actions: {search: searchTag, get: getTag, add: addTag, set: setTag, del: delTag}
+            always_send: []
+            items:
+              - fields: "{{ opnsense_test_tag }}"
+                state: query
+          register: opnsense_test_tag_left
+
+        - name: Assert that the cleanup removed every option and the tag
           ansible.builtin.assert:
             that:
               - opnsense_test_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
+              - opnsense_test_tag_left['outcomes'][0]['uuid'] is none
