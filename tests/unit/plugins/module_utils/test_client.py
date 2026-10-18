@@ -187,6 +187,23 @@ def test_require_saved_rejects_non_dict():
         require_saved([])
 
 
+def test_require_ok_accepts_result_ok():
+    require_ok({"result": "ok"})
+    require_ok({"result": " OK"})
+
+
+def test_require_ok_status_wins_over_result():
+    require_ok({"status": "ok", "result": "failed"})
+    with pytest.raises(OPNsenseError):
+        require_ok({"status": "failed", "result": "ok"})
+
+
+def test_require_ok_raises_on_result_failed():
+    with pytest.raises(OPNsenseError) as e:
+        require_ok({"result": "failed"})
+    assert e.value.msg.startswith("action failed: failed")
+
+
 def test_require_ok_rejects_non_dict():
     with pytest.raises(OPNsenseError):
         require_ok("done")

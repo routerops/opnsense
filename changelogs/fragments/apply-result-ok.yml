@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - >-
+    item, settings - an apply that answers ``result: ok`` without ``status``, as OpenVPN and WireGuard do, counts as applied.

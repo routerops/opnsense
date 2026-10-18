@@ -145,8 +145,9 @@ def require_saved(response):
 
 
 def require_ok(response):
-    """Raise unless an action answered status 'ok', ignoring case and surrounding whitespace."""
+    """Raise unless an action answered status 'ok', or result 'ok' without a status, ignoring case and surrounding whitespace."""
     if not isinstance(response, dict):
         raise OPNsenseError("unexpected action response: %r" % (response,))
-    if str(response.get("status", "")).strip().lower() != "ok":
-        raise OPNsenseError("action failed: %s %s" % (response.get("status"), response.get("status_msg", "")))
+    answer = response["status"] if "status" in response else response.get("result")
+    if str(answer if answer is not None else "").strip().lower() != "ok":
+        raise OPNsenseError("action failed: %s %s" % (answer, response.get("status_msg", "")))
