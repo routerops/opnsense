@@ -1,0 +1,247 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against OpenVPN instances
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['openvpn_instance'] }}"
+    opnsense_test_ca_area: "{{ opnsense_areas['trust_ca'] }}"
+    opnsense_test_cert_area: "{{ opnsense_areas['trust_cert'] }}"
+    opnsense_test_cas:
+      - fields:
+          descr: routerops test ca
+        write_only:
+          action: internal
+          commonname: routerops-test-ca
+      - "{{ opnsense_test_ca_area['examples'][0]['items'][0] }}"
+    opnsense_test_certs:
+      - fields:
+          descr: routerops test server
+          caref: "{{ opnsense_test_ca_add['outcomes'][0]['fields']['refid'] }}"
+        write_only:
+          action: internal
+          cert_type: server_cert
+          commonname: rt-test-server
+      - "{{ opnsense_test_cert_area['examples'][0]['items'][0] | to_json
+           | replace('CA_REFID', opnsense_test_ca_add['outcomes'][1]['fields']['refid']) | from_json }}"
+    opnsense_test_cert_refid: "{{ opnsense_test_cert_add['outcomes'][0]['fields']['refid'] }}"
+    opnsense_test_create:
+      vpnid: ""
+    opnsense_test_one:
+      role: server
+      dev_type: tun
+      proto: udp
+      port: "11940"
+      server: 10.250.80.0/24
+      cert: "{{ opnsense_test_cert_refid }}"
+      description: routerops test one
+    opnsense_test_two:
+      role: server
+      dev_type: tun
+      proto: udp
+      port: "11941"
+      server: 10.250.81.0/24
+      cert: "{{ opnsense_test_cert_refid }}"
+      description: routerops test two
+    opnsense_test_names:
+      - fields: {description: routerops test one}
+      - fields: {description: routerops test two}
+      - fields: {description: routerops example}
+    opnsense_test_cert_names:
+      - fields: {descr: routerops test server}
+      - fields: {descr: routerops example server}
+    opnsense_test_ca_names:
+      - fields: {descr: routerops test ca}
+      - fields: {descr: routerops example ca}
+    opnsense_test_examples: >-
+      {{ opnsense_test_area['examples'] | to_json
+         | replace('CERT_REFID', opnsense_test_cert_add['outcomes'][1]['fields']['refid']) | from_json }}
+  tasks:
+    - name: Run the OpenVPN instance tests
+      block:
+        - name: Add the CAs that sign the certificates
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_ca_area['path'] }}"
+            key: "{{ opnsense_test_ca_area['key'] }}"
+            lookup: "{{ opnsense_test_ca_area['lookup'] }}"
+            actions: "{{ opnsense_test_ca_area['actions'] }}"
+            secret_fields: "{{ opnsense_test_ca_area['secret_fields'] }}"
+            apply: "{{ none }}"
+            return_fields: [refid]
+            items: "{{ opnsense_test_cas }}"
+          register: opnsense_test_ca_add
+
+        - name: Add the certificates the instances use
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_cert_area['path'] }}"
+            key: "{{ opnsense_test_cert_area['key'] }}"
+            lookup: "{{ opnsense_test_cert_area['lookup'] }}"
+            actions: "{{ opnsense_test_cert_area['actions'] }}"
+            secret_fields: "{{ opnsense_test_cert_area['secret_fields'] }}"
+            apply: "{{ none }}"
+            return_fields: [refid]
+            items: "{{ opnsense_test_certs }}"
+          register: opnsense_test_cert_add
+
+        - name: Add the first instance in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                write_only: "{{ opnsense_test_create }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add both instances
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                write_only: "{{ opnsense_test_create }}"
+              - fields: "{{ opnsense_test_two }}"
+                write_only: "{{ opnsense_test_create }}"
+          register: opnsense_test_add
+
+        - name: Add both instances again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                write_only: "{{ opnsense_test_create }}"
+              - fields: "{{ opnsense_test_two }}"
+                write_only: "{{ opnsense_test_create }}"
+          register: opnsense_test_again
+
+        - name: Add both instances again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                write_only: "{{ opnsense_test_create }}"
+              - fields: "{{ opnsense_test_two }}"
+                write_only: "{{ opnsense_test_create }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Raise the log level of the first instance
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'verb': '4'}) }}"
+          register: opnsense_test_update
+
+        - name: Raise the log level of the first instance again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'verb': '4'}) }}"
+          register: opnsense_test_update_again
+
+        - name: Remove both instances
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Add an instance with an unknown certificate
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'cert': '0000000000000'}) }}"
+                write_only: "{{ opnsense_test_create }}"
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - not opnsense_test_update_again['changed']
+              - opnsense_test_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted']
+              - opnsense_test_invalid['failed']
+              - not opnsense_test_invalid['changed']
+              - "'instance.cert' in opnsense_test_invalid['validations']"
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_examples | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples_run
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples_run['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Remove the test instances and the example instance
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_names | map('combine', {'state': 'absent'}) | list }}"
+
+        - name: Remove the certificates
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_cert_area['path'] }}"
+            key: "{{ opnsense_test_cert_area['key'] }}"
+            lookup: "{{ opnsense_test_cert_area['lookup'] }}"
+            actions: "{{ opnsense_test_cert_area['actions'] }}"
+            apply: "{{ none }}"
+            items: "{{ opnsense_test_cert_names | map('combine', {'state': 'absent'}) | list }}"
+
+        - name: Remove the CAs
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_ca_area['path'] }}"
+            key: "{{ opnsense_test_ca_area['key'] }}"
+            lookup: "{{ opnsense_test_ca_area['lookup'] }}"
+            actions: "{{ opnsense_test_ca_area['actions'] }}"
+            apply: "{{ none }}"
+            items: "{{ opnsense_test_ca_names | map('combine', {'state': 'absent'}) | list }}"
+
+        - name: Look up the instances after the cleanup
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_names | map('combine', {'state': 'query'}) | list }}"
+          register: opnsense_test_left
+
+        - name: Look up the certificates after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_cert_area['path'] }}"
+            key: "{{ opnsense_test_cert_area['key'] }}"
+            lookup: "{{ opnsense_test_cert_area['lookup'] }}"
+            actions: "{{ opnsense_test_cert_area['actions'] }}"
+            apply: "{{ none }}"
+            items: "{{ opnsense_test_cert_names | map('combine', {'state': 'query'}) | list }}"
+          register: opnsense_test_cert_left
+
+        - name: Look up the CAs after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_ca_area['path'] }}"
+            key: "{{ opnsense_test_ca_area['key'] }}"
+            lookup: "{{ opnsense_test_ca_area['lookup'] }}"
+            actions: "{{ opnsense_test_ca_area['actions'] }}"
+            apply: "{{ none }}"
+            items: "{{ opnsense_test_ca_names | map('combine', {'state': 'query'}) | list }}"
+          register: opnsense_test_ca_left
+
+        - name: Assert that the cleanup left nothing behind
+          ansible.builtin.assert:
+            that:
+              - (opnsense_test_left['outcomes'] + opnsense_test_cert_left['outcomes'] + opnsense_test_ca_left['outcomes'])
+                | map(attribute='uuid') | select | list | length == 0

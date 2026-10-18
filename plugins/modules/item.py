@@ -816,6 +816,55 @@ EXAMPLES = r"""
           subnet: "10.250.69.0/24"
         state: "absent"
 
+- name: Run an OpenVPN server
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/instances"
+    key: "instance"
+    lookup: ["description"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    secret_fields: ["password"]
+    apply: "openvpn/service/reconfigure"
+    items:
+      - fields:
+          role: "server"
+          dev_type: "tun"
+          proto: "udp"
+          port: "11942"
+          server: "10.250.82.0/24"
+          cert: "CERT_REFID"
+          description: "routerops example"
+        write_only:
+          vpnid: ""
+
+- name: Remove an OpenVPN instance
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/instances"
+    key: "instance"
+    lookup: ["description"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    secret_fields: ["password"]
+    apply: "openvpn/service/reconfigure"
+    items:
+      - fields:
+          description: "routerops example"
+        state: "absent"
+
 - name: Route a remote network through a LAN gateway
   routerops.opnsense.item:
     url: https://fw.example
