@@ -1,0 +1,140 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test that a certificate an OpenVPN instance uses cannot be deleted
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+  vars:
+    opnsense_test_ca:
+      fields:
+        descr: routerops scenario ca
+      write_only:
+        action: internal
+        commonname: routerops-scenario-ca
+    opnsense_test_cert:
+      fields:
+        descr: routerops scenario server
+        caref: "{{ opnsense_test_ca_add['outcomes'][0]['fields']['refid'] }}"
+      write_only:
+        action: internal
+        cert_type: server_cert
+        commonname: rt-scenario-server
+    opnsense_test_instance:
+      fields:
+        role: server
+        dev_type: tun
+        proto: udp
+        port: "11943"
+        server: 10.250.83.0/24
+        cert: "{{ opnsense_test_cert_add['outcomes'][0]['fields']['refid'] }}"
+        description: routerops scenario
+      write_only:
+        vpnid: ""
+    opnsense_test_names:
+      - {area: openvpn_instance, fields: {description: routerops scenario}}
+      - {area: trust_cert, fields: {descr: routerops scenario server}}
+      - {area: trust_ca, fields: {descr: routerops scenario ca}}
+  tasks:
+    - name: Run the CA, certificate and OpenVPN scenario
+      block:
+        - name: Add the CA
+          routerops.opnsense.item:
+            return_fields: [refid]
+            items: ["{{ opnsense_test_ca }}"]
+          vars:
+            opnsense_test_area: "{{ opnsense_areas['trust_ca'] }}"
+          register: opnsense_test_ca_add
+
+        - name: Add the certificate signed by the CA
+          routerops.opnsense.item:
+            return_fields: [refid]
+            items: ["{{ opnsense_test_cert }}"]
+          vars:
+            opnsense_test_area: "{{ opnsense_areas['trust_cert'] }}"
+          register: opnsense_test_cert_add
+
+        - name: Add the OpenVPN instance that uses the certificate
+          routerops.opnsense.item:
+            items: ["{{ opnsense_test_instance }}"]
+          vars:
+            opnsense_test_area: "{{ opnsense_areas['openvpn_instance'] }}"
+          register: opnsense_test_instance_add
+
+        - name: Add the CA, the certificate and the instance again
+          routerops.opnsense.item:
+            items: ["{{ item['item'] }}"]
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop:
+            - {area: trust_ca, item: "{{ opnsense_test_ca }}"}
+            - {area: trust_cert, item: "{{ opnsense_test_cert }}"}
+            - {area: openvpn_instance, item: "{{ opnsense_test_instance }}"}
+          loop_control:
+            label: "{{ item['area'] }}"
+          register: opnsense_test_again
+
+        - name: Remove the certificate while the instance uses it
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_cert['fields'] }}"
+                state: absent
+          vars:
+            opnsense_test_area: "{{ opnsense_areas['trust_cert'] }}"
+          register: opnsense_test_cert_delete
+          ignore_errors: true
+
+        - name: Look up the certificate after the refused delete
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_cert['fields'] }}"
+                state: query
+          vars:
+            opnsense_test_area: "{{ opnsense_areas['trust_cert'] }}"
+          register: opnsense_test_cert_left
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_instance_add['outcomes'][0]['action'] == 'added'
+              - opnsense_test_again['results'] | selectattr('changed') | list | length == 0
+              - opnsense_test_cert_delete['failed']
+              - "'in use' in opnsense_test_cert_delete['msg'] | lower"
+              - opnsense_test_cert_left['outcomes'][0]['uuid'] == opnsense_test_cert_add['outcomes'][0]['uuid']
+      always:
+        - name: Remove the instance, the certificate and the CA in that order
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+                state: absent
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ opnsense_test_names }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+
+        - name: Look up the instance, the certificate and the CA after the cleanup
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+                state: query
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ opnsense_test_names }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+          register: opnsense_test_left
+
+        - name: Assert that the cleanup left nothing behind
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_left['results'] | map(attribute='outcomes') | flatten | map(attribute='uuid') | select | list | length == 0
