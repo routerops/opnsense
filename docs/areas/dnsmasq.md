@@ -10,6 +10,7 @@
 | Key | `host` |
 | Actions | `add: addHost`, `del: delHost`, `get: getHost`, `search: searchHost`, `set: setHost` |
 | Lookup | `host`, `domain` |
+| Item ids | `uuid` |
 | Apply | `dnsmasq/service/reconfigure` |
 | Write-only fields | - |
 | Ordered fields | - |

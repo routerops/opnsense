@@ -10,6 +10,7 @@
 | Key | `gateway_item` |
 | Actions | `add: addGateway`, `del: delGateway`, `get: getGateway`, `search: searchGateway`, `set: setGateway` |
 | Lookup | `name` |
+| Item ids | `uuid` |
 | Apply | `routing/settings/reconfigure` |
 | Write-only fields | - |
 | Ordered fields | - |

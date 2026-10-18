@@ -10,6 +10,7 @@
 | Key | `route` |
 | Actions | `add: addroute`, `del: delroute`, `get: getroute`, `search: searchroute`, `set: setroute` |
 | Lookup | `network` |
+| Item ids | `uuid` |
 | Apply | `routes/routes/reconfigure` |
 | Write-only fields | - |
 | Ordered fields | - |

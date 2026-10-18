@@ -97,6 +97,7 @@ BW_ITEM := routerops-opnsense-test
 
 integration-local: collection-tree
 	@test -n "$(PROXMOX_HOST)" || { echo "set PROXMOX_HOST, for example in integration.local.mk" >&2; exit 1; }
+	@bw status | grep -q '"status":"unlocked"' || { printf '%s\n' "Bitwarden vault is locked; unlock it with:" 'export BW_SESSION="$$(bw unlock --raw)"' >&2; exit 1; }
 	@socat TCP-LISTEN:$(TUNNEL_PORT),bind=127.0.0.1,reuseaddr,fork EXEC:"ssh -o BatchMode=yes root@$(PROXMOX_HOST) nc 10.250.1.1 443" & \
 	pid=$$!; trap 'kill $$pid 2>/dev/null' EXIT; \
 	for i in $$(seq 60); do curl -sk -o /dev/null https://127.0.0.1:$(TUNNEL_PORT)/ && break; sleep 2; done; \

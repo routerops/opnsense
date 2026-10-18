@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/Vlan.xml#vlan"
+fields:
+  - name: "if"
+    type: "VlanInterfaceField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tag"
+    type: "IntegerField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "pcp"
+    type: "OptionField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "0"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+  - name: "proto"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "802.1q"
+      - "802.1ad"
+  - name: "descr"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "vlanif"
+    type: "TextField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
