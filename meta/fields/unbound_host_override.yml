@@ -1,0 +1,86 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#hosts.host"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "hostname"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "domain"
+    type: "TextField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "rr"
+    type: "OptionField"
+    required: true
+    default: "A"
+    multiple: false
+    volatile: false
+    options:
+      - "A"
+      - "AAAA"
+      - "MX"
+      - "TXT"
+  - name: "mxprio"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "mx"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ttl"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "server"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "txtdata"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "addptr"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "aliases"
+    type: "AliasReflector"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

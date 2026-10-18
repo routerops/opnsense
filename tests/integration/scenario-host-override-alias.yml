@@ -1,0 +1,152 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test that deleting a host override deletes its aliases
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  vars:
+    opnsense_test_host_area: "{{ opnsense_areas['unbound_host_override'] }}"
+    opnsense_test_alias_area: "{{ opnsense_areas['unbound_host_alias'] }}"
+    opnsense_test_host:
+      hostname: rt-scenario
+      domain: routerops.test
+      rr: A
+      server: 10.250.1.40
+      description: routerops test scenario
+    opnsense_test_alias:
+      host: "{{ opnsense_test_host_add['outcomes'][0]['uuid'] }}"
+      hostname: rt-scenario-alias
+      domain: ""
+      description: routerops test scenario
+  tasks:
+    - name: Run the host override and alias scenario
+      block:
+        - name: Add the host override
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_host_area['path'] }}"
+            key: "{{ opnsense_test_host_area['key'] }}"
+            lookup: "{{ opnsense_test_host_area['lookup'] }}"
+            actions: "{{ opnsense_test_host_area['actions'] }}"
+            apply: "{{ opnsense_test_host_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_host }}"
+          register: opnsense_test_host_add
+
+        - name: Add the alias on the host override
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            actions: "{{ opnsense_test_alias_area['actions'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          register: opnsense_test_alias_add
+
+        - name: Add the host override again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_host_area['path'] }}"
+            key: "{{ opnsense_test_host_area['key'] }}"
+            lookup: "{{ opnsense_test_host_area['lookup'] }}"
+            actions: "{{ opnsense_test_host_area['actions'] }}"
+            apply: "{{ opnsense_test_host_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_host }}"
+          register: opnsense_test_host_again
+
+        - name: Add the alias again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            actions: "{{ opnsense_test_alias_area['actions'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          register: opnsense_test_alias_again
+
+        - name: Remove only the host override
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_host_area['path'] }}"
+            key: "{{ opnsense_test_host_area['key'] }}"
+            lookup: "{{ opnsense_test_host_area['lookup'] }}"
+            actions: "{{ opnsense_test_host_area['actions'] }}"
+            apply: "{{ opnsense_test_host_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_host }}"
+                state: absent
+          register: opnsense_test_host_delete
+
+        - name: Look up the alias after the host override is gone
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            actions: "{{ opnsense_test_alias_area['actions'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+                state: query
+          register: opnsense_test_alias_after
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_alias_add['changed']
+              - not opnsense_test_host_again['changed']
+              - not opnsense_test_alias_again['changed']
+              - opnsense_test_host_delete['changed']
+              - opnsense_test_alias_after['outcomes'][0]['uuid'] is none
+      always:
+        - name: Remove the alias
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            actions: "{{ opnsense_test_alias_area['actions'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+                state: absent
+          when: opnsense_test_host_add['outcomes'] is defined
+
+        - name: Remove the host override
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_host_area['path'] }}"
+            key: "{{ opnsense_test_host_area['key'] }}"
+            lookup: "{{ opnsense_test_host_area['lookup'] }}"
+            actions: "{{ opnsense_test_host_area['actions'] }}"
+            apply: "{{ opnsense_test_host_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_host }}"
+                state: absent
+
+        - name: Look up the alias after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            actions: "{{ opnsense_test_alias_area['actions'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+                state: query
+          register: opnsense_test_alias_left
+          when: opnsense_test_host_add['outcomes'] is defined
+
+        - name: Look up the host override after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_host_area['path'] }}"
+            key: "{{ opnsense_test_host_area['key'] }}"
+            lookup: "{{ opnsense_test_host_area['lookup'] }}"
+            actions: "{{ opnsense_test_host_area['actions'] }}"
+            items:
+              - fields: "{{ opnsense_test_host }}"
+                state: query
+          register: opnsense_test_host_left
+
+        - name: Assert that the cleanup removed both items
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_alias_left['outcomes'] | default([]) | map(attribute='uuid') | select | list | length == 0
+              - opnsense_test_host_left['outcomes'] | map(attribute='uuid') | select | list | length == 0

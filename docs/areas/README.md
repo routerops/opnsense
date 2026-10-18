@@ -16,3 +16,8 @@
 | [nodeexporter](nodeexporter.md) | [node_exporter general](nodeexporter.md#node_exporter-general) | `settings` | `nodeexporter/general` | `os-node_exporter` | - | v0 | 26.7.7 |
 | [routes](routes.md) | [Static route](routes.md#static-route) | `item` | `routes/routes` | - | - | v0 | 26.7.7 |
 | [routing](routing.md) | [Gateway](routing.md#gateway) | `item` | `routing/settings` | - | - | v0 | 26.7.7 |
+| [unbound](unbound.md) | [ACL](unbound.md#acl) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
+| [unbound](unbound.md) | [Query forward](unbound.md#query-forward) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
+| [unbound](unbound.md) | [Unbound general](unbound.md#unbound-general) | `settings` | `unbound/settings` | - | - | v0 | 26.7.7 |
+| [unbound](unbound.md) | [Host alias](unbound.md#host-alias) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
+| [unbound](unbound.md) | [Host override](unbound.md#host-override) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |

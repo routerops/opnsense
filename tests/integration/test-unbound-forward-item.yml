@@ -1,0 +1,151 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against Unbound query forwards
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['unbound_forward'] }}"
+    opnsense_test_one:
+      domain: one.routerops.test
+      server: 10.250.1.53
+      description: routerops test one
+    opnsense_test_two:
+      domain: two.routerops.test
+      server: 10.250.1.54
+      description: routerops test two
+  tasks:
+    - name: Run the forward tests
+      block:
+        - name: Add the first forward in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add both forwards
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_add
+
+        - name: Add both forwards again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_again
+
+        - name: Add both forwards again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Change the port of the first forward
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'port': 5353}) }}"
+          register: opnsense_test_update
+
+        - name: Change the port of the first forward again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'port': 5353}) }}"
+          register: opnsense_test_update_again
+
+        - name: Remove both forwards
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Add a forward with an invalid server
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'server': 'not-an-address'}) }}"
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - opnsense_test_add['outcomes'] | map(attribute='uuid') | select | list | length == 2
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - not opnsense_test_update_again['changed']
+              - opnsense_test_delete['changed']
+              - opnsense_test_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted']
+              - opnsense_test_invalid['failed']
+              - "'dot.server' in opnsense_test_invalid['validations']"
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            return_fields: "{{ item[0]['return_fields'] | default([]) }}"
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_area['examples'] | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Remove both test forwards
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+
+        - name: Remove the catalog examples
+          routerops.opnsense.item:
+            items: >-
+              {{ ((item['items'] | rejectattr('state', 'defined') | list)
+                  + (item['items'] | selectattr('state', 'defined') | rejectattr('state', 'equalto', 'query') | list))
+                 | map('combine', {'state': 'absent'}) | list }}
+          loop: "{{ opnsense_test_area['examples'] }}"
+          loop_control:
+            label: "{{ item['name'] }}"
+
+        - name: Look up the forwards after the cleanup
+          routerops.opnsense.item:
+            items: >-
+              {{ ([{'fields': opnsense_test_one}, {'fields': opnsense_test_two}] + opnsense_test_area['examples'][0]['items'])
+                 | map('combine', {'state': 'query'}) | list }}
+          register: opnsense_test_left
+
+        - name: Assert that the cleanup removed every forward
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_left['outcomes'] | map(attribute='uuid') | select | list | length == 0

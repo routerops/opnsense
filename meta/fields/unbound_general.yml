@@ -1,0 +1,135 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#general"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "port"
+    type: "PortField"
+    required: true
+    default: "53"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "stats"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "active_interface"
+    type: "UnboundInterfaceField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "dnssec"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns64"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns64prefix"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "noarecords"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "regdhcp"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "regdhcpdomain"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "regdhcpstatic"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "noreglladdr6"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "noregrecords"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "txtsupport"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "cacheflush"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "safesearch"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "local_zone_type"
+    type: "OptionField"
+    required: true
+    default: "transparent"
+    multiple: false
+    volatile: false
+    options:
+      - "transparent"
+      - "always_nxdomain"
+      - "always_refuse"
+      - "always_transparent"
+      - "deny"
+      - "inform"
+      - "inform_deny"
+      - "nodefault"
+      - "refuse"
+      - "static"
+      - "typetransparent"
+  - name: "outgoing_interface"
+    type: "UnboundInterfaceField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "enable_wpad"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

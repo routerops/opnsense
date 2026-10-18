@@ -21,6 +21,7 @@ Each area page lists the path, key, actions, lookup and apply path a call needs,
 | [nodeexporter](docs/areas/nodeexporter.md) | [node_exporter general](docs/areas/nodeexporter.md#node_exporter-general) |
 | [routes](docs/areas/routes.md) | [Static route](docs/areas/routes.md#static-route) |
 | [routing](docs/areas/routing.md) | [Gateway](docs/areas/routing.md#gateway) |
+| [unbound](docs/areas/unbound.md) | [ACL](docs/areas/unbound.md#acl), [Query forward](docs/areas/unbound.md#query-forward), [Unbound general](docs/areas/unbound.md#unbound-general), [Host alias](docs/areas/unbound.md#host-alias), [Host override](docs/areas/unbound.md#host-override) |
 
 All item types with plugin, version and stage: [docs/areas/README.md](docs/areas/README.md).
 <!-- END areas: generated from meta/areas.yml by make docs -->
