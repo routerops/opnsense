@@ -15,7 +15,7 @@
 | Write-only fields | `vpnid` |
 | Ordered fields | - |
 | Always sent | - |
-| Secret fields | `password` |
+| Secret fields | `password`, `auth-gen-token-secret` |
 | Separators | - |
 | Privileges | `page-openvpn-instances` ("VPN: OpenVPN: Instances", `api/openvpn/instances/*`), `page-status-openvpn` ("Status: OpenVPN", `api/openvpn/service/*`) |
 | Minimum OPNsense | - |
@@ -76,7 +76,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/Ope
 | `reneg-sec` | IntegerField |  |  |  |
 | `auth-gen-token` | IntegerField |  |  |  |
 | `auth-gen-token-renewal` | IntegerField |  |  |  |
-| `auth-gen-token-secret` | TextField |  |  |  |
+| `auth-gen-token-secret` (secret) | TextField |  |  |  |
 | `provision_exclusive` | BooleanField | yes | `0` |  |
 | `redirect_gateway` | OptionField, multiple |  |  | `local`, `autolocal`, `def1`, `bypass-dhcp`, `bypass-dns`, `block-local`, `ipv6`, `!ipv4` |
 | `route_metric` | IntegerField |  |  |  |
@@ -112,7 +112,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/Ope
       get: "get"
       search: "search"
       set: "set"
-    secret_fields: ["password"]
+    secret_fields: ["password", "auth-gen-token-secret"]
     apply: "openvpn/service/reconfigure"
     items:
       - fields:
@@ -140,7 +140,88 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/Ope
       get: "get"
       search: "search"
       set: "set"
-    secret_fields: ["password"]
+    secret_fields: ["password", "auth-gen-token-secret"]
+    apply: "openvpn/service/reconfigure"
+    items:
+      - fields:
+          description: "routerops example"
+        state: "absent"
+```
+
+## OpenVPN static key
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `openvpn/instances` |
+| Key | `statickey` |
+| Actions | `add: addStaticKey`, `del: delStaticKey`, `get: getStaticKey`, `search: searchStaticKey`, `set: setStaticKey` |
+| Lookup | `description` |
+| Item ids | `uuid` |
+| Apply | `openvpn/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | `key` |
+| Separators | - |
+| Privileges | `page-openvpn-instances` ("VPN: OpenVPN: Instances", `api/openvpn/instances/*`), `page-status-openvpn` ("Status: OpenVPN", `api/openvpn/service/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+Generate `key` with `openvpn/instances/gen_key/tls-crypt`, or `tls-auth` and `tls-crypt-v2-server` to match `mode`. OPNsense deletes a key even while an instance uses it as `tls_key`. The key is readable through the API; it is masked in the diff and the return values. Descriptions identify a key; keep them unique. In the examples, replace `EXAMPLE_STATIC_KEY` with a generated key.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#StaticKeys.StaticKey`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `mode` | OptionField | yes | `crypt` | `auth`, `crypt`, `crypt-v2` |
+| `key` (secret) | TextField | yes |  |  |
+| `description` | DescriptionField | yes |  |  |
+
+### Examples
+
+```yaml
+- name: Add a TLS crypt key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/instances"
+    key: "statickey"
+    lookup: ["description"]
+    actions:
+      add: "addStaticKey"
+      del: "delStaticKey"
+      get: "getStaticKey"
+      search: "searchStaticKey"
+      set: "setStaticKey"
+    secret_fields: ["key"]
+    apply: "openvpn/service/reconfigure"
+    items:
+      - fields:
+          mode: "crypt"
+          key: "EXAMPLE_STATIC_KEY"
+          description: "routerops example"
+
+- name: Remove a static key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/instances"
+    key: "statickey"
+    lookup: ["description"]
+    actions:
+      add: "addStaticKey"
+      del: "delStaticKey"
+      get: "getStaticKey"
+      search: "searchStaticKey"
+      set: "setStaticKey"
+    secret_fields: ["key"]
     apply: "openvpn/service/reconfigure"
     items:
       - fields:

@@ -830,7 +830,7 @@ EXAMPLES = r"""
       get: "get"
       search: "search"
       set: "set"
-    secret_fields: ["password"]
+    secret_fields: ["password", "auth-gen-token-secret"]
     apply: "openvpn/service/reconfigure"
     items:
       - fields:
@@ -858,7 +858,50 @@ EXAMPLES = r"""
       get: "get"
       search: "search"
       set: "set"
-    secret_fields: ["password"]
+    secret_fields: ["password", "auth-gen-token-secret"]
+    apply: "openvpn/service/reconfigure"
+    items:
+      - fields:
+          description: "routerops example"
+        state: "absent"
+
+- name: Add a TLS crypt key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/instances"
+    key: "statickey"
+    lookup: ["description"]
+    actions:
+      add: "addStaticKey"
+      del: "delStaticKey"
+      get: "getStaticKey"
+      search: "searchStaticKey"
+      set: "setStaticKey"
+    secret_fields: ["key"]
+    apply: "openvpn/service/reconfigure"
+    items:
+      - fields:
+          mode: "crypt"
+          key: "EXAMPLE_STATIC_KEY"
+          description: "routerops example"
+
+- name: Remove a static key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/instances"
+    key: "statickey"
+    lookup: ["description"]
+    actions:
+      add: "addStaticKey"
+      del: "delStaticKey"
+      get: "getStaticKey"
+      search: "searchStaticKey"
+      set: "setStaticKey"
+    secret_fields: ["key"]
     apply: "openvpn/service/reconfigure"
     items:
       - fields:
