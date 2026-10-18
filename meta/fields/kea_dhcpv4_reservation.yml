@@ -1,0 +1,115 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#reservations.reservation"
+fields:
+  - name: "subnet"
+    type: "ModelRelationField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ip_address"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "hw_address"
+    type: "MacAddressField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "client_id"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "hostname"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "next_server"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.domain_name_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.domain_search"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.routers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.static_routes"
+    type: "KeaStaticRoutesField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.classless_static_route"
+    type: "KeaClasslessStaticRouteField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.domain_name"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.ntp_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.time_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.tftp_server_name"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.boot_file_name"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []

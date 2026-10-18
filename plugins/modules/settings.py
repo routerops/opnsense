@@ -94,6 +94,17 @@ EXAMPLES = r"""
     fields:
       snat_mode: "hybrid"
 
+- name: Set the default lease time
+  routerops.opnsense.settings:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "kea/dhcpv4"
+    key: "dhcpv4.general"
+    apply: "kea/service/reconfigure"
+    fields:
+      valid_lifetime: 7200
+
 - name: Enable node_exporter on port 9100
   routerops.opnsense.settings:
     url: https://fw.example

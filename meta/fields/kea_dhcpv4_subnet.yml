@@ -1,0 +1,232 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#subnets.subnet4"
+fields:
+  - name: "subnet_id"
+    type: "AutoNumberField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "subnet"
+    type: "NetworkField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "valid_lifetime"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "next_server"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data_autocollect"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.domain_name_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.domain_search"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.routers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.static_routes"
+    type: "KeaStaticRoutesField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.classless_static_route"
+    type: "KeaClasslessStaticRouteField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.domain_name"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.ntp_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.time_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.tftp_server_name"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.boot_file_name"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.v6_only_preferred"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option_data.v4_dnr"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "option"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "match-client-id"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "allocator"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "iterative"
+      - "random"
+      - "flq"
+  - name: "pools"
+    type: "KeaPoolsField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ping_check"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_forward_zone"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_reverse_zone"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_qualifying_suffix"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_dns_server"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_dns_port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_domain_key_name"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_domain_key_secret"
+    type: "Base64Field"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_domain_key_algorithm"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "hmac-md5"
+      - "hmac-sha1"
+      - "hmac-sha224"
+      - "hmac-sha256"
+      - "hmac-sha384"
+      - "hmac-sha512"
+  - name: "ddns_override_no_update"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_override_client_update"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_update_on_renew"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ddns_conflict_resolution_mode"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "no-check-with-dhcid"
+      - "check-exists-with-dhcid"
+      - "no-check-without-dhcid"
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

@@ -591,6 +591,99 @@ EXAMPLES = r"""
           descr: "routerops example"
         state: "absent"
 
+- name: Reserve an address
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "kea/dhcpv4"
+    key: "reservation"
+    lookup: ["subnet", "hw_address", "client_id"]
+    actions:
+      add: "addReservation"
+      del: "delReservation"
+      get: "getReservation"
+      search: "searchReservation"
+      set: "setReservation"
+    apply: "kea/service/reconfigure"
+    items:
+      - fields:
+          subnet: "EXAMPLE_SUBNET_UUID"
+          hw_address: "02:00:00:00:69:01"
+          client_id: ""
+          ip_address: "10.250.69.10"
+          hostname: "rt-example"
+          description: "routerops example"
+
+- name: Remove a reservation
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "kea/dhcpv4"
+    key: "reservation"
+    lookup: ["subnet", "hw_address", "client_id"]
+    actions:
+      add: "addReservation"
+      del: "delReservation"
+      get: "getReservation"
+      search: "searchReservation"
+      set: "setReservation"
+    apply: "kea/service/reconfigure"
+    items:
+      - fields:
+          subnet: "EXAMPLE_SUBNET_UUID"
+          hw_address: "02:00:00:00:69:01"
+          client_id: ""
+        state: "absent"
+
+- name: Add a subnet
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "kea/dhcpv4"
+    key: "subnet4"
+    lookup: ["subnet"]
+    actions:
+      add: "addSubnet"
+      del: "delSubnet"
+      get: "getSubnet"
+      search: "searchSubnet"
+      set: "setSubnet"
+    separators:
+      pools: "\n"
+    secret_fields: ["ddns_domain_key_secret"]
+    apply: "kea/service/reconfigure"
+    items:
+      - fields:
+          subnet: "10.250.69.0/24"
+          pools: ["10.250.69.100-10.250.69.199"]
+          description: "routerops example"
+
+- name: Remove a subnet
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "kea/dhcpv4"
+    key: "subnet4"
+    lookup: ["subnet"]
+    actions:
+      add: "addSubnet"
+      del: "delSubnet"
+      get: "getSubnet"
+      search: "searchSubnet"
+      set: "setSubnet"
+    separators:
+      pools: "\n"
+    secret_fields: ["ddns_domain_key_secret"]
+    apply: "kea/service/reconfigure"
+    items:
+      - fields:
+          subnet: "10.250.69.0/24"
+        state: "absent"
+
 - name: Route a remote network through a LAN gateway
   routerops.opnsense.item:
     url: https://fw.example

@@ -1,0 +1,245 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against Kea DHCPv4 reservations
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    routerops.opnsense.item:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['kea_dhcpv4_reservation'] }}"
+    opnsense_test_subnet_area: "{{ opnsense_areas['kea_dhcpv4_subnet'] }}"
+    opnsense_test_subnets:
+      - fields:
+          subnet: 10.250.60.0/24
+          pools: [10.250.60.100-10.250.60.199]
+          description: routerops test one
+      - fields:
+          subnet: 10.250.61.0/24
+          pools: [10.250.61.100-10.250.61.199]
+          description: routerops test two
+      - fields: "{{ opnsense_test_subnet_area['examples'][0]['items'][0]['fields'] }}"
+    opnsense_test_subnet_one: "{{ opnsense_test_subnet_add['outcomes'][0]['uuid'] }}"
+    opnsense_test_subnet_two: "{{ opnsense_test_subnet_add['outcomes'][1]['uuid'] }}"
+    opnsense_test_one:
+      subnet: "{{ opnsense_test_subnet_one }}"
+      hw_address: "02:00:00:00:60:0a"
+      client_id: ""
+      ip_address: 10.250.60.10
+      hostname: rt-test-one
+      description: routerops test one
+    opnsense_test_two:
+      subnet: "{{ opnsense_test_subnet_one }}"
+      hw_address: "02:00:00:00:60:02"
+      client_id: ""
+      ip_address: 10.250.60.11
+      hostname: rt-test-two
+      description: routerops test two
+    opnsense_test_three:
+      subnet: "{{ opnsense_test_subnet_two }}"
+      hw_address: "02:00:00:00:60:0a"
+      client_id: ""
+      ip_address: 10.250.61.10
+      hostname: rt-test-three
+      description: routerops test three
+    opnsense_test_client_ids:
+      - fields:
+          subnet: "{{ opnsense_test_subnet_one }}"
+          hw_address: ""
+          client_id: "01:02:00:00:00:60:21"
+          ip_address: 10.250.60.21
+          description: routerops test client one
+      - fields:
+          subnet: "{{ opnsense_test_subnet_one }}"
+          hw_address: ""
+          client_id: "01:02:00:00:00:60:22"
+          ip_address: 10.250.60.22
+          description: routerops test client two
+    opnsense_test_examples: >-
+      {{ opnsense_test_area['examples'] | to_json
+         | replace('EXAMPLE_SUBNET_UUID', opnsense_test_subnet_add['outcomes'][2]['uuid']) | from_json }}
+  tasks:
+    - name: Run the reservation tests
+      block:
+        - name: Add the subnets the reservations use
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            separators: "{{ opnsense_test_subnet_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_subnet_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_subnet_area['apply'] }}"
+            items: "{{ opnsense_test_subnets }}"
+          register: opnsense_test_subnet_add
+
+        - name: Add the first reservation in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add three reservations, one MAC address in two subnets
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+              - fields: "{{ opnsense_test_three }}"
+          register: opnsense_test_add
+
+        - name: Add the three reservations again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+              - fields: "{{ opnsense_test_three }}"
+          register: opnsense_test_again
+
+        - name: Add the three reservations again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+              - fields: "{{ opnsense_test_three }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Add two reservations by client id in one subnet
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_client_ids }}"
+          register: opnsense_test_client_ids_add
+
+        - name: Remove the two client id reservations
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_client_ids | map('combine', {'state': 'absent'}) | list }}"
+          register: opnsense_test_client_ids_delete
+
+        - name: Add the first reservation again with its MAC address in upper case, which OPNsense refuses
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'hw_address': opnsense_test_one['hw_address'] | upper}) }}"
+          register: opnsense_test_upper
+          ignore_errors: true
+
+        - name: Change the host name of the first reservation
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'hostname': 'rt-test-one-b'}) }}"
+          register: opnsense_test_update
+
+        - name: Change the host name of the first reservation again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'hostname': 'rt-test-one-b'}) }}"
+          register: opnsense_test_update_again
+
+        - name: Remove the three reservations
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+              - fields: "{{ opnsense_test_three }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Reserve an address outside the subnet
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'ip_address': '10.250.61.20'}) }}"
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added', 'added']
+              - opnsense_test_add['outcomes'] | map(attribute='uuid') | select | unique | list | length == 3
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_client_ids_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - opnsense_test_client_ids_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted']
+              - opnsense_test_upper['failed']
+              - not opnsense_test_upper['changed']
+              - "'Duplicate entry exists.' in opnsense_test_upper['validations']['reservation.hw_address']"
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - not opnsense_test_update_again['changed']
+              - opnsense_test_delete['changed']
+              - opnsense_test_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted', 'deleted']
+              - opnsense_test_invalid['failed']
+              - "'reservation.ip_address' in opnsense_test_invalid['validations']"
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            return_fields: "{{ item[0]['return_fields'] | default([]) }}"
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_examples | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples_run
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples_run['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Remove the test reservations and the example reservation
+          routerops.opnsense.item:
+            items: >-
+              {{ ([{'fields': opnsense_test_one}, {'fields': opnsense_test_two}, {'fields': opnsense_test_three}]
+                  + opnsense_test_client_ids + opnsense_test_examples[0]['items'])
+                 | map('combine', {'state': 'absent'}) | list }}
+          when: opnsense_test_subnet_add['outcomes'] is defined
+
+        - name: Remove the subnets
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            separators: "{{ opnsense_test_subnet_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_subnet_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_subnet_area['apply'] }}"
+            items: "{{ opnsense_test_subnets | map('combine', {'state': 'absent'}) | list }}"
+
+        - name: Look up the reservations after the cleanup
+          routerops.opnsense.item:
+            items: >-
+              {{ ([{'fields': opnsense_test_one}, {'fields': opnsense_test_two}, {'fields': opnsense_test_three}]
+                  + opnsense_test_client_ids + opnsense_test_examples[0]['items'])
+                 | map('combine', {'state': 'query'}) | list }}
+          register: opnsense_test_left
+          when: opnsense_test_subnet_add['outcomes'] is defined
+
+        - name: Look up the subnets after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            items: "{{ opnsense_test_subnets | map('combine', {'state': 'query'}) | list }}"
+          register: opnsense_test_subnets_left
+
+        - name: Assert that the cleanup removed every reservation and subnet
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_left['outcomes'] | default([]) | map(attribute='uuid') | select | list | length == 0
+              - opnsense_test_subnets_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
