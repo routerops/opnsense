@@ -925,6 +925,91 @@ EXAMPLES = r"""
           name: "RT_EXAMPLE_GW"
         state: "absent"
 
+- name: Create an internal CA
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "trust/ca"
+    key: "ca"
+    lookup: ["descr"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    return_fields: ["refid"]
+    items:
+      - fields:
+          descr: "routerops example ca"
+        write_only:
+          action: "internal"
+          commonname: "routerops-example-ca"
+          country: "AT"
+
+- name: Remove a CA
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "trust/ca"
+    key: "ca"
+    lookup: ["descr"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    items:
+      - fields:
+          descr: "routerops example ca"
+        state: "absent"
+
+- name: Create a server certificate
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "trust/cert"
+    key: "cert"
+    lookup: ["descr"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    return_fields: ["refid"]
+    items:
+      - fields:
+          descr: "routerops example server"
+          caref: "CA_REFID"
+        write_only:
+          action: "internal"
+          cert_type: "server_cert"
+          commonname: "rt-example-server"
+
+- name: Remove a certificate
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "trust/cert"
+    key: "cert"
+    lookup: ["descr"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    items:
+      - fields:
+          descr: "routerops example server"
+        state: "absent"
+
 - name: Allow a network
   routerops.opnsense.item:
     url: https://fw.example
