@@ -15,7 +15,7 @@
 | Write-only fields | `action`, `key_type`, `digest`, `lifetime`, `commonname`, `country`, `city`, `state`, `organization`, `organizationalunit`, `email` |
 | Ordered fields | - |
 | Always sent | - |
-| Secret fields | - |
+| Secret fields | `prv`, `prv_payload` |
 | Separators | - |
 | Privileges | `page-system-camanager` ("System: Trust: Authorities", `api/trust/ca/*`) |
 | Minimum OPNsense | - |
@@ -23,7 +23,7 @@
 | Plugin | - |
 | Stage | v0 |
 
-The fields that create the CA (`action`, `commonname`, the key and lifetime settings) are not stored, so they go in `write_only` and are sent only when the CA is added. OPNsense applies a CA as soon as it is saved; there is nothing to apply. Read the `refid` that certificates and OpenVPN instances refer to with `return_fields: [refid]`. OPNsense deletes a CA even while certificates or instances use it. The private key is readable through the API. Descriptions identify a CA; keep them unique.
+The fields that create the CA (`action`, `commonname`, the key and lifetime settings) are not stored, so they go in `write_only` and are sent only when the CA is added. OPNsense applies a CA as soon as it is saved; there is nothing to apply. Read the `refid` that certificates and OpenVPN instances refer to with `return_fields: [refid]`. OPNsense deletes a CA even while certificates or instances use it. The private key is readable through the API; it is masked in the diff and the return values, and an imported key (`prv_payload`) belongs in `write_only`. Descriptions identify a CA; keep them unique.
 
 ### Fields
 
@@ -34,7 +34,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
 | `refid` | TextField |  |  |  |
 | `descr` | DescriptionField | yes |  |  |
 | `crt` | TextField |  |  |  |
-| `prv` | TextField |  |  |  |
+| `prv` (secret) | TextField |  |  |  |
 | `serial` | IntegerField |  |  |  |
 | `caref` | CertificateField |  |  |  |
 | `action` (write-only) | OptionField, not stored | yes | `internal` | `existing`, `internal`, `ocsp` |
@@ -50,7 +50,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
 | `commonname` (write-only) | TextField, not stored |  |  |  |
 | `ocsp_uri` | UrlField, not stored |  |  |  |
 | `crt_payload` | TextField, not stored |  |  |  |
-| `prv_payload` | TextField, not stored |  |  |  |
+| `prv_payload` (secret) | TextField, not stored |  |  |  |
 | `refcount` | IntegerField, not stored |  |  |  |
 | `name` | TextField, not stored |  |  |  |
 | `valid_from` | TextField, not stored |  |  |  |
@@ -73,6 +73,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     return_fields: ["refid"]
     items:
       - fields:
@@ -96,6 +97,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     items:
       - fields:
           descr: "routerops example ca"
@@ -116,7 +118,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
 | Write-only fields | `action`, `key_type`, `digest`, `lifetime`, `cert_type`, `private_key_location`, `commonname`, `country`, `city`, `state`, `organization`, `organizationalunit`, `email`, `altnames_dns`, `altnames_ip`, `altnames_uri`, `altnames_email` |
 | Ordered fields | - |
 | Always sent | - |
-| Secret fields | - |
+| Secret fields | `prv`, `prv_payload` |
 | Separators | - |
 | Privileges | `page-system-certmanager` ("System: Trust: Certificates", `api/trust/cert/*`) |
 | Minimum OPNsense | - |
@@ -124,7 +126,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
 | Plugin | - |
 | Stage | v0 |
 
-`caref` is the `refid` of the signing CA. The fields that create the certificate (`action`, `cert_type`, `commonname`, the key, lifetime and alternative names) are not stored, so they go in `write_only` and are sent only when the certificate is added. Separate several `altnames_dns` with a newline. Every update reissues the certificate with the same key. A certificate an OpenVPN instance uses cannot be deleted; OPNsense answers HTTP 500 "Item in use by". The private key is readable through the API. Descriptions identify a certificate; keep them unique. In the examples, replace `CA_REFID` with the `refid` the example in the Certificate authority section returns.
+`caref` is the `refid` of the signing CA. The fields that create the certificate (`action`, `cert_type`, `commonname`, the key, lifetime and alternative names) are not stored, so they go in `write_only` and are sent only when the certificate is added. Separate several `altnames_dns` with a newline. Every update reissues the certificate with the same key. A certificate an OpenVPN instance uses cannot be deleted; OPNsense answers HTTP 500 "Item in use by". The private key is readable through the API; it is masked in the diff and the return values, and an imported key (`prv_payload`) belongs in `write_only`. Descriptions identify a certificate; keep them unique. In the examples, replace `CA_REFID` with the `refid` the example in the Certificate authority section returns.
 
 ### Fields
 
@@ -137,7 +139,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Cert.
 | `caref` | CertificateField |  |  |  |
 | `crt` | TextField |  |  |  |
 | `csr` | TextField |  |  |  |
-| `prv` | TextField |  |  |  |
+| `prv` (secret) | TextField |  |  |  |
 | `action` (write-only) | OptionField, not stored | yes | `internal` | `internal`, `external`, `import`, `sign_csr`, `import_csr`, `reissue`, `manual` |
 | `key_type` (write-only) | OptionField, not stored | yes | `2048` | `512`, `1024`, `2048`, `3072`, `4096`, `7680`, `8192`, `prime256v1`, `secp384r1`, `secp521r1` |
 | `digest` (write-only) | OptionField, not stored | yes | `sha256` | `sha1`, `sha224`, `sha256`, `sha384`, `sha512` |
@@ -158,7 +160,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Cert.
 | `altnames_email` (write-only) | TextField, not stored |  |  |  |
 | `crt_payload` | TextField, not stored |  |  |  |
 | `csr_payload` | TextField, not stored |  |  |  |
-| `prv_payload` | TextField, not stored |  |  |  |
+| `prv_payload` (secret) | TextField, not stored |  |  |  |
 | `rfc3280_purpose` | TextField, not stored |  |  |  |
 | `in_use` | BooleanField, not stored |  |  |  |
 | `is_user` | BooleanField, not stored |  |  |  |
@@ -183,6 +185,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Cert.
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     return_fields: ["refid"]
     items:
       - fields:
@@ -207,6 +210,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Cert.
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     items:
       - fields:
           descr: "routerops example server"

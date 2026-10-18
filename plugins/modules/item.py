@@ -939,6 +939,7 @@ EXAMPLES = r"""
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     return_fields: ["refid"]
     items:
       - fields:
@@ -962,6 +963,7 @@ EXAMPLES = r"""
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     items:
       - fields:
           descr: "routerops example ca"
@@ -981,6 +983,7 @@ EXAMPLES = r"""
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     return_fields: ["refid"]
     items:
       - fields:
@@ -1005,6 +1008,7 @@ EXAMPLES = r"""
       get: "get"
       search: "search"
       set: "set"
+    secret_fields: ["prv", "prv_payload"]
     items:
       - fields:
           descr: "routerops example server"
