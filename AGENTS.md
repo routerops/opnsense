@@ -14,7 +14,7 @@ Spec: `docs/superpowers/specs/2026-10-17-routerops-opnsense-design.md`. Plans: `
 |---|---|
 | Licences | `plugins/module_utils/` BSD-2-Clause, everything else GPL-3.0-or-later; every file starts with an `SPDX-FileCopyrightText: routerops.opnsense contributors` and an `SPDX-License-Identifier` comment, or is covered by `REUSE.toml`. No code copied from `oxlorg.opnsense` or `matthew-on-git/terraform-provider-opnsense`, facts and ideas only, each fact re-checked against `opnsense/core` or `opnsense/plugins`. Contributions under the DCO, no CLA |
 | Dependencies | every dependency pinned to an exact version (`requirements-dev.txt`, `mise.toml`, actions by commit SHA); Renovate bumps them |
-| API results | a write succeeds on `result == "saved"` (delete: `"deleted"`), an action on `status` `ok`; never trust the HTTP code; show `validations` and `status_msg` on failure |
+| API results | a write succeeds on `result == "saved"` (delete: `"deleted"`), an action on `status` `ok`, or on `result` `ok` when the answer has no `status` (OpenVPN, WireGuard); never trust the HTTP code; show `validations` and `status_msg` on failure |
 | Module behaviour | check mode never writes; `changed` only on a real write; one apply per call, only after a write; `--diff` per field; secrets carry `no_log` and never reach a diff |
 | Ansible style | see "Ansible" below |
 | Tests | TDD: a test fails before the code exists; a new check or assert counts only after it failed once against a real fault; check mode must not fail on a fresh target, a rerun shows `changed=0` |
