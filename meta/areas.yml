@@ -1261,3 +1261,51 @@ opnsense_areas:
           - fields:
               common_name: rt-example-client
             state: absent
+  wireguard_server:
+    area: wireguard
+    title: WireGuard server
+    module: item
+    path: wireguard/server
+    key: server
+    lookup: [name]
+    actions:
+      search: searchServer
+      get: getServer
+      add: addServer
+      set: setServer
+      del: delServer
+    apply: wireguard/service/reconfigure
+    secret_fields: [privkey]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Wireguard/Server.xml
+      node: servers.server
+    privileges:
+      - name: page-wireguard-config
+        title: "VPN: WireGuard: Configuration"
+        pattern: api/wireguard/server/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Wireguard/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Create the key pair with `wireguard/server/key_pair` and send `privkey` and `pubkey`; OPNsense does not derive the public key.
+      Attach peers through the peer's `servers`, never through `peers`.
+      OPNsense numbers servers itself (`instance`, interface `wgN`).
+      WireGuard runs only after `wireguard/general` `enabled` is set; the apply answers `ok` even when the configuration fails.
+      The private key is readable through the API; it is masked in the diff and the return values.
+      Names identify a server; keep them unique.
+      In the examples, replace `EXAMPLE_SERVER_PRIVKEY` and `EXAMPLE_SERVER_PUBKEY` with a generated key pair.
+    examples:
+      - name: Add a WireGuard server
+        items:
+          - fields:
+              name: rt-example
+              privkey: EXAMPLE_SERVER_PRIVKEY
+              pubkey: EXAMPLE_SERVER_PUBKEY
+              port: "51822"
+              tunneladdress: [10.250.92.1/24]
+      - name: Remove a WireGuard server
+        items:
+          - fields:
+              name: rt-example
+            state: absent

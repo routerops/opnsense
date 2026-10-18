@@ -1317,6 +1317,51 @@ EXAMPLES = r"""
           domain: "routerops.test"
           rr: "A"
         state: "absent"
+
+- name: Add a WireGuard server
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "wireguard/server"
+    key: "server"
+    lookup: ["name"]
+    actions:
+      add: "addServer"
+      del: "delServer"
+      get: "getServer"
+      search: "searchServer"
+      set: "setServer"
+    secret_fields: ["privkey"]
+    apply: "wireguard/service/reconfigure"
+    items:
+      - fields:
+          name: "rt-example"
+          privkey: "EXAMPLE_SERVER_PRIVKEY"
+          pubkey: "EXAMPLE_SERVER_PUBKEY"
+          port: "51822"
+          tunneladdress: ["10.250.92.1/24"]
+
+- name: Remove a WireGuard server
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "wireguard/server"
+    key: "server"
+    lookup: ["name"]
+    actions:
+      add: "addServer"
+      del: "delServer"
+      get: "getServer"
+      search: "searchServer"
+      set: "setServer"
+    secret_fields: ["privkey"]
+    apply: "wireguard/service/reconfigure"
+    items:
+      - fields:
+          name: "rt-example"
+        state: "absent"
 """
 # END EXAMPLES: generated from meta/areas.yml by make docs
 
