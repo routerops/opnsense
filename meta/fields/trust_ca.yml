@@ -1,0 +1,174 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xml#ca"
+fields:
+  - name: "refid"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "descr"
+    type: "DescriptionField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "crt"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "prv"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "serial"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "caref"
+    type: "CertificateField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "action"
+    type: "OptionField"
+    required: true
+    default: "internal"
+    multiple: false
+    volatile: true
+    options:
+      - "existing"
+      - "internal"
+      - "ocsp"
+  - name: "key_type"
+    type: "OptionField"
+    required: true
+    default: "2048"
+    multiple: false
+    volatile: true
+    options:
+      - "512"
+      - "1024"
+      - "2048"
+      - "3072"
+      - "4096"
+      - "7680"
+      - "8192"
+      - "prime256v1"
+      - "secp384r1"
+      - "secp521r1"
+  - name: "digest"
+    type: "OptionField"
+    required: true
+    default: "sha256"
+    multiple: false
+    volatile: true
+    options:
+      - "sha1"
+      - "sha224"
+      - "sha256"
+      - "sha384"
+      - "sha512"
+  - name: "lifetime"
+    type: "IntegerField"
+    required: true
+    default: "825"
+    multiple: false
+    volatile: true
+    options: []
+  - name: "city"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "state"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "organization"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "organizationalunit"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "country"
+    type: "CountryField"
+    required: true
+    default: "NL"
+    multiple: false
+    volatile: true
+    options: []
+  - name: "email"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "commonname"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "ocsp_uri"
+    type: "UrlField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "crt_payload"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "prv_payload"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "refcount"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "name"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "valid_from"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "valid_to"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []

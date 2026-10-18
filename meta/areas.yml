@@ -1015,3 +1015,104 @@ opnsense_areas:
           - fields:
               description: routerops example
             state: absent
+  trust_ca:
+    area: trust
+    title: Certificate authority
+    module: item
+    path: trust/ca
+    key: ca
+    lookup: [descr]
+    actions:
+      search: search
+      get: get
+      add: add
+      set: set
+      del: del
+    write_only: [action, key_type, digest, lifetime, commonname, country, city, state, organization, organizationalunit, email]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xml
+      node: ca
+    privileges:
+      - name: page-system-camanager
+        title: "System: Trust: Authorities"
+        pattern: api/trust/ca/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      The fields that create the CA (`action`, `commonname`, the key and lifetime settings) are not stored,
+      so they go in `write_only` and are sent only when the CA is added.
+      OPNsense applies a CA as soon as it is saved; there is nothing to apply.
+      Read the `refid` that certificates and OpenVPN instances refer to with `return_fields: [refid]`.
+      OPNsense deletes a CA even while certificates or instances use it.
+      The private key is readable through the API.
+      Descriptions identify a CA; keep them unique.
+    examples:
+      - name: Create an internal CA
+        return_fields: [refid]
+        items:
+          - fields:
+              descr: routerops example ca
+            write_only:
+              action: internal
+              commonname: routerops-example-ca
+              country: AT
+      - name: Remove a CA
+        items:
+          - fields:
+              descr: routerops example ca
+            state: absent
+  trust_cert:
+    area: trust
+    title: Certificate
+    module: item
+    path: trust/cert
+    key: cert
+    lookup: [descr]
+    actions:
+      search: search
+      get: get
+      add: add
+      set: set
+      del: del
+    write_only:
+      [action, key_type, digest, lifetime, cert_type, private_key_location, commonname, country, city, state, organization, organizationalunit, email,
+       altnames_dns, altnames_ip, altnames_uri, altnames_email]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Trust/Cert.xml
+      node: cert
+    privileges:
+      - name: page-system-certmanager
+        title: "System: Trust: Certificates"
+        pattern: api/trust/cert/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `caref` is the `refid` of the signing CA.
+      The fields that create the certificate (`action`, `cert_type`, `commonname`, the key, lifetime and alternative names) are not stored,
+      so they go in `write_only` and are sent only when the certificate is added.
+      Separate several `altnames_dns` with a newline.
+      Every update reissues the certificate with the same key.
+      A certificate an OpenVPN instance uses cannot be deleted; OPNsense answers HTTP 500 "Item in use by".
+      The private key is readable through the API.
+      Descriptions identify a certificate; keep them unique.
+      In the examples, replace `CA_REFID` with the `refid` the example in the Certificate authority section returns.
+    examples:
+      - name: Create a server certificate
+        return_fields: [refid]
+        items:
+          - fields:
+              descr: routerops example server
+              caref: CA_REFID
+            write_only:
+              action: internal
+              cert_type: server_cert
+              commonname: rt-example-server
+      - name: Remove a certificate
+        items:
+          - fields:
+              descr: routerops example server
+            state: absent
