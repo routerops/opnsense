@@ -1,0 +1,246 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against WireGuard peers
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+    ansible.builtin.uri:
+      url_username: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      url_password: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+      force_basic_auth: true
+      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS') | default('true', true) | bool }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['wireguard_peer'] }}"
+    opnsense_test_server_area: "{{ opnsense_areas['wireguard_server'] }}"
+    opnsense_test_api: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}/api/{{ opnsense_test_server_area['path'] }}"
+    opnsense_test_pairs: "{{ opnsense_test_key_pair['results'] | map(attribute='json') | list }}"
+    opnsense_test_servers:
+      - fields:
+          name: rt-test-one
+          privkey: "{{ opnsense_test_pairs[0]['privkey'] }}"
+          pubkey: "{{ opnsense_test_pairs[0]['pubkey'] }}"
+          port: "51820"
+          tunneladdress: [10.250.90.1/24]
+      - fields: >-
+          {{ opnsense_test_server_area['examples'][0]['items'][0]['fields']
+             | combine({'privkey': opnsense_test_pairs[1]['privkey'], 'pubkey': opnsense_test_pairs[1]['pubkey']}) }}
+    opnsense_test_server_uuid: "{{ opnsense_test_server_add['outcomes'][0]['uuid'] }}"
+    opnsense_test_one:
+      name: rt-test-peer-one
+      pubkey: "{{ opnsense_test_pairs[2]['pubkey'] }}"
+      tunneladdress: [10.250.90.2/32]
+      servers: ["{{ opnsense_test_server_uuid }}"]
+    opnsense_test_two:
+      name: rt-test-peer-two
+      pubkey: "{{ opnsense_test_pairs[3]['pubkey'] }}"
+      tunneladdress: [10.250.90.3/32, 10.250.90.4/32]
+      servers: ["{{ opnsense_test_server_uuid }}"]
+    opnsense_test_names:
+      - fields: {name: rt-test-peer-one}
+      - fields: {name: rt-test-peer-two}
+      - fields: {name: rt-example-peer}
+    opnsense_test_examples: >-
+      {{ opnsense_test_area['examples'] | to_json
+         | replace('EXAMPLE_PEER_PUBKEY', opnsense_test_pairs[4]['pubkey'])
+         | replace('SERVER_UUID', opnsense_test_server_add['outcomes'][1]['uuid']) | from_json }}
+  tasks:
+    - name: Run the WireGuard peer tests
+      block:
+        - name: Generate the key pairs the tests use
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_api }}/key_pair"
+          loop: [1, 2, 3, 4, 5]
+          register: opnsense_test_key_pair
+          no_log: true
+
+        - name: Add the servers the peers belong to
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_server_area['path'] }}"
+            key: "{{ opnsense_test_server_area['key'] }}"
+            lookup: "{{ opnsense_test_server_area['lookup'] }}"
+            actions: "{{ opnsense_test_server_area['actions'] }}"
+            secret_fields: "{{ opnsense_test_server_area['secret_fields'] }}"
+            ordered_fields: []
+            always_send: []
+            apply: "{{ opnsense_test_server_area['apply'] }}"
+            items: "{{ opnsense_test_servers }}"
+          register: opnsense_test_server_add
+          no_log: true
+
+        - name: Add the first peer in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add both peers
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_add
+
+        - name: Add both peers again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_again
+
+        - name: Add both peers again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Add the second peer with its tunnel addresses reversed
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_two | combine({'tunneladdress': opnsense_test_two['tunneladdress'] | reverse | list}) }}"
+          check_mode: true
+          register: opnsense_test_reversed
+
+        - name: Set a keepalive on the first peer
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'keepalive': 25}) }}"
+          register: opnsense_test_update
+
+        - name: Set a keepalive on the first peer again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'keepalive': 25}) }}"
+          register: opnsense_test_update_again
+
+        - name: Remove both peers
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Add a peer with a keepalive of zero
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'keepalive': 0}) }}"
+          register: opnsense_test_invalid_keepalive
+          ignore_errors: true
+
+        - name: Add a peer with a public key that is not base64
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'pubkey': 'not base64!'}) }}"
+          register: opnsense_test_invalid_pubkey
+          ignore_errors: true
+
+        - name: Add a peer on an unknown server
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'servers': ['00000000-0000-4000-8000-000000000000']}) }}"
+          register: opnsense_test_invalid_server
+          ignore_errors: true
+
+        - name: Look up the peer after the unknown server
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: query
+          register: opnsense_test_invalid_server_left
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_reversed['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - not opnsense_test_update_again['changed']
+              - opnsense_test_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted']
+              - opnsense_test_invalid_keepalive['failed']
+              - "'client.keepalive' in opnsense_test_invalid_keepalive['validations']"
+              - opnsense_test_invalid_pubkey['failed']
+              - "'client.pubkey' in opnsense_test_invalid_pubkey['validations']"
+              - opnsense_test_invalid_server['failed']
+              - not opnsense_test_invalid_server['changed']
+              - opnsense_test_invalid_server_left['outcomes'][0]['uuid'] is none
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_examples | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples_run
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples_run['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Remove the test peers and the example peer
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_names | map('combine', {'state': 'absent'}) | list }}"
+
+        - name: Remove the servers
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_server_area['path'] }}"
+            key: "{{ opnsense_test_server_area['key'] }}"
+            lookup: "{{ opnsense_test_server_area['lookup'] }}"
+            actions: "{{ opnsense_test_server_area['actions'] }}"
+            ordered_fields: []
+            always_send: []
+            apply: "{{ opnsense_test_server_area['apply'] }}"
+            items:
+              - fields: {name: rt-test-one}
+                state: absent
+              - fields: {name: rt-example}
+                state: absent
+
+        - name: Look up the peers after the cleanup
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_names | map('combine', {'state': 'query'}) | list }}"
+          register: opnsense_test_left
+
+        - name: Look up the servers after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_server_area['path'] }}"
+            key: "{{ opnsense_test_server_area['key'] }}"
+            lookup: "{{ opnsense_test_server_area['lookup'] }}"
+            actions: "{{ opnsense_test_server_area['actions'] }}"
+            ordered_fields: []
+            always_send: []
+            items:
+              - fields: {name: rt-test-one}
+                state: query
+              - fields: {name: rt-example}
+                state: query
+          register: opnsense_test_server_left
+
+        - name: Assert that the cleanup left no peer or server behind
+          ansible.builtin.assert:
+            that:
+              - (opnsense_test_left['outcomes'] + opnsense_test_server_left['outcomes']) | map(attribute='uuid') | select | list | length == 0

@@ -1309,3 +1309,53 @@ opnsense_areas:
           - fields:
               name: rt-example
             state: absent
+  wireguard_peer:
+    area: wireguard
+    title: WireGuard peer
+    module: item
+    path: wireguard/client
+    key: client
+    lookup: [name]
+    actions:
+      search: searchClient
+      get: getClient
+      add: addClient
+      set: setClient
+      del: delClient
+    apply: wireguard/service/reconfigure
+    always_send: [servers]
+    ordered_fields: [tunneladdress]
+    secret_fields: [psk]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Wireguard/Client.xml
+      node: clients.client
+    privileges:
+      - name: page-wireguard-config
+        title: "VPN: WireGuard: Configuration"
+        pattern: api/wireguard/client/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Wireguard/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `servers` lists the uuids of the servers the peer belongs to.
+      OPNsense reads it on every write and drops the peer from every server when it is missing, so the module always sends it; list it in every present item.
+      `tunneladdress` keeps the order you send.
+      `keepalive` takes 1 to 65535; leave it out for none.
+      The pre-shared key is readable through the API; it is masked in the diff and the return values.
+      Names identify a peer; keep them unique.
+      In the examples, replace `EXAMPLE_PEER_PUBKEY` with the peer's public key
+      and `SERVER_UUID` with the `uuid` the example in the WireGuard server section returns.
+    examples:
+      - name: Add a WireGuard peer
+        items:
+          - fields:
+              name: rt-example-peer
+              pubkey: EXAMPLE_PEER_PUBKEY
+              tunneladdress: [10.250.92.2/32]
+              servers: [SERVER_UUID]
+      - name: Remove a WireGuard peer
+        items:
+          - fields:
+              name: rt-example-peer
+            state: absent

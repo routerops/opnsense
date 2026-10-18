@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/Client.xml#clients.client"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "name"
+    type: "TextField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "pubkey"
+    type: "Base64Field"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "psk"
+    type: "Base64Field"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tunneladdress"
+    type: "NetworkField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "serveraddress"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "serverport"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "endpoint"
+    type: "IPPortField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "keepalive"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "servers"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: true
+    options: []
+  - name: "privkey"
+    type: "Base64Field"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

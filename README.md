@@ -25,7 +25,7 @@ Each area page lists the path, key, actions, lookup and apply path a call needs,
 | [routing](docs/areas/routing.md) | [Gateway](docs/areas/routing.md#gateway) |
 | [trust](docs/areas/trust.md) | [Certificate authority](docs/areas/trust.md#certificate-authority), [Certificate](docs/areas/trust.md#certificate) |
 | [unbound](docs/areas/unbound.md) | [ACL](docs/areas/unbound.md#acl), [Query forward](docs/areas/unbound.md#query-forward), [Unbound general](docs/areas/unbound.md#unbound-general), [Host alias](docs/areas/unbound.md#host-alias), [Host override](docs/areas/unbound.md#host-override) |
-| [wireguard](docs/areas/wireguard.md) | [WireGuard server](docs/areas/wireguard.md#wireguard-server) |
+| [wireguard](docs/areas/wireguard.md) | [WireGuard peer](docs/areas/wireguard.md#wireguard-peer), [WireGuard server](docs/areas/wireguard.md#wireguard-server) |
 
 All item types with plugin, version and stage: [docs/areas/README.md](docs/areas/README.md).
 <!-- END areas: generated from meta/areas.yml by make docs -->
