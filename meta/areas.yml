@@ -1118,3 +1118,58 @@ opnsense_areas:
           - fields:
               descr: routerops example server
             state: absent
+  openvpn_instance:
+    area: openvpn
+    title: OpenVPN instance
+    module: item
+    path: openvpn/instances
+    key: instance
+    lookup: [description]
+    actions:
+      search: search
+      get: get
+      add: add
+      set: set
+      del: del
+    apply: openvpn/service/reconfigure
+    write_only: [vpnid]
+    secret_fields: [password]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml
+      node: Instances.Instance
+    privileges:
+      - name: page-openvpn-instances
+        title: "VPN: OpenVPN: Instances"
+        pattern: api/openvpn/instances/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+      - name: page-status-openvpn
+        title: "Status: OpenVPN"
+        pattern: api/openvpn/service/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `cert` and `ca` take a `refid` from the Trust areas; `tls_key` takes the uuid of a static key.
+      OPNsense numbers instances itself, but only when `vpnid` arrives empty, so send `vpnid: ""` in `write_only`.
+      The apply needs the privilege "Status: OpenVPN" and starts, restarts or stops every changed instance.
+      Descriptions identify an instance; keep them unique.
+      In the examples, replace `CERT_REFID` with the `refid` the example in the Certificate section returns.
+    examples:
+      - name: Run an OpenVPN server
+        items:
+          - fields:
+              role: server
+              dev_type: tun
+              proto: udp
+              port: "11942"
+              server: 10.250.82.0/24
+              cert: CERT_REFID
+              description: routerops example
+            write_only:
+              vpnid: ""
+      - name: Remove an OpenVPN instance
+        items:
+          - fields:
+              description: routerops example
+            state: absent

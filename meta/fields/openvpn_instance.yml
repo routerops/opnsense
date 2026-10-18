@@ -1,0 +1,516 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Instances.Instance"
+fields:
+  - name: "vpnid"
+    type: "VPNIdField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dev_type"
+    type: "OptionField"
+    required: true
+    default: "tun"
+    multiple: false
+    volatile: false
+    options:
+      - "tun"
+      - "tap"
+      - "ovpn"
+  - name: "verb"
+    type: "OptionField"
+    required: true
+    default: "3"
+    multiple: false
+    volatile: false
+    options:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+      - "8"
+      - "9"
+      - "10"
+      - "11"
+  - name: "proto"
+    type: "OptionField"
+    required: true
+    default: "udp"
+    multiple: false
+    volatile: false
+    options:
+      - "udp"
+      - "udp4"
+      - "udp6"
+      - "tcp"
+      - "tcp4"
+      - "tcp6"
+  - name: "port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "port-share"
+    type: "IPPortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "local"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "topology"
+    type: "OptionField"
+    required: true
+    default: "subnet"
+    multiple: false
+    volatile: false
+    options:
+      - "net30"
+      - "p2p"
+      - "subnet"
+  - name: "remote"
+    type: "RemoteHostField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "role"
+    type: "OptionField"
+    required: true
+    default: "server"
+    multiple: false
+    volatile: false
+    options:
+      - "client"
+      - "server"
+  - name: "server"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "server_ipv6"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nopool"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "bridge_gateway"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "bridge_pool"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "route"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "push_route"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "push_excluded_routes"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "cert"
+    type: "CertificateField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "crl"
+    type: "CertificateField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ca"
+    type: "CertificateField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "cert_depth"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+  - name: "remote_cert_tls"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "verify_client_cert"
+    type: "OptionField"
+    required: true
+    default: "require"
+    multiple: false
+    volatile: false
+    options:
+      - "none"
+      - "require"
+  - name: "use_ocsp"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "auth"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "BLAKE2b512"
+      - "BLAKE2s256"
+      - "MD4"
+      - "MD5"
+      - "MD5-SHA1"
+      - "RIPEMD160"
+      - "SHA1"
+      - "SHA224"
+      - "SHA256"
+      - "SHA3-224"
+      - "SHA3-256"
+      - "SHA3-384"
+      - "SHA3-512"
+      - "SHA384"
+      - "SHA512"
+      - "SHA512-224"
+      - "SHA512-256"
+      - "SHAKE128"
+      - "SHAKE256"
+      - "whirlpool"
+      - "none"
+  - name: "data-ciphers"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "AES-128-GCM"
+      - "AES-192-GCM"
+      - "AES-256-GCM"
+      - "CHACHA20-POLY1305"
+      - "AES-128-CBC"
+      - "AES-192-CBC"
+      - "AES-256-CBC"
+      - "AES-128-CFB"
+      - "AES-192-CFB"
+      - "AES-256-CFB"
+      - "AES-128-CFB1"
+      - "AES-192-CFB1"
+      - "AES-256-CFB1"
+      - "AES-128-CFB8"
+      - "AES-192-CFB8"
+      - "AES-256-CFB8"
+      - "AES-128-OFB"
+      - "AES-192-OFB"
+      - "AES-256-OFB"
+  - name: "data-ciphers-fallback"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "AES-128-GCM"
+      - "AES-192-GCM"
+      - "AES-256-GCM"
+      - "CHACHA20-POLY1305"
+      - "AES-128-CBC"
+      - "AES-192-CBC"
+      - "AES-256-CBC"
+      - "AES-128-CFB"
+      - "AES-192-CFB"
+      - "AES-256-CFB"
+      - "AES-128-CFB1"
+      - "AES-192-CFB1"
+      - "AES-256-CFB1"
+      - "AES-128-CFB8"
+      - "AES-192-CFB8"
+      - "AES-256-CFB8"
+      - "AES-128-OFB"
+      - "AES-192-OFB"
+      - "AES-256-OFB"
+  - name: "tls_key"
+    type: "ModelRelationField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "authmode"
+    type: "AuthenticationServerField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "local_group"
+    type: "AuthGroupField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "various_flags"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "block-ipv6"
+      - "client-to-client"
+      - "duplicate-cn"
+      - "float"
+      - "passtos"
+      - "persist-remote-ip"
+      - "remote-random"
+      - "route-noexec"
+      - "route-nopull"
+      - "explicit-exit-notify"
+      - "fast-io"
+  - name: "various_push_flags"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "block-ipv6"
+      - "block-outside-dns"
+      - "register-dns"
+      - "explicit-exit-notify"
+  - name: "push_inactive"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "username_as_common_name"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "strictusercn"
+    type: "OptionField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options:
+      - "0"
+      - "1"
+      - "2"
+  - name: "username"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "password"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "maxclients"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "keepalive_interval"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "keepalive_timeout"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "reneg-sec"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "auth-gen-token"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "auth-gen-token-renewal"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "auth-gen-token-secret"
+    type: "TextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "provision_exclusive"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "redirect_gateway"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "local"
+      - "autolocal"
+      - "def1"
+      - "bypass-dhcp"
+      - "bypass-dns"
+      - "block-local"
+      - "ipv6"
+      - "!ipv4"
+  - name: "route_metric"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "register_dns"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns_domain"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns_domain_search"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ntp_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tun_mtu"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "fragment"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "mssfix"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "carp_depend_on"
+    type: "VirtualIPField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "compress_migrate"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ifconfig-pool-persist"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "http-proxy"
+    type: "IPPortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "verify-x509-name"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
