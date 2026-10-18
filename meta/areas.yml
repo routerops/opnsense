@@ -535,3 +535,202 @@ opnsense_areas:
           - fields:
               name: RT_EXAMPLE_GW
             state: absent
+  unbound_general:
+    area: unbound
+    title: Unbound general
+    module: settings
+    path: unbound/settings
+    key: unbound.general
+    apply: unbound/service/reconfigureGeneral
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml
+      node: general
+    privileges:
+      - name: page-services-unbound
+        title: "Services: Unbound"
+        pattern: api/unbound/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Every apply restarts Unbound, so DNS stops answering for a moment.
+      A save that changes `enabled` or `port` fails while another service uses the port.
+    examples:
+      - name: Enable TXT records for host overrides
+        fields:
+          txtsupport: true
+  unbound_host_override:
+    area: unbound
+    title: Host override
+    module: item
+    path: unbound/settings
+    key: host
+    lookup: [hostname, domain, rr]
+    actions:
+      search: searchHostOverride
+      get: getHostOverride
+      add: addHostOverride
+      set: setHostOverride
+      del: delHostOverride
+    apply: unbound/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml
+      node: hosts.host
+    privileges:
+      - name: page-services-unbound
+        title: "Services: Unbound"
+        pattern: api/unbound/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Do not send `aliases`: OPNsense adds and deletes alias items from it; manage them with the host alias area.
+      The lookup includes `rr`, so an A and an AAAA record for one name are two items.
+      Deleting a host override also deletes its aliases.
+      Every apply restarts Unbound.
+    examples:
+      - name: Add a host override
+        items:
+          - fields:
+              hostname: rt-example
+              domain: routerops.test
+              rr: A
+              server: 10.250.1.30
+              description: routerops example
+      - name: Remove a host override
+        items:
+          - fields:
+              hostname: rt-example
+              domain: routerops.test
+              rr: A
+            state: absent
+  unbound_host_alias:
+    area: unbound
+    title: Host alias
+    module: item
+    path: unbound/settings
+    key: alias
+    lookup: [host, hostname, domain]
+    actions:
+      search: searchHostAlias
+      get: getHostAlias
+      add: addHostAlias
+      set: setHostAlias
+      del: delHostAlias
+    apply: unbound/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml
+      node: aliases.alias
+    privileges:
+      - name: page-services-unbound
+        title: "Services: Unbound"
+        pattern: api/unbound/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `host` is the uuid of a host override; register it from the host override's outcome.
+      The lookup includes `domain`, because an alias may set only a domain.
+      Send `domain: ""` to take the host's domain; the lookup needs the field.
+      In the examples, replace `EXAMPLE_HOST_UUID` with the `uuid` the host override example returns.
+    examples:
+      - name: Add an alias for the example host
+        items:
+          - fields:
+              host: EXAMPLE_HOST_UUID
+              hostname: rt-example-alias
+              domain: ""
+              description: routerops example
+      - name: Remove the alias
+        items:
+          - fields:
+              host: EXAMPLE_HOST_UUID
+              hostname: rt-example-alias
+              domain: ""
+            state: absent
+  unbound_forward:
+    area: unbound
+    title: Query forward
+    module: item
+    path: unbound/settings
+    key: dot
+    lookup: [domain, server]
+    actions:
+      search: searchForward
+      get: getForward
+      add: addForward
+      set: setForward
+      del: delForward
+    apply: unbound/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml
+      node: dots.dot
+    privileges:
+      - name: page-services-unbound
+        title: "Services: Unbound"
+        pattern: api/unbound/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Forward and DNS over TLS items share one list; the action name sets `type`, so never send it.
+      An empty `domain` forwards every query.
+      Every apply restarts Unbound.
+    examples:
+      - name: Forward a domain
+        items:
+          - fields:
+              domain: routerops.test
+              server: 10.250.1.53
+              description: routerops example
+      - name: Remove a forward
+        items:
+          - fields:
+              domain: routerops.test
+              server: 10.250.1.53
+            state: absent
+  unbound_acl:
+    area: unbound
+    title: ACL
+    module: item
+    path: unbound/settings
+    key: acl
+    lookup: [name]
+    actions:
+      search: searchAcl
+      get: getAcl
+      add: addAcl
+      set: setAcl
+      del: delAcl
+    apply: unbound/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml
+      node: acls.acl
+    privileges:
+      - name: page-services-unbound
+        title: "Services: Unbound"
+        pattern: api/unbound/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Names are not unique; keep them unique, the lookup takes the name.
+      Every apply restarts Unbound.
+    examples:
+      - name: Allow a network
+        items:
+          - fields:
+              name: routerops_example
+              action: allow
+              networks: [10.250.72.0/24]
+              description: routerops example
+      - name: Remove an ACL
+        items:
+          - fields:
+              name: routerops_example
+            state: absent

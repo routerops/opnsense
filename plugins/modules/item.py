@@ -699,6 +699,179 @@ EXAMPLES = r"""
       - fields:
           name: "RT_EXAMPLE_GW"
         state: "absent"
+
+- name: Allow a network
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "acl"
+    lookup: ["name"]
+    actions:
+      add: "addAcl"
+      del: "delAcl"
+      get: "getAcl"
+      search: "searchAcl"
+      set: "setAcl"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          name: "routerops_example"
+          action: "allow"
+          networks: ["10.250.72.0/24"]
+          description: "routerops example"
+
+- name: Remove an ACL
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "acl"
+    lookup: ["name"]
+    actions:
+      add: "addAcl"
+      del: "delAcl"
+      get: "getAcl"
+      search: "searchAcl"
+      set: "setAcl"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          name: "routerops_example"
+        state: "absent"
+
+- name: Forward a domain
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "dot"
+    lookup: ["domain", "server"]
+    actions:
+      add: "addForward"
+      del: "delForward"
+      get: "getForward"
+      search: "searchForward"
+      set: "setForward"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          domain: "routerops.test"
+          server: "10.250.1.53"
+          description: "routerops example"
+
+- name: Remove a forward
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "dot"
+    lookup: ["domain", "server"]
+    actions:
+      add: "addForward"
+      del: "delForward"
+      get: "getForward"
+      search: "searchForward"
+      set: "setForward"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          domain: "routerops.test"
+          server: "10.250.1.53"
+        state: "absent"
+
+- name: Add an alias for the example host
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "alias"
+    lookup: ["host", "hostname", "domain"]
+    actions:
+      add: "addHostAlias"
+      del: "delHostAlias"
+      get: "getHostAlias"
+      search: "searchHostAlias"
+      set: "setHostAlias"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          host: "EXAMPLE_HOST_UUID"
+          hostname: "rt-example-alias"
+          domain: ""
+          description: "routerops example"
+
+- name: Remove the alias
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "alias"
+    lookup: ["host", "hostname", "domain"]
+    actions:
+      add: "addHostAlias"
+      del: "delHostAlias"
+      get: "getHostAlias"
+      search: "searchHostAlias"
+      set: "setHostAlias"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          host: "EXAMPLE_HOST_UUID"
+          hostname: "rt-example-alias"
+          domain: ""
+        state: "absent"
+
+- name: Add a host override
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "host"
+    lookup: ["hostname", "domain", "rr"]
+    actions:
+      add: "addHostOverride"
+      del: "delHostOverride"
+      get: "getHostOverride"
+      search: "searchHostOverride"
+      set: "setHostOverride"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          hostname: "rt-example"
+          domain: "routerops.test"
+          rr: "A"
+          server: "10.250.1.30"
+          description: "routerops example"
+
+- name: Remove a host override
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "host"
+    lookup: ["hostname", "domain", "rr"]
+    actions:
+      add: "addHostOverride"
+      del: "delHostOverride"
+      get: "getHostOverride"
+      search: "searchHostOverride"
+      set: "setHostOverride"
+    apply: "unbound/service/reconfigure"
+    items:
+      - fields:
+          hostname: "rt-example"
+          domain: "routerops.test"
+          rr: "A"
+        state: "absent"
 """
 # END EXAMPLES: generated from meta/areas.yml by make docs
 

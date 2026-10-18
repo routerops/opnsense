@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#acls.acl"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "name"
+    type: "StrictTextField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "action"
+    type: "OptionField"
+    required: true
+    default: "allow"
+    multiple: false
+    volatile: false
+    options:
+      - "allow"
+      - "deny"
+      - "refuse"
+      - "allow_snoop"
+      - "deny_non_local"
+      - "refuse_non_local"
+  - name: "networks"
+    type: "NetworkField"
+    required: true
+    multiple: true
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

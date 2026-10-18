@@ -105,6 +105,17 @@ EXAMPLES = r"""
     fields:
       enabled: true
       listenport: 9100
+
+- name: Enable TXT records for host overrides
+  routerops.opnsense.settings:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "unbound/settings"
+    key: "unbound.general"
+    apply: "unbound/service/reconfigureGeneral"
+    fields:
+      txtsupport: true
 """
 # END EXAMPLES: generated from meta/areas.yml by make docs
 

@@ -1,0 +1,67 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#dots.dot"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "type"
+    type: "OptionField"
+    required: true
+    default: "dot"
+    multiple: false
+    volatile: false
+    options:
+      - "dot"
+      - "forward"
+  - name: "domain"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "server"
+    type: "NetworkField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "verify"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "forward_tcp_upstream"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "forward_first"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
