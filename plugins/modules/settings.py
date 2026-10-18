@@ -83,6 +83,18 @@ notes:
 
 # BEGIN EXAMPLES: generated from meta/areas.yml by make docs
 EXAMPLES = r"""
+- name: Raise the lease limit
+  routerops.opnsense.settings:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "dnsmasq"
+    apply: "dnsmasq/service/reconfigure"
+    fields:
+      dhcp:
+        lease_max: 2000
+
 - name: Use hybrid outbound NAT
   routerops.opnsense.settings:
     url: https://fw.example

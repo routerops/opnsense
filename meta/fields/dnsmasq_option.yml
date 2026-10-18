@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#dhcp_options"
+fields:
+  - name: "type"
+    type: "OptionField"
+    required: true
+    default: "set"
+    multiple: false
+    volatile: false
+    options:
+      - "set"
+      - "match"
+  - name: "option"
+    type: "JsonKeyValueStoreField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      # mock option groups returned by JSON
+      - "optgroup1"
+      - "optgroup2"
+      - "optgroup3"
+  - name: "option6"
+    type: "JsonKeyValueStoreField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      # mock option groups returned by JSON
+      - "optgroup1"
+      - "optgroup2"
+      - "optgroup3"
+  - name: "interface"
+    type: "InterfaceField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tag"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "set_tag"
+    type: "ModelRelationField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "value"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "force"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

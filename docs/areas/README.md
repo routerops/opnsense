@@ -3,7 +3,11 @@
 
 | Area | Item type | Module | Path | Plugin | Minimum OPNsense | Stage | Tested on |
 |---|---|---|---|---|---|---|---|
+| [dnsmasq](dnsmasq.md) | [Dnsmasq domain override](dnsmasq.md#dnsmasq-domain-override) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq general](dnsmasq.md#dnsmasq-general) | `settings` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
 | [dnsmasq](dnsmasq.md) | [Dnsmasq host](dnsmasq.md#dnsmasq-host) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq DHCP option](dnsmasq.md#dnsmasq-dhcp-option) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq DHCP range](dnsmasq.md#dnsmasq-dhcp-range) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
 | [firewall](firewall.md) | [Firewall alias](firewall.md#firewall-alias) | `item` | `firewall/alias` | - | - | v0 | 26.7.7 |
 | [firewall](firewall.md) | [Firewall destination NAT](firewall.md#firewall-destination-nat) | `item` | `firewall/d_nat` | - | - | v0 | 26.7.7 |
 | [firewall](firewall.md) | [Firewall filter rule](firewall.md#firewall-filter-rule) | `item` | `firewall/filter` | - | - | v0 | 26.7.7 |

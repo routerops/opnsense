@@ -1,0 +1,106 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the settings module against the Dnsmasq general settings
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['dnsmasq_general'] }}"
+  tasks:
+    - name: Read the original lease limit
+      routerops.opnsense.settings:
+        fields:
+          dhcp:
+            lease_max: 2000
+      check_mode: true
+      register: opnsense_test_original
+
+    - name: Run the Dnsmasq general tests
+      block:
+        - name: Raise the lease limit in check mode
+          routerops.opnsense.settings:
+            fields:
+              dhcp:
+                lease_max: "{{ opnsense_test_original['settings']['dhcp']['lease_max'] | int + 1000 }}"
+          check_mode: true
+          register: opnsense_test_check_flip
+
+        - name: Read the lease limit after the check-mode run
+          routerops.opnsense.settings:
+            fields:
+              dhcp:
+                lease_max: "{{ opnsense_test_original['settings']['dhcp']['lease_max'] }}"
+          check_mode: true
+          register: opnsense_test_after_check
+
+        - name: Raise the lease limit
+          routerops.opnsense.settings:
+            fields:
+              dhcp:
+                lease_max: "{{ opnsense_test_original['settings']['dhcp']['lease_max'] | int + 1000 }}"
+          register: opnsense_test_flip
+
+        - name: Raise the lease limit again
+          routerops.opnsense.settings:
+            fields:
+              dhcp:
+                lease_max: "{{ opnsense_test_original['settings']['dhcp']['lease_max'] | int + 1000 }}"
+          register: opnsense_test_again
+
+        - name: Move Dnsmasq onto the Unbound port
+          routerops.opnsense.settings:
+            fields:
+              port: 53
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_flip['changed']
+              - not opnsense_test_after_check['changed']
+              - opnsense_test_flip['changed']
+              - not opnsense_test_again['changed']
+              - opnsense_test_invalid['failed']
+              - not opnsense_test_invalid['changed']
+              - "'dnsmasq.port' in opnsense_test_invalid['validations']"
+              - "'currently using this port' in opnsense_test_invalid['validations']['dnsmasq.port']"
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.settings:
+            fields: "{{ item[0]['fields'] }}"
+          loop: "{{ opnsense_test_area['examples'] | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Restore the original lease limit
+          routerops.opnsense.settings:
+            fields: "{{ opnsense_test_original['settings'] }}"
+
+        - name: Read the lease limit after the restore
+          routerops.opnsense.settings:
+            fields: "{{ opnsense_test_original['settings'] }}"
+          check_mode: true
+          register: opnsense_test_restored
+
+        - name: Assert that the original setting is back
+          ansible.builtin.assert:
+            that:
+              - not opnsense_test_restored['changed']

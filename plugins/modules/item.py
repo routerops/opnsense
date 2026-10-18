@@ -151,6 +151,50 @@ notes:
 
 # BEGIN EXAMPLES: generated from meta/areas.yml by make docs
 EXAMPLES = r"""
+- name: Send a domain to another server
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "domainoverride"
+    lookup: ["domain", "ip", "ipset"]
+    actions:
+      add: "addDomain"
+      del: "delDomain"
+      get: "getDomain"
+      search: "searchDomain"
+      set: "setDomain"
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          domain: "example.routerops.test"
+          ip: "10.250.1.53"
+          ipset: ""
+          descr: "routerops example"
+
+- name: Remove a domain override
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "domainoverride"
+    lookup: ["domain", "ip", "ipset"]
+    actions:
+      add: "addDomain"
+      del: "delDomain"
+      get: "getDomain"
+      search: "searchDomain"
+      set: "setDomain"
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          domain: "example.routerops.test"
+          ip: "10.250.1.53"
+          ipset: ""
+        state: "absent"
+
 - name: Add a Dnsmasq host
   routerops.opnsense.item:
     url: https://fw.example
@@ -217,6 +261,94 @@ EXAMPLES = r"""
       - fields:
           host: "scanner"
           domain: "example.test"
+        state: "absent"
+
+- name: Hand out the LAN DNS server
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "option"
+    lookup: ["description"]
+    actions:
+      add: "addOption"
+      del: "delOption"
+      get: "getOption"
+      search: "searchOption"
+      set: "setOption"
+    always_send: ["type"]
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          type: "set"
+          option: "6"
+          interface: "lan"
+          value: "10.250.1.1"
+          description: "routerops example"
+
+- name: Remove a DHCP option
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "option"
+    lookup: ["description"]
+    actions:
+      add: "addOption"
+      del: "delOption"
+      get: "getOption"
+      search: "searchOption"
+      set: "setOption"
+    always_send: ["type"]
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          description: "routerops example"
+        state: "absent"
+
+- name: Add a DHCP range on LAN
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "range"
+    lookup: ["interface", "start_addr"]
+    actions:
+      add: "addRange"
+      del: "delRange"
+      get: "getRange"
+      search: "searchRange"
+      set: "setRange"
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          interface: "lan"
+          start_addr: "10.250.1.200"
+          end_addr: "10.250.1.219"
+          description: "routerops example"
+
+- name: Remove a DHCP range
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "dnsmasq/settings"
+    key: "range"
+    lookup: ["interface", "start_addr"]
+    actions:
+      add: "addRange"
+      del: "delRange"
+      get: "getRange"
+      search: "searchRange"
+      set: "setRange"
+    apply: "dnsmasq/service/reconfigure"
+    items:
+      - fields:
+          interface: "lan"
+          start_addr: "10.250.1.200"
         state: "absent"
 
 - name: Keep a host alias
