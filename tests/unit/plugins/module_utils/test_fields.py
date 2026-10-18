@@ -29,6 +29,14 @@ def test_normalize_single_option():
     assert normalize({"a": {"value": "A", "selected": 0}, "b": {"value": "B", "selected": 1}}, "b") == "b"
 
 
+def test_normalize_option_list_with_numeric_keys():
+    read = [{"value": "zero", "selected": 0}, {"value": "one", "selected": 0}, {"value": "two", "selected": 1}]
+    assert normalize(read, "2") == "2"
+    assert normalize(read, 2) == 2
+    assert normalize(read, ["2"]) == ["2"]
+    assert not field_diff({"verb": read}, {"verb": "2"})
+
+
 def test_normalize_multi_option():
     assert normalize({"a": {"selected": 1}, "b": {"selected": 1}, "c": {"selected": 0}}, ["a", "b"]) == ["a", "b"]
 
