@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#general"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "manual_config"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "interfaces"
+    type: "InterfaceField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "service_sockets_max_retries"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "service_sockets_retry_wait_time"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "valid_lifetime"
+    type: "IntegerField"
+    required: true
+    default: "4000"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "decline_probation_period"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "fwrules"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dhcp_socket_type"
+    type: "OptionField"
+    required: true
+    default: "raw"
+    multiple: false
+    volatile: false
+    options:
+      - "udp"
+      - "raw"
+  - name: "compatibility"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "exclude-first-last-24"
+      - "ignore-dhcp-server-identifier"
+      - "ignore-rai-link-selection"
+      - "lenient-option-parsing"

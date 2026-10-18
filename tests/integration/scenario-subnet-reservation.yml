@@ -1,0 +1,151 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test that a subnet a reservation uses cannot be deleted
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  vars:
+    opnsense_test_subnet_area: "{{ opnsense_areas['kea_dhcpv4_subnet'] }}"
+    opnsense_test_reservation_area: "{{ opnsense_areas['kea_dhcpv4_reservation'] }}"
+    opnsense_test_subnet:
+      subnet: 10.250.62.0/24
+      pools: [10.250.62.100-10.250.62.199]
+      description: routerops test scenario
+    opnsense_test_reservation:
+      subnet: "{{ opnsense_test_subnet_add['outcomes'][0]['uuid'] }}"
+      hw_address: "02:00:00:00:62:01"
+      client_id: ""
+      ip_address: 10.250.62.10
+      hostname: rt-scenario
+      description: routerops test scenario
+  tasks:
+    - name: Run the subnet and reservation scenario
+      block:
+        - name: Add the subnet
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            separators: "{{ opnsense_test_subnet_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_subnet_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_subnet_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_subnet }}"
+          register: opnsense_test_subnet_add
+
+        - name: Add the reservation in the subnet
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_reservation_area['path'] }}"
+            key: "{{ opnsense_test_reservation_area['key'] }}"
+            lookup: "{{ opnsense_test_reservation_area['lookup'] }}"
+            actions: "{{ opnsense_test_reservation_area['actions'] }}"
+            apply: "{{ opnsense_test_reservation_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_reservation }}"
+          register: opnsense_test_reservation_add
+
+        - name: Add the subnet again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            separators: "{{ opnsense_test_subnet_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_subnet_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_subnet_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_subnet }}"
+          register: opnsense_test_subnet_again
+
+        - name: Add the reservation again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_reservation_area['path'] }}"
+            key: "{{ opnsense_test_reservation_area['key'] }}"
+            lookup: "{{ opnsense_test_reservation_area['lookup'] }}"
+            actions: "{{ opnsense_test_reservation_area['actions'] }}"
+            apply: "{{ opnsense_test_reservation_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_reservation }}"
+          register: opnsense_test_reservation_again
+
+        - name: Remove the subnet while a reservation uses it
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            separators: "{{ opnsense_test_subnet_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_subnet_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_subnet_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_subnet }}"
+                state: absent
+          register: opnsense_test_subnet_in_use
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_reservation_add['changed']
+              - not opnsense_test_subnet_again['changed']
+              - not opnsense_test_reservation_again['changed']
+              - opnsense_test_subnet_in_use['failed']
+              - not opnsense_test_subnet_in_use['changed']
+              - "'in use by' in opnsense_test_subnet_in_use['msg']"
+      always:
+        - name: Remove the reservation
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_reservation_area['path'] }}"
+            key: "{{ opnsense_test_reservation_area['key'] }}"
+            lookup: "{{ opnsense_test_reservation_area['lookup'] }}"
+            actions: "{{ opnsense_test_reservation_area['actions'] }}"
+            apply: "{{ opnsense_test_reservation_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_reservation }}"
+                state: absent
+          when: opnsense_test_subnet_add['outcomes'] is defined
+
+        - name: Remove the subnet
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            separators: "{{ opnsense_test_subnet_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_subnet_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_subnet_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_subnet }}"
+                state: absent
+
+        - name: Look up the reservation after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_reservation_area['path'] }}"
+            key: "{{ opnsense_test_reservation_area['key'] }}"
+            lookup: "{{ opnsense_test_reservation_area['lookup'] }}"
+            actions: "{{ opnsense_test_reservation_area['actions'] }}"
+            items:
+              - fields: "{{ opnsense_test_reservation }}"
+                state: query
+          register: opnsense_test_reservation_left
+          when: opnsense_test_subnet_add['outcomes'] is defined
+
+        - name: Look up the subnet after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_subnet_area['path'] }}"
+            key: "{{ opnsense_test_subnet_area['key'] }}"
+            lookup: "{{ opnsense_test_subnet_area['lookup'] }}"
+            actions: "{{ opnsense_test_subnet_area['actions'] }}"
+            items:
+              - fields: "{{ opnsense_test_subnet }}"
+                state: query
+          register: opnsense_test_subnet_left
+
+        - name: Assert that the cleanup removed both items
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_reservation_left['outcomes'] | default([]) | map(attribute='uuid') | select | list | length == 0
+              - opnsense_test_subnet_left['outcomes'] | map(attribute='uuid') | select | list | length == 0

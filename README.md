@@ -18,6 +18,7 @@ Each area page lists the path, key, actions, lookup and apply path a call needs,
 | [dnsmasq](docs/areas/dnsmasq.md) | [Dnsmasq host](docs/areas/dnsmasq.md#dnsmasq-host) |
 | [firewall](docs/areas/firewall.md) | [Firewall alias](docs/areas/firewall.md#firewall-alias), [Firewall destination NAT](docs/areas/firewall.md#firewall-destination-nat), [Firewall filter rule](docs/areas/firewall.md#firewall-filter-rule), [Firewall one-to-one NAT](docs/areas/firewall.md#firewall-one-to-one-nat), [Firewall source NAT rule](docs/areas/firewall.md#firewall-source-nat-rule), [Firewall outbound NAT mode](docs/areas/firewall.md#firewall-outbound-nat-mode) |
 | [interfaces](docs/areas/interfaces.md) | [Assignment](docs/areas/interfaces.md#assignment), [Virtual IP](docs/areas/interfaces.md#virtual-ip), [VLAN](docs/areas/interfaces.md#vlan) |
+| [kea](docs/areas/kea.md) | [Kea DHCPv4 general](docs/areas/kea.md#kea-dhcpv4-general), [DHCPv4 reservation](docs/areas/kea.md#dhcpv4-reservation), [DHCPv4 subnet](docs/areas/kea.md#dhcpv4-subnet) |
 | [nodeexporter](docs/areas/nodeexporter.md) | [node_exporter general](docs/areas/nodeexporter.md#node_exporter-general) |
 | [routes](docs/areas/routes.md) | [Static route](docs/areas/routes.md#static-route) |
 | [routing](docs/areas/routing.md) | [Gateway](docs/areas/routing.md#gateway) |
