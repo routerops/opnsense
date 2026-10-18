@@ -53,6 +53,9 @@
     items:
 {% for i in x['items'] %}
       - fields:{{ yaml_value(i['fields'], 10) }}
+{% if i.get('write_only') %}
+        write_only:{{ yaml_value(i['write_only'], 10) }}
+{% endif %}
 {% if i.get('state') %}
         state:{{ yaml_value(i['state'], 8) }}
 {% endif %}

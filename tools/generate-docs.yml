@@ -126,6 +126,8 @@
               fields:
                 type: dict
                 required: true
+              write_only:
+                type: dict
               state:
                 type: str
                 choices: [present, absent, query]

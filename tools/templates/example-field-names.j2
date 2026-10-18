@@ -2,6 +2,7 @@
 {# SPDX-License-Identifier: GPL-3.0-or-later #}
 {% set e = opnsense_docs_entry %}
 {% set maps = e['examples'] | map(attribute='fields') | list if e['module'] == 'settings' else e['examples'] | map(attribute='items') | flatten(levels=1) | map(attribute='fields') | list %}
+{% set maps = maps + (e['examples'] | map(attribute='items') | flatten(levels=1) | selectattr('write_only', 'defined') | map(attribute='write_only') | list if e['module'] == 'item' else []) %}
 {% for m in maps %}
 {% for k, v in m.items() %}
 {% if v is mapping %}
