@@ -852,3 +852,164 @@ opnsense_areas:
               hw_address: "02:00:00:00:69:01"
               client_id: ""
             state: absent
+  dnsmasq_general:
+    area: dnsmasq
+    title: Dnsmasq general
+    module: settings
+    path: dnsmasq/settings
+    key: dnsmasq
+    apply: dnsmasq/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml
+    privileges:
+      - name: page-services-dnsforwarder
+        title: "Services: Dnsmasq DNS/DHCP: Settings"
+        pattern: api/dnsmasq/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a save that moves Dnsmasq onto a port another service uses fails.
+      Send `port: 0` to run Dnsmasq for DHCP only.
+      Every apply also reloads the firewall rules.
+    examples:
+      - name: Raise the lease limit
+        fields:
+          dhcp:
+            lease_max: 2000
+  dnsmasq_domain_override:
+    area: dnsmasq
+    title: Dnsmasq domain override
+    module: item
+    path: dnsmasq/settings
+    key: domainoverride
+    lookup: [domain, ip, ipset]
+    actions:
+      search: searchDomain
+      get: getDomain
+      add: addDomain
+      set: setDomain
+      del: delDomain
+    apply: dnsmasq/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml
+      node: domainoverrides
+    privileges:
+      - name: page-services-dnsforwarder
+        title: "Services: Dnsmasq DNS/DHCP: Settings"
+        pattern: api/dnsmasq/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      The lookup includes `ip` and `ipset`, so one domain can go to several servers or feed several aliases; send the unused one as `""`.
+      With `ip` and `ipset` empty, Dnsmasq answers the domain from its hosts and leases only and never forwards it;
+      with only `ipset` set, the domain is forwarded as usual and its addresses go into the alias.
+      `!` is stored as empty and shows a change on every run.
+      Every apply also reloads the firewall rules.
+    examples:
+      - name: Send a domain to another server
+        items:
+          - fields:
+              domain: example.routerops.test
+              ip: 10.250.1.53
+              ipset: ""
+              descr: routerops example
+      - name: Remove a domain override
+        items:
+          - fields:
+              domain: example.routerops.test
+              ip: 10.250.1.53
+              ipset: ""
+            state: absent
+  dnsmasq_range:
+    area: dnsmasq
+    title: Dnsmasq DHCP range
+    module: item
+    path: dnsmasq/settings
+    key: range
+    lookup: [interface, start_addr]
+    actions:
+      search: searchRange
+      get: getRange
+      add: addRange
+      set: setRange
+      del: delRange
+    apply: dnsmasq/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml
+      node: dhcp_ranges
+    privileges:
+      - name: page-services-dnsforwarder
+        title: "Services: Dnsmasq DNS/DHCP: Settings"
+        pattern: api/dnsmasq/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      A range serves DHCP once Dnsmasq is enabled, which it is by default, and listens on the range's interface, by default only `lan`.
+      With `dhcp.default_fw_rules` on, the firewall opens DHCP on the listen interfaces, or on every range interface when Dnsmasq listens on all.
+      Every apply also reloads the firewall rules.
+    examples:
+      - name: Add a DHCP range on LAN
+        items:
+          - fields:
+              interface: lan
+              start_addr: 10.250.1.200
+              end_addr: 10.250.1.219
+              description: routerops example
+      - name: Remove a DHCP range
+        items:
+          - fields:
+              interface: lan
+              start_addr: 10.250.1.200
+            state: absent
+  dnsmasq_option:
+    area: dnsmasq
+    title: Dnsmasq DHCP option
+    module: item
+    path: dnsmasq/settings
+    key: option
+    lookup: [description]
+    always_send: [type]
+    actions:
+      search: searchOption
+      get: getOption
+      add: addOption
+      set: setOption
+      del: delOption
+    apply: dnsmasq/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml
+      node: dhcp_options
+    privileges:
+      - name: page-services-dnsforwarder
+        title: "Services: Dnsmasq DNS/DHCP: Settings"
+        pattern: api/dnsmasq/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      OPNsense clears the fields that do not fit `type` on a write that sends it, as the GUI always does, so the module sends `type` on every update.
+      `type: set` clears `set_tag`, and `type: match` clears `tag`, `interface` and `force`; send only the fields that fit, or every run shows a change.
+      `option` takes the DHCP option number (`6` is dns-server).
+      Descriptions identify an option; keep them unique.
+      Options made in the GUI often have no description, and two of those collide, so give each one a description before managing it here.
+    examples:
+      - name: Hand out the LAN DNS server
+        items:
+          - fields:
+              type: set
+              option: "6"
+              interface: lan
+              value: 10.250.1.1
+              description: routerops example
+      - name: Remove a DHCP option
+        items:
+          - fields:
+              description: routerops example
+            state: absent

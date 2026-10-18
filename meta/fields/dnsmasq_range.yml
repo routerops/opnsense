@@ -1,0 +1,127 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#dhcp_ranges"
+fields:
+  - name: "interface"
+    type: "InterfaceField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "set_tag"
+    type: "ModelRelationField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "start_addr"
+    type: "RangeAddressField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "end_addr"
+    type: "RangeAddressField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "subnet_mask"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "constructor"
+    type: "InterfaceField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "mode"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "static"
+  - name: "prefix_len"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "lease_time"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "domain_type"
+    type: "OptionField"
+    required: true
+    default: "range"
+    multiple: false
+    volatile: false
+    options:
+      - "interface"
+      - "range"
+  - name: "domain"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nosync"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ra_mode"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "ra-only"
+      - "slaac"
+      - "ra-names"
+      - "ra-stateless"
+      - "ra-advrouter"
+      - "off-link"
+  - name: "ra_priority"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "high"
+      - "low"
+  - name: "ra_mtu"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ra_interval"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ra_router_lifetime"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

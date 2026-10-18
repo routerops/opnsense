@@ -31,6 +31,7 @@ PATH_EXPR
         | map({"prefix": $c + ".", "e": .}))
     else [] end)
 | flatten(1)
+ROOT_FILTER
 | map({
     "name": .prefix + .e.key,
     "type": (.e.value["+@type"] | split("\\") | .[-1]),
@@ -63,6 +64,10 @@ if [ "$(yq -p xml -oy "${deep/PATH_EXPR/$path}" "$xml")" != 0 ]; then
     exit 1
 fi
 
+# A model root lists its item lists next to its fields; each list is its own area.
+root_filter='| map(select(.e.value["+@type"] | test("ArrayField$") | not))'
+[ -n "$node" ] && root_filter=''
+program=${program/ROOT_FILTER/$root_filter}
 out=$(yq -p xml -oy "${program/PATH_EXPR/$path}" "$xml")
 if [ "$out" = "[]" ]; then
     echo "extract-fields: node '$node' below model.items in $xml holds no fields" >&2

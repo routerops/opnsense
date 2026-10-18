@@ -1,0 +1,17 @@
+<!-- node: -->
+<model>
+    <mount>//Test/Arrays</mount>
+    <items>
+        <name type="TextField"/>
+        <dhcp>
+            <local type="BooleanField">
+                <Default>1</Default>
+            </local>
+        </dhcp>
+        <hosts type="ArrayField">
+            <host type="TextField">
+                <Required>Y</Required>
+            </host>
+        </hosts>
+    </items>
+</model>
