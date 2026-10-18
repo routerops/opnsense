@@ -22,6 +22,7 @@
 | [kea](kea.md) | [DHCPv4 subnet](kea.md#dhcpv4-subnet) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [nodeexporter](nodeexporter.md) | [node_exporter general](nodeexporter.md#node_exporter-general) | `settings` | `nodeexporter/general` | `os-node_exporter` | - | v0 | 26.7.7 |
 | [openvpn](openvpn.md) | [OpenVPN instance](openvpn.md#openvpn-instance) | `item` | `openvpn/instances` | - | - | v0 | 26.7.7 |
+| [openvpn](openvpn.md) | [OpenVPN static key](openvpn.md#openvpn-static-key) | `item` | `openvpn/instances` | - | - | v0 | 26.7.7 |
 | [routes](routes.md) | [Static route](routes.md#static-route) | `item` | `routes/routes` | - | - | v0 | 26.7.7 |
 | [routing](routing.md) | [Gateway](routing.md#gateway) | `item` | `routing/settings` | - | - | v0 | 26.7.7 |
 | [trust](trust.md) | [Certificate authority](trust.md#certificate-authority) | `item` | `trust/ca` | - | - | v0 | 26.7.7 |

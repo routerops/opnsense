@@ -1133,7 +1133,7 @@ opnsense_areas:
       del: del
     apply: openvpn/service/reconfigure
     write_only: [vpnid]
-    secret_fields: [password]
+    secret_fields: [password, auth-gen-token-secret]
     model:
       repo: core
       file: src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml
@@ -1169,6 +1169,54 @@ opnsense_areas:
             write_only:
               vpnid: ""
       - name: Remove an OpenVPN instance
+        items:
+          - fields:
+              description: routerops example
+            state: absent
+  openvpn_static_key:
+    area: openvpn
+    title: OpenVPN static key
+    module: item
+    path: openvpn/instances
+    key: statickey
+    lookup: [description]
+    actions:
+      search: searchStaticKey
+      get: getStaticKey
+      add: addStaticKey
+      set: setStaticKey
+      del: delStaticKey
+    apply: openvpn/service/reconfigure
+    secret_fields: [key]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml
+      node: StaticKeys.StaticKey
+    privileges:
+      - name: page-openvpn-instances
+        title: "VPN: OpenVPN: Instances"
+        pattern: api/openvpn/instances/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+      - name: page-status-openvpn
+        title: "Status: OpenVPN"
+        pattern: api/openvpn/service/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Generate `key` with `openvpn/instances/gen_key/tls-crypt`, or `tls-auth` and `tls-crypt-v2-server` to match `mode`.
+      OPNsense deletes a key even while an instance uses it as `tls_key`.
+      The key is readable through the API; it is masked in the diff and the return values.
+      Descriptions identify a key; keep them unique.
+      In the examples, replace `EXAMPLE_STATIC_KEY` with a generated key.
+    examples:
+      - name: Add a TLS crypt key
+        items:
+          - fields:
+              mode: crypt
+              key: EXAMPLE_STATIC_KEY
+              description: routerops example
+      - name: Remove a static key
         items:
           - fields:
               description: routerops example
