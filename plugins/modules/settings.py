@@ -83,6 +83,17 @@ notes:
 
 # BEGIN EXAMPLES: generated from meta/areas.yml by make docs
 EXAMPLES = r"""
+- name: Use hybrid outbound NAT
+  routerops.opnsense.settings:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "firewall/source_nat"
+    key: "filter.general"
+    apply: "firewall/source_nat/apply"
+    fields:
+      snat_mode: "hybrid"
+
 - name: Enable node_exporter on port 9100
   routerops.opnsense.settings:
     url: https://fw.example

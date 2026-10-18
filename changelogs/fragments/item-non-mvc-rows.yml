@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - >-
+    item - ignore search rows whose ``uuid`` is not a UUID (automatic rules, generated gateways) for ``present``, ``absent`` and ``purge``;
+    a lookup could match them and add a duplicate on every run. ``query`` still finds such rows, for example the built-in alias ``bogons``.

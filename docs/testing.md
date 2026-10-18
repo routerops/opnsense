@@ -28,7 +28,7 @@ OPNSENSE_INTEGRATION=1 make integration TARGET=test-nodeexporter-general-setting
 unset OPNSENSE_API_KEY OPNSENSE_API_SECRET OPNSENSE_URL OPNSENSE_VALIDATE_CERTS
 ```
 
-Omit `TARGET` to run every test. Reset the VM between runs on the Proxmox node: `qm rollback 9090 clean && qm start 9090` (VMID 9090 on the owner's node); `make integration` has no Proxmox access.
+Omit `TARGET` to run every test. Scenario playbooks (`scenario-*.yml`) run after the area tests; `TARGET=scenario-<name>` runs one alone. Reset the VM between runs on the Proxmox node: `qm rollback 9090 clean && qm start 9090` (VMID 9090 on the owner's node); `make integration` has no Proxmox access.
 
 A test whose catalog entry names a `plugin` fails when the endpoint is not found. On a target without that plugin, set `OPNSENSE_SKIP_MISSING_PLUGINS=1` to end the play with a skip message instead; the test VM has every plugin installed, so runs against it leave the variable unset.
 
@@ -55,7 +55,14 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 |---|---|---|
 | `test-dnsmasq-host-item` | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml` |
 | `test-firewall-alias-item` | `page-firewall-alias-edit` ("Firewall: Alias: Edit", `api/firewall/alias/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml` |
+| `test-firewall-destination-nat-item` | `page-firewall-nat-portforward-edit` ("Firewall: NAT: Destination NAT", `api/firewall/d_nat/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml` |
+| `test-firewall-filter-rule-item` | `page-filter-api` ("Firewall: Rules [new]", `api/firewall/filter/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml` |
+| `test-firewall-one-to-one-nat-item` | `page-firewall-nat-1-1-edit` ("Firewall: NAT: 1:1", `api/firewall/one_to_one/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml` |
+| `test-firewall-source-nat-item` | `page-filter-snat-api` ("Firewall: NAT: Source NAT", `api/firewall/source_nat/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml` |
+| `test-firewall-source-nat-general-settings` | `page-filter-snat-api` ("Firewall: NAT: Source NAT", `api/firewall/source_nat/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml` |
 | `test-nodeexporter-general-settings` | `page-services-nodeexporter` ("Services: Prometheus Exporter", `api/nodeexporter/*`) | `opnsense-plugins/sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/ACL/ACL.xml` |
+| `test-routes-static-route-item` | `page-system-staticroutes` ("System: Static Routes", `api/routes/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml` |
+| `test-routing-gateway-item` | `page-system-gateways` ("System: Gateways", `api/routing/settings/*`) | `opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml` |
 <!-- END privileges: generated from meta/areas.yml by make docs -->
 
 ## Verified runs
@@ -71,4 +78,14 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 | 17.10.2026 | 26.7.7 | `test-dnsmasq-host-item` | passed with connection options from the environment and the example list (add, purge, delete), each example run twice (`failed=0`, one ignored expected failure) |
 | 17.10.2026 | 26.7.7 | `test-firewall-alias-item` | passed with `secret_fields` on a `urltable` alias password (a copy without it failed on the leak assert), `state: query` on `bogons` (type `external`; a copy expecting another type failed) and `return_fields` (`failed=0`) |
 | 17.10.2026 | 26.7.7 | `test-nodeexporter-general-settings` | passed with connection options from the environment (`failed=0`, one ignored expected failure) |
+| 18.10.2026 | 26.7.7 | `test-firewall-filter-rule-item` | passed (`failed=0`, one ignored expected failure); the fresh VM lists 17 automatic rules with md5 ids, and a build from `main` without the non-MVC row fix failed on the purge assert; the fault-injected copy failed on the idempotency assert as intended |
+| 18.10.2026 | 26.7.7 | `test-firewall-destination-nat-item` | passed with a nested `destination.port` update and an unchanged rerun (`failed=0`, one ignored expected failure); the fault-injected copy failed on the nested idempotency assert as intended |
+| 18.10.2026 | 26.7.7 | `test-firewall-source-nat-general-settings` | passed with the original mode restored in `always` (`failed=0`, one ignored expected failure); OPNsense rejects an unknown mode with "Option [] not in list." |
+| 18.10.2026 | 26.7.7 | `test-firewall-source-nat-item` | passed in `hybrid` mode with the original mode restored after the cleanup (`failed=0`, one ignored expected failure); the copy without the mode switch failed on the rerun assert (duplicate add) as intended |
+| 18.10.2026 | 26.7.7 | `test-firewall-one-to-one-nat-item` | passed with the `purge` example run twice (`failed=0`, one ignored expected failure: "External subnet should match internal subnet."); the fault-injected copy failed on the idempotency assert as intended |
+| 18.10.2026 | 26.7.7 | `test-routing-gateway-item` | passed (`failed=0`, one ignored expected failure); the check-mode `purge` listed one gateway the VM already holds, a UUID row, and no generated gateway; the fault-injected copy failed on the idempotency assert as intended |
+| 18.10.2026 | 26.7.7 | `test-routes-static-route-item` | passed with the `purge` example run twice (`failed=0`, one ignored expected failure); the fault-injected copy failed on the idempotency assert as intended; after a route write that fills the gateway cache before the gateway exists, a copy without the 21 s pause failed on `route.gateway` and the copy with it passed |
+| 18.10.2026 | 26.7.7 | `scenario-alias-filter-rule` | passed (`failed=0`, one ignored expected failure); deleting the alias a filter rule uses answers HTTP 500 "Alias in use: Cannot delete alias rt_scenario_hosts. Currently in use by [OPNsense.Firewall.Filter.rules.rule.2/destination_net]", naming the alias and the rule's model path, not its description; a copy whose rule does not use the alias failed on the `failed` assert as intended |
+| 18.10.2026 | 26.7.7 | all `test-*` and `scenario-alias-filter-rule` in one `make integration-local` | the first full run failed in `test-firewall-alias-item`: the non-MVC row filter hid the built-in alias `bogons`, whose search `uuid` is its name, from `state: query`; after the fix all eleven plays passed (`failed=0`) |
+| 18.10.2026 | 26.7.7 | `test-firewall-source-nat-item`, `test-routes-static-route-item`, `test-firewall-alias-item` | passed after the review fixes (`query` prefers UUID rows, mode restore before the last assert, gateway lookup after the route cleanup) (`failed=0`); a route test copy that skips the gateway removal failed on the new gateway assert as intended |
 | 17.10.2026 | 26.7.7 | `test-dnsmasq-host-item`, `test-firewall-alias-item` | passed with a cleanup check that queries every catalog example after the `always` block; the earlier runs above left the examples without `state` on the VM, which the new check caught (`failed=1`) before the cleanup filter was fixed |

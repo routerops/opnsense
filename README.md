@@ -16,8 +16,10 @@ Each area page lists the path, key, actions, lookup and apply path a call needs,
 | Area | Item types |
 |---|---|
 | [dnsmasq](docs/areas/dnsmasq.md) | [Dnsmasq host](docs/areas/dnsmasq.md#dnsmasq-host) |
-| [firewall](docs/areas/firewall.md) | [Firewall alias](docs/areas/firewall.md#firewall-alias) |
+| [firewall](docs/areas/firewall.md) | [Firewall alias](docs/areas/firewall.md#firewall-alias), [Firewall destination NAT](docs/areas/firewall.md#firewall-destination-nat), [Firewall filter rule](docs/areas/firewall.md#firewall-filter-rule), [Firewall one-to-one NAT](docs/areas/firewall.md#firewall-one-to-one-nat), [Firewall source NAT rule](docs/areas/firewall.md#firewall-source-nat-rule), [Firewall outbound NAT mode](docs/areas/firewall.md#firewall-outbound-nat-mode) |
 | [nodeexporter](docs/areas/nodeexporter.md) | [node_exporter general](docs/areas/nodeexporter.md#node_exporter-general) |
+| [routes](docs/areas/routes.md) | [Static route](docs/areas/routes.md#static-route) |
+| [routing](docs/areas/routing.md) | [Gateway](docs/areas/routing.md#gateway) |
 
 All item types with plugin, version and stage: [docs/areas/README.md](docs/areas/README.md).
 <!-- END areas: generated from meta/areas.yml by make docs -->

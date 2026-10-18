@@ -1,0 +1,194 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/DNat.xml#rule"
+fields:
+  - name: "sequence"
+    type: "DNatSequenceField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "disabled"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nordr"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "interface"
+    type: "InterfaceField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "ipprotocol"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "inet"
+      - "inet6"
+      - "inet46"
+  - name: "protocol"
+    type: "ProtocolField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source.network"
+    type: "NetworkMappedField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source.address"
+    type: "NetworkMappedField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "source.port"
+    type: "PortMappedField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "source.not"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination.network"
+    type: "NetworkMappedField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination.address"
+    type: "NetworkMappedField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "destination.port"
+    type: "PortMappedField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "destination.not"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "target"
+    type: "NetworkAliasField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "local-port"
+    type: "PortField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "poolopts"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "round-robin"
+      - "round-robin sticky-address"
+      - "random"
+      - "random sticky-address"
+      - "source-hash"
+      - "bitmask"
+  - name: "log"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "category"
+    type: "CategoryField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "categories"
+    type: "CategoryMapField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []
+  - name: "descr"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tag"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tagged"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "nosync"
+    type: "BooleanField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "natreflection"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "purenat"
+      - "disable"
+  - name: "pass"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "pass"
+      - "rule"
+  - name: "audit"
+    type: "JsonAuditField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "associated-rule-id"
+    type: "DNatAssociatedRuleField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "created"
+    type: "JsonAuditField"
+    required: false
+    multiple: false
+    volatile: true
+    options: []

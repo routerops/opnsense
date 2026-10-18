@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Routes/Route.xml#route"
+fields:
+  - name: "network"
+    type: "NetworkField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "gateway"
+    type: "JsonKeyValueStoreField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "descr"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []

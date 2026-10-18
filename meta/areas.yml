@@ -96,6 +96,209 @@ opnsense_areas:
               name: bogons
             state: query
 
+  firewall_destination_nat:
+    area: firewall
+    title: Firewall destination NAT
+    module: item
+    path: firewall/d_nat
+    key: rule
+    lookup: [descr]
+    actions:
+      search: searchRule
+      get: getRule
+      add: addRule
+      set: setRule
+      del: delRule
+    apply: firewall/d_nat/apply
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Firewall/DNat.xml
+      node: rule
+    privileges:
+      - name: page-firewall-nat-portforward-edit
+        title: "Firewall: NAT: Destination NAT"
+        pattern: api/firewall/d_nat/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    examples:
+      - name: Forward port 8080 on WAN to a LAN web server
+        items:
+          - fields:
+              interface: wan
+              protocol: tcp
+              destination:
+                network: wanip
+                port: "8080"
+              target: 10.250.1.50
+              local-port: "80"
+              descr: routerops example web
+      - name: Remove a port forward
+        items:
+          - fields:
+              descr: routerops example web
+            state: absent
+
+  firewall_filter_rule:
+    area: firewall
+    title: Firewall filter rule
+    module: item
+    path: firewall/filter
+    key: rule
+    lookup: [description]
+    actions:
+      search: searchRule
+      get: getRule
+      add: addRule
+      set: setRule
+      del: delRule
+    apply: firewall/filter/apply
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml
+      node: rules.rule
+    privileges:
+      - name: page-filter-api
+        title: "Firewall: Rules [new]"
+        pattern: api/firewall/filter/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    examples:
+      - name: Allow HTTPS to the firewall from LAN
+        items:
+          - fields:
+              interface: lan
+              protocol: TCP
+              source_net: lan
+              destination_net: (self)
+              destination_port: "443"
+              description: routerops example https
+      - name: Block a host on LAN
+        items:
+          - fields:
+              action: block
+              source_net: 10.250.1.99
+              description: routerops example block
+      - name: Remove a filter rule
+        items:
+          - fields:
+              description: routerops example block
+            state: absent
+
+  firewall_one_to_one_nat:
+    area: firewall
+    title: Firewall one-to-one NAT
+    module: item
+    path: firewall/one_to_one
+    key: rule
+    lookup: [description]
+    actions:
+      search: searchRule
+      get: getRule
+      add: addRule
+      set: setRule
+      del: delRule
+    apply: firewall/one_to_one/apply
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml
+      node: onetoone.rule
+    privileges:
+      - name: page-firewall-nat-1-1-edit
+        title: "Firewall: NAT: 1:1"
+        pattern: api/firewall/one_to_one/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    examples:
+      - name: Map a LAN host to a WAN address
+        items:
+          - fields:
+              source_net: 10.250.1.50
+              external: 10.250.0.50
+              description: routerops example one
+      - name: Keep only the listed one-to-one rules
+        purge: true
+        items:
+          - fields:
+              source_net: 10.250.1.50
+              external: 10.250.0.50
+              description: routerops example one
+          - fields:
+              source_net: 10.250.1.51
+              external: 10.250.0.51
+              description: routerops example two
+      - name: Remove a one-to-one rule
+        items:
+          - fields:
+              description: routerops example two
+            state: absent
+
+  firewall_source_nat:
+    area: firewall
+    title: Firewall source NAT rule
+    module: item
+    path: firewall/source_nat
+    key: rule
+    lookup: [description]
+    actions:
+      search: searchRule
+      get: getRule
+      add: addRule
+      set: setRule
+      del: delRule
+    apply: firewall/source_nat/apply
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml
+      node: snatrules.rule
+    privileges:
+      - name: page-filter-snat-api
+        title: "Firewall: NAT: Source NAT"
+        pattern: api/firewall/source_nat/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      OPNsense lists source NAT rules only in the outbound NAT mode `hybrid` or `advanced` (default `automatic`);
+      set the mode with the outbound NAT mode entry first, or every run adds a duplicate rule and `absent` finds nothing.
+    examples:
+      - name: Translate a LAN subnet on WAN
+        items:
+          - fields:
+              interface: wan
+              source_net: 10.250.1.0/24
+              description: routerops example lan
+      - name: Remove a source NAT rule
+        items:
+          - fields:
+              description: routerops example lan
+            state: absent
+
+  firewall_source_nat_general:
+    area: firewall
+    title: Firewall outbound NAT mode
+    module: settings
+    path: firewall/source_nat
+    key: filter.general
+    apply: firewall/source_nat/apply
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml
+      node: general
+    privileges:
+      - name: page-filter-snat-api
+        title: "Firewall: NAT: Source NAT"
+        pattern: api/firewall/source_nat/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    examples:
+      - name: Use hybrid outbound NAT
+        fields:
+          snat_mode: hybrid
+
   nodeexporter_general:
     area: nodeexporter
     title: node_exporter general
@@ -119,3 +322,97 @@ opnsense_areas:
         fields:
           enabled: true
           listenport: 9100
+
+  routes_static_route:
+    area: routes
+    title: Static route
+    module: item
+    path: routes/routes
+    key: route
+    lookup: [network]
+    actions:
+      search: searchroute
+      get: getroute
+      add: addroute
+      set: setroute
+      del: delroute
+    apply: routes/routes/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Routes/Route.xml
+      node: route
+    privileges:
+      - name: page-system-staticroutes
+        title: "System: Static Routes"
+        pattern: api/routes/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      The gateway a route names must exist before the route; OPNsense caches its gateway list for 20 seconds,
+      so a route sent right after a new gateway can fail validation.
+    examples:
+      - name: Route a remote network through a LAN gateway
+        items:
+          - fields:
+              network: 10.99.0.0/24
+              gateway: RT_EXAMPLE_GW
+              descr: routerops example
+      - name: Keep only the listed static routes
+        purge: true
+        items:
+          - fields:
+              network: 10.99.0.0/24
+              gateway: RT_EXAMPLE_GW
+              descr: routerops example
+          - fields:
+              network: 10.99.1.0/24
+              gateway: RT_EXAMPLE_GW
+              descr: routerops example
+      - name: Remove a static route
+        items:
+          - fields:
+              network: 10.99.1.0/24
+            state: absent
+
+  routing_gateway:
+    area: routing
+    title: Gateway
+    module: item
+    path: routing/settings
+    key: gateway_item
+    lookup: [name]
+    actions:
+      search: searchGateway
+      get: getGateway
+      add: addGateway
+      set: setGateway
+      del: delGateway
+    apply: routing/settings/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/Routing/Gateways.xml
+      node: gateway_item
+    privileges:
+      - name: page-system-gateways
+        title: "System: Gateways"
+        pattern: api/routing/settings/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Gateways OPNsense generates for dynamic interfaces, such as `WAN_DHCP`, carry their name as `uuid` and are not items of this area:
+      `present` and `absent` do not find them, so `present` with such a name sends an add; `state: query` finds them.
+    examples:
+      - name: Add a LAN gateway
+        items:
+          - fields:
+              name: RT_EXAMPLE_GW
+              interface: lan
+              gateway: 10.250.1.254
+              descr: routerops example
+      - name: Remove a gateway
+        items:
+          - fields:
+              name: RT_EXAMPLE_GW
+            state: absent

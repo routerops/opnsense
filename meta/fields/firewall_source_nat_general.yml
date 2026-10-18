@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#general"
+fields:
+  - name: "snat_mode"
+    type: "SNatModeField"
+    required: true
+    default: "automatic"
+    multiple: false
+    volatile: true
+    options:
+      - "automatic"
+      - "hybrid"
+      - "advanced"
+      - "disabled"

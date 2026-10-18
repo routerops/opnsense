@@ -1,0 +1,149 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test a filter rule that uses an alias
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  vars:
+    opnsense_test_alias_area: "{{ opnsense_areas['firewall_alias'] }}"
+    opnsense_test_rule_area: "{{ opnsense_areas['firewall_filter_rule'] }}"
+    opnsense_test_alias:
+      name: rt_scenario_hosts
+      type: host
+      content: [10.250.1.30, 10.250.1.31]
+      description: routerops test scenario
+    opnsense_test_rule:
+      interface: lan
+      protocol: TCP
+      destination_net: rt_scenario_hosts
+      destination_port: "443"
+      description: routerops test scenario
+  tasks:
+    - name: Run the alias and filter rule scenario
+      block:
+        - name: Add the alias
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            separators: "{{ opnsense_test_alias_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_alias_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          register: opnsense_test_alias_add
+
+        - name: Add the filter rule that uses the alias
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_rule_area['path'] }}"
+            key: "{{ opnsense_test_rule_area['key'] }}"
+            lookup: "{{ opnsense_test_rule_area['lookup'] }}"
+            actions: "{{ opnsense_test_rule_area['actions'] }}"
+            apply: "{{ opnsense_test_rule_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_rule }}"
+          register: opnsense_test_rule_add
+
+        - name: Add the alias again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            separators: "{{ opnsense_test_alias_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_alias_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+          register: opnsense_test_alias_again
+
+        - name: Add the filter rule again
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_rule_area['path'] }}"
+            key: "{{ opnsense_test_rule_area['key'] }}"
+            lookup: "{{ opnsense_test_rule_area['lookup'] }}"
+            actions: "{{ opnsense_test_rule_area['actions'] }}"
+            apply: "{{ opnsense_test_rule_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_rule }}"
+          register: opnsense_test_rule_again
+
+        - name: Remove the alias while the filter rule uses it
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            separators: "{{ opnsense_test_alias_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_alias_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+                state: absent
+          register: opnsense_test_alias_in_use
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_alias_add['changed']
+              - opnsense_test_rule_add['changed']
+              - not opnsense_test_alias_again['changed']
+              - not opnsense_test_rule_again['changed']
+              - opnsense_test_alias_in_use['failed']
+              - not opnsense_test_alias_in_use['changed']
+              - >-
+                'rt_scenario_hosts' in opnsense_test_alias_in_use['msg']
+                or 'routerops test scenario' in opnsense_test_alias_in_use['msg']
+      always:
+        - name: Remove the filter rule
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_rule_area['path'] }}"
+            key: "{{ opnsense_test_rule_area['key'] }}"
+            lookup: "{{ opnsense_test_rule_area['lookup'] }}"
+            actions: "{{ opnsense_test_rule_area['actions'] }}"
+            apply: "{{ opnsense_test_rule_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_rule }}"
+                state: absent
+
+        - name: Remove the alias
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            separators: "{{ opnsense_test_alias_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_alias_area['secret_fields'] }}"
+            apply: "{{ opnsense_test_alias_area['apply'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+                state: absent
+
+        - name: Look up the filter rule after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_rule_area['path'] }}"
+            key: "{{ opnsense_test_rule_area['key'] }}"
+            lookup: "{{ opnsense_test_rule_area['lookup'] }}"
+            actions: "{{ opnsense_test_rule_area['actions'] }}"
+            items:
+              - fields: "{{ opnsense_test_rule }}"
+                state: query
+          register: opnsense_test_rule_left
+
+        - name: Look up the alias after the cleanup
+          routerops.opnsense.item:
+            path: "{{ opnsense_test_alias_area['path'] }}"
+            key: "{{ opnsense_test_alias_area['key'] }}"
+            lookup: "{{ opnsense_test_alias_area['lookup'] }}"
+            separators: "{{ opnsense_test_alias_area['separators'] }}"
+            secret_fields: "{{ opnsense_test_alias_area['secret_fields'] }}"
+            items:
+              - fields: "{{ opnsense_test_alias }}"
+                state: query
+          register: opnsense_test_alias_left
+
+        - name: Assert that the cleanup removed the rule and the alias
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_rule_left['outcomes'][0]['uuid'] is none
+              - opnsense_test_alias_left['outcomes'][0]['uuid'] is none
