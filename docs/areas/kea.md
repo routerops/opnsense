@@ -22,7 +22,7 @@
 | Plugin | - |
 | Stage | v0 |
 
-Kea serves DHCP only with `enabled: true` and at least one entry in `interfaces`. A save rewrites the router, DNS and NTP options of every subnet that collects them automatically.
+Kea serves DHCP only with `enabled: true` and at least one entry in `interfaces`. A save rewrites the router, DNS and NTP options of every subnet that collects them automatically and lies on an interface.
 
 ### Fields
 
@@ -78,7 +78,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcp
 | Plugin | - |
 | Stage | v0 |
 
-`subnet` is the uuid of a subnet; register it from the subnet's outcome. Reservations hold MAC addresses and host names, which can be personal data, and `--diff` prints them. OPNsense stores `hw_address` as sent but checks it for duplicates regardless of case, so send it in the same case on every run; a run in another case fails with "Duplicate entry exists." A reservation sets either `hw_address` or `client_id`; send the other one as `""`, because the lookup needs both. In the examples, replace `EXAMPLE_SUBNET_UUID` with the `uuid` the subnet example returns.
+`subnet` is the uuid of a subnet; register it from the subnet's outcome. Reservations hold MAC addresses and host names, which can be personal data, and `--diff` prints them. OPNsense stores `hw_address` as sent but checks it for duplicates regardless of case, so send it in the same case on every run; a run in another case fails with "Duplicate entry exists." A reservation sets either `hw_address` or `client_id`; send the other one as `""`, because the lookup needs both. In the examples, replace `SUBNET_UUID` with the `uuid` the subnet example returns.
 
 ### Fields
 
@@ -125,7 +125,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcp
     apply: "kea/service/reconfigure"
     items:
       - fields:
-          subnet: "EXAMPLE_SUBNET_UUID"
+          subnet: "SUBNET_UUID"
           hw_address: "02:00:00:00:69:01"
           client_id: ""
           ip_address: "10.250.69.10"
@@ -149,7 +149,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcp
     apply: "kea/service/reconfigure"
     items:
       - fields:
-          subnet: "EXAMPLE_SUBNET_UUID"
+          subnet: "SUBNET_UUID"
           hw_address: "02:00:00:00:69:01"
           client_id: ""
         state: "absent"

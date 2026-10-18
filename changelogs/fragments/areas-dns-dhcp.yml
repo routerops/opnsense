@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - >-
+    Documentation - the area catalog gains Unbound (general, host override, host alias, query forward, ACL),
+    Kea DHCPv4 (general, subnet, reservation) and Dnsmasq (general, domain override, DHCP range, DHCP option), each tested against OPNsense 26.7.7.

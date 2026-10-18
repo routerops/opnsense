@@ -95,6 +95,7 @@
               - opnsense_test_subnet_in_use['failed']
               - not opnsense_test_subnet_in_use['changed']
               - "'in use by' in opnsense_test_subnet_in_use['msg']"
+              - opnsense_test_reservation_add['outcomes'][0]['uuid'] in opnsense_test_subnet_in_use['msg']
       always:
         - name: Remove the reservation
           routerops.opnsense.item:

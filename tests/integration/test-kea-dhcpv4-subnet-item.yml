@@ -149,13 +149,6 @@
             that:
               - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
       always:
-        - name: Restore the original default lease time
-          routerops.opnsense.settings:
-            path: "{{ opnsense_test_general_area['path'] }}"
-            key: "{{ opnsense_test_general_area['key'] }}"
-            apply: "{{ opnsense_test_general_area['apply'] }}"
-            fields: "{{ opnsense_test_general_original['settings'] }}"
-
         - name: Remove both test subnets
           routerops.opnsense.item:
             items:
@@ -173,6 +166,13 @@
           loop: "{{ opnsense_test_area['examples'] }}"
           loop_control:
             label: "{{ item['name'] }}"
+
+        - name: Restore the original default lease time
+          routerops.opnsense.settings:
+            path: "{{ opnsense_test_general_area['path'] }}"
+            key: "{{ opnsense_test_general_area['key'] }}"
+            apply: "{{ opnsense_test_general_area['apply'] }}"
+            fields: "{{ opnsense_test_general_original['settings'] }}"
 
         - name: Look up the subnets after the cleanup
           routerops.opnsense.item:

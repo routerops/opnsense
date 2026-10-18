@@ -635,19 +635,19 @@ opnsense_areas:
       `host` is the uuid of a host override; register it from the host override's outcome.
       The lookup includes `domain`, because an alias may set only a domain.
       Send `domain: ""` to take the host's domain; the lookup needs the field.
-      In the examples, replace `EXAMPLE_HOST_UUID` with the `uuid` the host override example returns.
+      In the examples, replace `HOST_OVERRIDE_UUID` with the `uuid` the example in the Host override section returns.
     examples:
       - name: Add an alias for the example host
         items:
           - fields:
-              host: EXAMPLE_HOST_UUID
+              host: HOST_OVERRIDE_UUID
               hostname: rt-example-alias
               domain: ""
               description: routerops example
       - name: Remove the alias
         items:
           - fields:
-              host: EXAMPLE_HOST_UUID
+              host: HOST_OVERRIDE_UUID
               hostname: rt-example-alias
               domain: ""
             state: absent
@@ -677,7 +677,7 @@ opnsense_areas:
     tested: ["26.7.7"]
     stage: v0
     note: >-
-      Forward and DNS over TLS items share one list; the action name sets `type`, so never send it.
+      Forward and DNS over TLS items share one list; the action name sets `type` and overwrites a sent one, so never send it, or every run shows a change.
       An empty `domain` forwards every query.
       Every apply restarts Unbound.
     examples:
@@ -754,7 +754,7 @@ opnsense_areas:
     stage: v0
     note: >-
       Kea serves DHCP only with `enabled: true` and at least one entry in `interfaces`.
-      A save rewrites the router, DNS and NTP options of every subnet that collects them automatically.
+      A save rewrites the router, DNS and NTP options of every subnet that collects them automatically and lies on an interface.
     examples:
       - name: Set the default lease time
         fields:
@@ -834,12 +834,12 @@ opnsense_areas:
       OPNsense stores `hw_address` as sent but checks it for duplicates regardless of case, so send it in the same case on every run;
       a run in another case fails with "Duplicate entry exists."
       A reservation sets either `hw_address` or `client_id`; send the other one as `""`, because the lookup needs both.
-      In the examples, replace `EXAMPLE_SUBNET_UUID` with the `uuid` the subnet example returns.
+      In the examples, replace `SUBNET_UUID` with the `uuid` the subnet example returns.
     examples:
       - name: Reserve an address
         items:
           - fields:
-              subnet: EXAMPLE_SUBNET_UUID
+              subnet: SUBNET_UUID
               hw_address: "02:00:00:00:69:01"
               client_id: ""
               ip_address: 10.250.69.10
@@ -848,7 +848,7 @@ opnsense_areas:
       - name: Remove a reservation
         items:
           - fields:
-              subnet: EXAMPLE_SUBNET_UUID
+              subnet: SUBNET_UUID
               hw_address: "02:00:00:00:69:01"
               client_id: ""
             state: absent
@@ -870,7 +870,7 @@ opnsense_areas:
     tested: ["26.7.7"]
     stage: v0
     note: >-
-      Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a save that moves Dnsmasq onto a port another service uses fails.
+      Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a save that moves Dnsmasq onto a port another DNS service uses fails.
       Send `port: 0` to run Dnsmasq for DHCP only.
       Every apply also reloads the firewall rules.
     examples:
@@ -952,6 +952,8 @@ opnsense_areas:
     note: >-
       A range serves DHCP once Dnsmasq is enabled, which it is by default, and listens on the range's interface, by default only `lan`.
       With `dhcp.default_fw_rules` on, the firewall opens DHCP on the listen interfaces, or on every range interface when Dnsmasq listens on all.
+      The lookup leaves out `constructor`, so two IPv6 ranges built from interfaces with the same `interface` and `start_addr` collide;
+      give them distinct start addresses.
       Every apply also reloads the firewall rules.
     examples:
       - name: Add a DHCP range on LAN

@@ -68,7 +68,7 @@
           description: routerops test client two
     opnsense_test_examples: >-
       {{ opnsense_test_area['examples'] | to_json
-         | replace('EXAMPLE_SUBNET_UUID', opnsense_test_subnet_add['outcomes'][2]['uuid']) | from_json }}
+         | replace('SUBNET_UUID', opnsense_test_subnet_add['outcomes'][2]['uuid']) | from_json }}
   tasks:
     - name: Run the reservation tests
       block:

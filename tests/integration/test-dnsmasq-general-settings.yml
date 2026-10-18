@@ -18,11 +18,12 @@
   vars:
     opnsense_test_area: "{{ opnsense_areas['dnsmasq_general'] }}"
   tasks:
-    - name: Read the original lease limit
+    - name: Read the original lease limit and port
       routerops.opnsense.settings:
         fields:
           dhcp:
             lease_max: 2000
+          port: 53053
       check_mode: true
       register: opnsense_test_original
 
@@ -90,17 +91,17 @@
             that:
               - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
       always:
-        - name: Restore the original lease limit
+        - name: Restore the original lease limit and port
           routerops.opnsense.settings:
             fields: "{{ opnsense_test_original['settings'] }}"
 
-        - name: Read the lease limit after the restore
+        - name: Read the lease limit and port after the restore
           routerops.opnsense.settings:
             fields: "{{ opnsense_test_original['settings'] }}"
           check_mode: true
           register: opnsense_test_restored
 
-        - name: Assert that the original setting is back
+        - name: Assert that the original settings are back
           ansible.builtin.assert:
             that:
               - not opnsense_test_restored['changed']

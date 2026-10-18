@@ -108,7 +108,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dns
 | Plugin | - |
 | Stage | v0 |
 
-Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a save that moves Dnsmasq onto a port another service uses fails. Send `port: 0` to run Dnsmasq for DHCP only. Every apply also reloads the firewall rules.
+Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a save that moves Dnsmasq onto a port another DNS service uses fails. Send `port: 0` to run Dnsmasq for DHCP only. Every apply also reloads the firewall rules.
 
 ### Fields
 
@@ -395,7 +395,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dns
 | Plugin | - |
 | Stage | v0 |
 
-A range serves DHCP once Dnsmasq is enabled, which it is by default, and listens on the range's interface, by default only `lan`. With `dhcp.default_fw_rules` on, the firewall opens DHCP on the listen interfaces, or on every range interface when Dnsmasq listens on all. Every apply also reloads the firewall rules.
+A range serves DHCP once Dnsmasq is enabled, which it is by default, and listens on the range's interface, by default only `lan`. With `dhcp.default_fw_rules` on, the firewall opens DHCP on the listen interfaces, or on every range interface when Dnsmasq listens on all. The lookup leaves out `constructor`, so two IPv6 ranges built from interfaces with the same `interface` and `start_addr` collide; give them distinct start addresses. Every apply also reloads the firewall rules.
 
 ### Fields
 

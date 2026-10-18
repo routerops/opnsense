@@ -53,7 +53,7 @@
           description: routerops test domain b
     opnsense_test_examples: >-
       {{ opnsense_test_area['examples'] | to_json
-         | replace('EXAMPLE_HOST_UUID', opnsense_test_example_host_uuid) | from_json }}
+         | replace('HOST_OVERRIDE_UUID', opnsense_test_example_host_uuid) | from_json }}
   tasks:
     - name: Run the host alias tests
       block:
