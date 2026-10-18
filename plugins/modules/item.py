@@ -816,6 +816,45 @@ EXAMPLES = r"""
           subnet: "10.250.69.0/24"
         state: "absent"
 
+- name: Give a client a fixed tunnel address
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/client_overwrites"
+    key: "cso"
+    lookup: ["common_name"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    items:
+      - fields:
+          common_name: "rt-example-client"
+          tunnel_network: "10.250.82.10/24"
+          description: "routerops example"
+
+- name: Remove an override
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/client_overwrites"
+    key: "cso"
+    lookup: ["common_name"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    items:
+      - fields:
+          common_name: "rt-example-client"
+        state: "absent"
+
 - name: Run an OpenVPN server
   routerops.opnsense.item:
     url: https://fw.example

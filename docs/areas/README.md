@@ -21,6 +21,7 @@
 | [kea](kea.md) | [DHCPv4 reservation](kea.md#dhcpv4-reservation) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [DHCPv4 subnet](kea.md#dhcpv4-subnet) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [nodeexporter](nodeexporter.md) | [node_exporter general](nodeexporter.md#node_exporter-general) | `settings` | `nodeexporter/general` | `os-node_exporter` | - | v0 | 26.7.7 |
+| [openvpn](openvpn.md) | [OpenVPN client-specific override](openvpn.md#openvpn-client-specific-override) | `item` | `openvpn/client_overwrites` | - | - | v0 | 26.7.7 |
 | [openvpn](openvpn.md) | [OpenVPN instance](openvpn.md#openvpn-instance) | `item` | `openvpn/instances` | - | - | v0 | 26.7.7 |
 | [openvpn](openvpn.md) | [OpenVPN static key](openvpn.md#openvpn-static-key) | `item` | `openvpn/instances` | - | - | v0 | 26.7.7 |
 | [routes](routes.md) | [Static route](routes.md#static-route) | `item` | `routes/routes` | - | - | v0 | 26.7.7 |
