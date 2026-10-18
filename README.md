@@ -20,7 +20,7 @@ Each area page lists the path, key, actions, lookup and apply path a call needs,
 | [interfaces](docs/areas/interfaces.md) | [Assignment](docs/areas/interfaces.md#assignment), [Virtual IP](docs/areas/interfaces.md#virtual-ip), [VLAN](docs/areas/interfaces.md#vlan) |
 | [kea](docs/areas/kea.md) | [Kea DHCPv4 general](docs/areas/kea.md#kea-dhcpv4-general), [DHCPv4 reservation](docs/areas/kea.md#dhcpv4-reservation), [DHCPv4 subnet](docs/areas/kea.md#dhcpv4-subnet) |
 | [nodeexporter](docs/areas/nodeexporter.md) | [node_exporter general](docs/areas/nodeexporter.md#node_exporter-general) |
-| [openvpn](docs/areas/openvpn.md) | [OpenVPN instance](docs/areas/openvpn.md#openvpn-instance), [OpenVPN static key](docs/areas/openvpn.md#openvpn-static-key) |
+| [openvpn](docs/areas/openvpn.md) | [OpenVPN client-specific override](docs/areas/openvpn.md#openvpn-client-specific-override), [OpenVPN instance](docs/areas/openvpn.md#openvpn-instance), [OpenVPN static key](docs/areas/openvpn.md#openvpn-static-key) |
 | [routes](docs/areas/routes.md) | [Static route](docs/areas/routes.md#static-route) |
 | [routing](docs/areas/routing.md) | [Gateway](docs/areas/routing.md#gateway) |
 | [trust](docs/areas/trust.md) | [Certificate authority](docs/areas/trust.md#certificate-authority), [Certificate](docs/areas/trust.md#certificate) |

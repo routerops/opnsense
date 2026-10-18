@@ -1,0 +1,137 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against OpenVPN client-specific overrides
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['openvpn_cso'] }}"
+    opnsense_test_one:
+      common_name: rt-test-client-one
+      tunnel_network: 10.250.80.10/24
+      description: routerops test one
+    opnsense_test_two:
+      common_name: rt-test-client-two
+      tunnel_network: 10.250.80.11/24
+      description: routerops test two
+  tasks:
+    - name: Run the client-specific override tests
+      block:
+        - name: Add the first override in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add both overrides
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_add
+
+        - name: Add both overrides again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_again
+
+        - name: Add both overrides again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Block the first client
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'block': true}) }}"
+          register: opnsense_test_update
+
+        - name: Block the first client again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'block': true}) }}"
+          register: opnsense_test_update_again
+
+        - name: Remove both overrides
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Add an override with an invalid tunnel network
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'tunnel_network': '10.250.80.300/24'}) }}"
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - not opnsense_test_update_again['changed']
+              - opnsense_test_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted']
+              - opnsense_test_invalid['failed']
+              - not opnsense_test_invalid['changed']
+              - "'cso.tunnel_network' in opnsense_test_invalid['validations']"
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_area['examples'] | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Remove both test overrides and the example override
+          routerops.opnsense.item:
+            items: >-
+              {{ ([{'fields': opnsense_test_one}, {'fields': opnsense_test_two}] + opnsense_test_area['examples'][0]['items'])
+                 | map('combine', {'state': 'absent'}) | list }}
+
+        - name: Look up the overrides after the cleanup
+          routerops.opnsense.item:
+            items: >-
+              {{ ([{'fields': opnsense_test_one}, {'fields': opnsense_test_two}] + opnsense_test_area['examples'][0]['items'])
+                 | map('combine', {'state': 'query'}) | list }}
+          register: opnsense_test_left
+
+        - name: Assert that the cleanup left no override behind
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_left['outcomes'] | map(attribute='uuid') | select | list | length == 0

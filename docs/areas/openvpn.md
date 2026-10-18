@@ -1,6 +1,98 @@
 <!-- Generated from meta/areas.yml by make docs; do not edit. -->
 # Area `openvpn`
 
+## OpenVPN client-specific override
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `openvpn/client_overwrites` |
+| Key | `cso` |
+| Actions | `add: add`, `del: del`, `get: get`, `search: search`, `set: set` |
+| Lookup | `common_name` |
+| Item ids | `uuid` |
+| Apply | - |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | - |
+| Separators | - |
+| Privileges | `page-openvpn-csc` ("VPN: OpenVPN: Client Specific Override", `api/openvpn/client_overwrites/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+OpenVPN reads the overrides when a client connects; there is nothing to apply. An empty `servers` applies the override to every server; otherwise list instance uuids. Common names identify an override; keep them unique.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Overwrites.Overwrite`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `enabled` | BooleanField | yes | `1` |  |
+| `servers` | OpenVPNServerField, multiple |  |  |  |
+| `common_name` | StrictTextField | yes |  |  |
+| `block` | BooleanField | yes | `0` |  |
+| `push_reset` | BooleanField | yes | `0` |  |
+| `tunnel_network` | NetworkField |  |  |  |
+| `tunnel_networkv6` | NetworkField |  |  |  |
+| `local_networks` | NetworkField |  |  |  |
+| `remote_networks` | NetworkField |  |  |  |
+| `route_gateway` | NetworkField |  |  |  |
+| `redirect_gateway` | OptionField, multiple |  |  | `local`, `autolocal`, `def1`, `bypass-dhcp`, `bypass-dns`, `block-local`, `ipv6`, `!ipv4` |
+| `register_dns` | BooleanField | yes | `0` |  |
+| `dns_domain` | HostnameField |  |  |  |
+| `dns_domain_search` | HostnameField |  |  |  |
+| `dns_servers` | NetworkField |  |  |  |
+| `ntp_servers` | NetworkField |  |  |  |
+| `wins_servers` | NetworkField |  |  |  |
+| `description` | DescriptionField |  |  |  |
+
+### Examples
+
+```yaml
+- name: Give a client a fixed tunnel address
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/client_overwrites"
+    key: "cso"
+    lookup: ["common_name"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    items:
+      - fields:
+          common_name: "rt-example-client"
+          tunnel_network: "10.250.82.10/24"
+          description: "routerops example"
+
+- name: Remove an override
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "openvpn/client_overwrites"
+    key: "cso"
+    lookup: ["common_name"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    items:
+      - fields:
+          common_name: "rt-example-client"
+        state: "absent"
+```
+
 ## OpenVPN instance
 
 | Setting | Value |

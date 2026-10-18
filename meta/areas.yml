@@ -1221,3 +1221,43 @@ opnsense_areas:
           - fields:
               description: routerops example
             state: absent
+  openvpn_cso:
+    area: openvpn
+    title: OpenVPN client-specific override
+    module: item
+    path: openvpn/client_overwrites
+    key: cso
+    lookup: [common_name]
+    actions:
+      search: search
+      get: get
+      add: add
+      set: set
+      del: del
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml
+      node: Overwrites.Overwrite
+    privileges:
+      - name: page-openvpn-csc
+        title: "VPN: OpenVPN: Client Specific Override"
+        pattern: api/openvpn/client_overwrites/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      OpenVPN reads the overrides when a client connects; there is nothing to apply.
+      An empty `servers` applies the override to every server; otherwise list instance uuids.
+      Common names identify an override; keep them unique.
+    examples:
+      - name: Give a client a fixed tunnel address
+        items:
+          - fields:
+              common_name: rt-example-client
+              tunnel_network: 10.250.82.10/24
+              description: routerops example
+      - name: Remove an override
+        items:
+          - fields:
+              common_name: rt-example-client
+            state: absent

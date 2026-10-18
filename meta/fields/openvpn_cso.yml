@@ -1,0 +1,127 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Overwrites.Overwrite"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "servers"
+    type: "OpenVPNServerField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "common_name"
+    type: "StrictTextField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "block"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "push_reset"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tunnel_network"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "tunnel_networkv6"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "local_networks"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "remote_networks"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "route_gateway"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "redirect_gateway"
+    type: "OptionField"
+    required: false
+    multiple: true
+    volatile: false
+    options:
+      - "local"
+      - "autolocal"
+      - "def1"
+      - "bypass-dhcp"
+      - "bypass-dns"
+      - "block-local"
+      - "ipv6"
+      - "!ipv4"
+  - name: "register_dns"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns_domain"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns_domain_search"
+    type: "HostnameField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "dns_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "ntp_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "wins_servers"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
