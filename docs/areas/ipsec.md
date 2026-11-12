@@ -282,6 +282,79 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
         state: "absent"
 ```
 
+## IPsec pre-shared key
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `ipsec/pre_shared_keys` |
+| Key | `preSharedKey` |
+| Actions | default |
+| Lookup | `ident`, `remote_ident` |
+| Item ids | `uuid` |
+| Apply | `ipsec/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | `Key` |
+| Separators | - |
+| Privileges | `page-vpn-ipsec-editkeys` ("VPN: IPsec: Edit Pre-Shared Keys", `api/ipsec/pre_shared_keys/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+`ident` and `remote_ident` together identify a key. The key is readable through the API; it is masked in the diff and the return values. The apply needs IPsec enabled, as described for the IPsec connection.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/IPsec.xml#preSharedKeys.preSharedKey`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `ident` | TextField | yes |  |  |
+| `remote_ident` | TextField |  |  |  |
+| `keyType` | OptionField | yes | `PSK` | `PSK`, `EAP` |
+| `Key` (secret) | TextField |  |  |  |
+| `description` | DescriptionField |  |  |  |
+
+### Examples
+
+```yaml
+- name: Add a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/pre_shared_keys"
+    key: "preSharedKey"
+    lookup: ["ident", "remote_ident"]
+    secret_fields: ["Key"]
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          ident: "rt-example-local.routerops.test"
+          remote_ident: "rt-example-remote.routerops.test"
+          keyType: "PSK"
+          Key: "EXAMPLE_PSK"
+
+- name: Remove a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/pre_shared_keys"
+    key: "preSharedKey"
+    lookup: ["ident", "remote_ident"]
+    secret_fields: ["Key"]
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          ident: "rt-example-local.routerops.test"
+          remote_ident: "rt-example-remote.routerops.test"
+        state: "absent"
+```
+
 ## IPsec remote authentication
 
 | Setting | Value |
