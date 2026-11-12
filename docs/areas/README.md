@@ -18,6 +18,8 @@
 | [interfaces](interfaces.md) | [Virtual IP](interfaces.md#virtual-ip) | `item` | `interfaces/vip_settings` | - | - | v0 | 26.7.7 |
 | [interfaces](interfaces.md) | [VLAN](interfaces.md#vlan) | `item` | `interfaces/vlan_settings` | - | - | v0 | 26.7.7 |
 | [ipsec](ipsec.md) | [IPsec connection](ipsec.md#ipsec-connection) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
+| [ipsec](ipsec.md) | [IPsec local authentication](ipsec.md#ipsec-local-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
+| [ipsec](ipsec.md) | [IPsec remote authentication](ipsec.md#ipsec-remote-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [Kea DHCPv4 general](kea.md#kea-dhcpv4-general) | `settings` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [DHCPv4 reservation](kea.md#dhcpv4-reservation) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [DHCPv4 subnet](kea.md#dhcpv4-subnet) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |

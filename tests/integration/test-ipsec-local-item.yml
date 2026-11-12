@@ -1,0 +1,184 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test the item module against IPsec local authentications
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+    ansible.builtin.uri:
+      url_username: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      url_password: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+      force_basic_auth: true
+      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS') | default('true', true) | bool }}"
+  vars:
+    opnsense_test_area: "{{ opnsense_areas['ipsec_local'] }}"
+    opnsense_test_connection_area: "{{ opnsense_areas['ipsec_connection'] }}"
+    opnsense_test_api: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}/api/{{ opnsense_test_area['path'] }}"
+    opnsense_test_connections:
+      - fields: {description: routerops test one, version: "2", local_addrs: [10.250.1.1], remote_addrs: [10.250.110.2]}
+      - "{{ opnsense_test_connection_area['examples'][0]['items'][0] }}"
+    opnsense_test_connection_uuid: "{{ opnsense_test_connection_add['outcomes'][0]['uuid'] | default('') }}"
+    opnsense_test_example_uuid: "{{ opnsense_test_connection_add['outcomes'][1]['uuid'] | default('') }}"
+    opnsense_test_one:
+      connection: "{{ opnsense_test_connection_uuid }}"
+      auth: psk
+      id: rt-test-local.routerops.test
+      description: routerops test local one
+    opnsense_test_two:
+      connection: "{{ opnsense_test_connection_uuid }}"
+      auth: psk
+      id: rt-test-local-two.routerops.test
+      description: routerops test local two
+    opnsense_test_names:
+      - fields: {connection: "{{ opnsense_test_connection_uuid }}", description: routerops test local one}
+      - fields: {connection: "{{ opnsense_test_connection_uuid }}", description: routerops test local two}
+      - fields: {connection: "{{ opnsense_test_example_uuid }}", description: routerops example local}
+    opnsense_test_examples: >-
+      {{ opnsense_test_area['examples'] | to_json
+         | replace('EXAMPLE_CONNECTION_UUID', opnsense_test_example_uuid) | from_json }}
+  tasks:
+    - name: Run the IPsec local authentication tests
+      block:
+        - name: Enable IPsec
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_api }}/toggle/1"
+            method: POST
+            body_format: json
+            body: {}
+          register: opnsense_test_enable
+          failed_when: opnsense_test_enable['json']['status'] != 'ok'
+
+        - name: Add the test connection and the example connection
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_connections }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_test_connection_area }}"
+          register: opnsense_test_connection_add
+
+        - name: Add the first entry in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+          check_mode: true
+          register: opnsense_test_check_add
+
+        - name: Add both entries
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_add
+
+        - name: Add both entries again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          register: opnsense_test_again
+
+        - name: Add both entries again in check mode
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+              - fields: "{{ opnsense_test_two }}"
+          check_mode: true
+          register: opnsense_test_again_check
+
+        - name: Move the first entry to round 1
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'round': '1'}) }}"
+          register: opnsense_test_update
+
+        - name: Move the first entry to round 1 again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'round': '1'}) }}"
+          register: opnsense_test_update_again
+
+        - name: Remove both entries
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one }}"
+                state: absent
+              - fields: "{{ opnsense_test_two }}"
+                state: absent
+          register: opnsense_test_delete
+
+        - name: Add an entry in round 11
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_one | combine({'round': '11'}) }}"
+          register: opnsense_test_invalid
+          ignore_errors: true
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_check_add['changed']
+              - opnsense_test_check_add['outcomes'][0]['uuid'] is none
+              - opnsense_test_add['changed']
+              - opnsense_test_add['outcomes'] | map(attribute='action') | list == ['added', 'added']
+              - not opnsense_test_again['changed']
+              - not opnsense_test_again_check['changed']
+              - opnsense_test_update['changed']
+              - opnsense_test_update['outcomes'][0]['action'] == 'updated'
+              - opnsense_test_update['outcomes'][0]['uuid'] == opnsense_test_add['outcomes'][0]['uuid']
+              - not opnsense_test_update_again['changed']
+              - opnsense_test_delete['outcomes'] | map(attribute='action') | list == ['deleted', 'deleted']
+              - opnsense_test_invalid['failed']
+              - not opnsense_test_invalid['changed']
+              - "'local.round' in opnsense_test_invalid['validations']"
+
+        - name: Run each catalog example twice in a row
+          routerops.opnsense.item:
+            items: "{{ item[0]['items'] }}"
+          loop: "{{ opnsense_test_examples | product([1, 2]) | list }}"
+          loop_control:
+            label: "{{ item[0]['name'] }} ({{ item[1] }})"
+          register: opnsense_test_examples_run
+
+        - name: Assert that no second example run changed anything
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_examples_run['results'] | selectattr('item.1', '==', 2) | selectattr('changed') | list | length == 0
+      always:
+        - name: Remove the test entries and the example entry
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_names | map('combine', {'state': 'absent'}) | list }}"
+
+        - name: Remove the test connection and the example connection
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_connections | map('combine', {'state': 'absent'}) | list }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_test_connection_area }}"
+
+        - name: Look up the entries after the cleanup
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_names | map('combine', {'state': 'query'}) | list }}"
+          register: opnsense_test_left
+
+        - name: Look up the connections after the cleanup
+          routerops.opnsense.item:
+            items: "{{ opnsense_test_connections | map('combine', {'state': 'query'}) | list }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_test_connection_area }}"
+          register: opnsense_test_connections_left
+
+        - name: Assert that the cleanup left nothing behind
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
+              - opnsense_test_connections_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
