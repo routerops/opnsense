@@ -1100,6 +1100,8 @@ opnsense_areas:
       Every update reissues the certificate with the same key.
       A certificate an OpenVPN instance uses cannot be deleted; OPNsense answers HTTP 500 "Item in use by".
       The private key is readable through the API; it is masked in the diff and the return values, and an imported key (`prv_payload`) belongs in `write_only`.
+      Do not use `private_key_location: local`: OPNsense then returns the new key only once, in the answer to the add,
+      and the module does not return it, so the key is lost.
       Descriptions identify a certificate; keep them unique.
       In the examples, replace `CA_REFID` with the `refid` the example in the Certificate authority section returns.
     examples:
