@@ -148,7 +148,22 @@
             items: "{{ opnsense_test_names | map('combine', {'state': 'query'}) | list }}"
           register: opnsense_test_left
 
+        - name: Disable IPsec again
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_api }}/toggle/0"
+            method: POST
+            body_format: json
+            body: {}
+          register: opnsense_test_disable
+          failed_when: opnsense_test_disable['json']['status'] != 'ok'
+
+        - name: Read whether IPsec is enabled after the cleanup
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_api }}/is_enabled"
+          register: opnsense_test_enabled_left
+
         - name: Assert that the cleanup left no connection behind
           ansible.builtin.assert:
             that:
               - opnsense_test_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
+              - not opnsense_test_enabled_left['json']['enabled']

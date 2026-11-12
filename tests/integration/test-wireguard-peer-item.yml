@@ -185,6 +185,7 @@
               - opnsense_test_invalid_pubkey['failed']
               - "'client.pubkey' in opnsense_test_invalid_pubkey['validations']"
               - opnsense_test_invalid_server['failed']
+              - "'client.servers' in opnsense_test_invalid_server['validations']"
               - not opnsense_test_invalid_server['changed']
               - opnsense_test_invalid_server_left['outcomes'][0]['uuid'] is none
 
