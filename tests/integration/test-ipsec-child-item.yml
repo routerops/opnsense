@@ -30,9 +30,9 @@
       - fields: {description: routerops test one, version: "2", local_addrs: [10.250.1.1], remote_addrs: [10.250.110.2]}
       - fields: {description: routerops test two, version: "2", local_addrs: [10.250.1.1], remote_addrs: [10.250.110.3]}
       - "{{ opnsense_test_connection_area['examples'][0]['items'][0] }}"
-    opnsense_test_connection_uuid: "{{ opnsense_test_connection_add['outcomes'][0]['uuid'] | default('') }}"
-    opnsense_test_other_uuid: "{{ opnsense_test_connection_add['outcomes'][1]['uuid'] | default('') }}"
-    opnsense_test_example_uuid: "{{ opnsense_test_connection_add['outcomes'][2]['uuid'] | default('') }}"
+    opnsense_test_connection_uuid: "{{ opnsense_test_connection_add['outcomes'][0]['uuid'] | default('none-one') }}"
+    opnsense_test_other_uuid: "{{ opnsense_test_connection_add['outcomes'][1]['uuid'] | default('none-other') }}"
+    opnsense_test_example_uuid: "{{ opnsense_test_connection_add['outcomes'][2]['uuid'] | default('none-example') }}"
     opnsense_test_one:
       connection: "{{ opnsense_test_connection_uuid }}"
       mode: tunnel
@@ -198,8 +198,23 @@
             opnsense_test_area: "{{ opnsense_test_connection_area }}"
           register: opnsense_test_connections_left
 
+        - name: Disable IPsec again
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_api }}/toggle/0"
+            method: POST
+            body_format: json
+            body: {}
+          register: opnsense_test_disable
+          failed_when: opnsense_test_disable['json']['status'] != 'ok'
+
+        - name: Read whether IPsec is enabled after the cleanup
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_api }}/is_enabled"
+          register: opnsense_test_enabled_left
+
         - name: Assert that the cleanup left nothing behind
           ansible.builtin.assert:
             that:
               - opnsense_test_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
               - opnsense_test_connections_left['outcomes'] | map(attribute='uuid') | select | list | length == 0
+              - not opnsense_test_enabled_left['json']['enabled']
