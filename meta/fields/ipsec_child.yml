@@ -1,0 +1,121 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#children.child"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "connection"
+    type: "ModelRelationField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "reqid"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "esp_proposals"
+    type: "IPsecProposalField"
+    required: true
+    default: "default"
+    multiple: true
+    volatile: false
+    options: []
+  - name: "sha256_96"
+    type: "BooleanField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "start_action"
+    type: "OptionField"
+    required: true
+    default: "start"
+    multiple: false
+    volatile: false
+    options:
+      - "none"
+      - "trap|start"
+      - "route"
+      - "start"
+      - "trap"
+  - name: "close_action"
+    type: "OptionField"
+    required: true
+    default: "none"
+    multiple: false
+    volatile: false
+    options:
+      - "none"
+      - "trap"
+      - "start"
+  - name: "dpd_action"
+    type: "OptionField"
+    required: true
+    default: "clear"
+    multiple: false
+    volatile: false
+    options:
+      - "clear"
+      - "trap"
+      - "start"
+  - name: "mode"
+    type: "OptionField"
+    required: true
+    default: "tunnel"
+    multiple: false
+    volatile: false
+    options:
+      - "tunnel"
+      - "transport"
+      - "pass"
+      - "drop"
+  - name: "policies"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "local_ts"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "remote_ts"
+    type: "NetworkField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "rekey_time"
+    type: "IntegerField"
+    required: true
+    default: "3600"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "replay_window"
+    type: "IntegerField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []

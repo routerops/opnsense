@@ -17,6 +17,7 @@
 | [interfaces](interfaces.md) | [Assignment](interfaces.md#assignment) | `item` | `interfaces/assignment` | - | 26.7.6 | v0 | 26.7.7 |
 | [interfaces](interfaces.md) | [Virtual IP](interfaces.md#virtual-ip) | `item` | `interfaces/vip_settings` | - | - | v0 | 26.7.7 |
 | [interfaces](interfaces.md) | [VLAN](interfaces.md#vlan) | `item` | `interfaces/vlan_settings` | - | - | v0 | 26.7.7 |
+| [ipsec](ipsec.md) | [IPsec child](ipsec.md#ipsec-child) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
 | [ipsec](ipsec.md) | [IPsec connection](ipsec.md#ipsec-connection) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
 | [ipsec](ipsec.md) | [IPsec local authentication](ipsec.md#ipsec-local-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
 | [ipsec](ipsec.md) | [IPsec remote authentication](ipsec.md#ipsec-remote-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |

@@ -1492,3 +1492,49 @@ opnsense_areas:
               connection: EXAMPLE_CONNECTION_UUID
               description: routerops example remote
             state: absent
+  ipsec_child:
+    area: ipsec
+    title: IPsec child
+    module: item
+    path: ipsec/connections
+    key: child
+    lookup: [connection, description]
+    actions:
+      search: searchChild
+      get: getChild
+      add: addChild
+      set: setChild
+      del: delChild
+    apply: ipsec/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml
+      node: children.child
+    privileges:
+      - name: page-vpn-ipsec-connections
+        title: "VPN: IPsec: Connections"
+        pattern: api/ipsec/connections/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `connection` is the uuid of an IPsec connection; `connection` and `description` together identify a child, so keep descriptions unique per connection.
+      Deleting the connection deletes its children too.
+      A VTI pairs with a child through the same `reqid`; OPNsense does not check it.
+      The apply needs IPsec enabled, as described for the IPsec connection.
+      In the examples, replace `EXAMPLE_CONNECTION_UUID` with the `uuid` the connection example returns.
+    examples:
+      - name: Add a tunnel child
+        items:
+          - fields:
+              connection: EXAMPLE_CONNECTION_UUID
+              mode: tunnel
+              local_ts: [10.250.111.0/24]
+              remote_ts: [10.250.116.0/24]
+              description: routerops example child
+      - name: Remove a child
+        items:
+          - fields:
+              connection: EXAMPLE_CONNECTION_UUID
+              description: routerops example child
+            state: absent
