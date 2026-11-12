@@ -1333,7 +1333,7 @@ EXAMPLES = r"""
       search: "searchClient"
       set: "setClient"
     ordered_fields: ["tunneladdress"]
-    secret_fields: ["psk"]
+    secret_fields: ["psk", "privkey"]
     always_send: ["servers"]
     apply: "wireguard/service/reconfigure"
     items:
@@ -1358,7 +1358,7 @@ EXAMPLES = r"""
       search: "searchClient"
       set: "setClient"
     ordered_fields: ["tunneladdress"]
-    secret_fields: ["psk"]
+    secret_fields: ["psk", "privkey"]
     always_send: ["servers"]
     apply: "wireguard/service/reconfigure"
     items:

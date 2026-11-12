@@ -15,7 +15,7 @@
 | Write-only fields | - |
 | Ordered fields | `tunneladdress` |
 | Always sent | `servers` |
-| Secret fields | `psk` |
+| Secret fields | `psk`, `privkey` |
 | Separators | - |
 | Privileges | `page-wireguard-config` ("VPN: WireGuard: Configuration", `api/wireguard/client/*`) |
 | Minimum OPNsense | - |
@@ -23,7 +23,7 @@
 | Plugin | - |
 | Stage | v0 |
 
-`servers` lists the uuids of the servers the peer belongs to. OPNsense reads it on every write and drops the peer from every server when it is missing, so the module always sends it; list it in every present item. `tunneladdress` keeps the order you send. `keepalive` takes 1 to 65535; leave it out for none. The pre-shared key is readable through the API; it is masked in the diff and the return values. Names identify a peer; keep them unique. In the examples, replace `EXAMPLE_PEER_PUBKEY` with the peer's public key and `SERVER_UUID` with the `uuid` the example in the WireGuard server section returns.
+`servers` lists the uuids of the servers the peer belongs to. OPNsense reads it on every write and drops the peer from every server when it is missing, so the module always sends it; list it in every present item. `tunneladdress` keeps the order you send. `keepalive` takes 1 to 65535; leave it out for none. The pre-shared key and the peer private key OPNsense keeps for its configuration generator are readable through the API; both are masked in the diff and the return values. Names identify a peer; keep them unique. In the examples, replace `EXAMPLE_PEER_PUBKEY` with the peer's public key and `SERVER_UUID` with the `uuid` the example in the WireGuard server section returns.
 
 ### Fields
 
@@ -41,7 +41,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/C
 | `endpoint` | IPPortField, not stored |  |  |  |
 | `keepalive` | IntegerField |  |  |  |
 | `servers` | ModelRelationField, multiple, not stored |  |  |  |
-| `privkey` | Base64Field |  |  |  |
+| `privkey` (secret) | Base64Field |  |  |  |
 
 ### Examples
 
@@ -61,7 +61,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/C
       search: "searchClient"
       set: "setClient"
     ordered_fields: ["tunneladdress"]
-    secret_fields: ["psk"]
+    secret_fields: ["psk", "privkey"]
     always_send: ["servers"]
     apply: "wireguard/service/reconfigure"
     items:
@@ -86,7 +86,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/C
       search: "searchClient"
       set: "setClient"
     ordered_fields: ["tunneladdress"]
-    secret_fields: ["psk"]
+    secret_fields: ["psk", "privkey"]
     always_send: ["servers"]
     apply: "wireguard/service/reconfigure"
     items:
