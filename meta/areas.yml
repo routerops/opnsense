@@ -1404,3 +1404,91 @@ opnsense_areas:
           - fields:
               description: routerops example
             state: absent
+  ipsec_local:
+    area: ipsec
+    title: IPsec local authentication
+    module: item
+    path: ipsec/connections
+    key: local
+    lookup: [connection, description]
+    actions:
+      search: searchLocal
+      get: getLocal
+      add: addLocal
+      set: setLocal
+      del: delLocal
+    apply: ipsec/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml
+      node: locals.local
+    privileges:
+      - name: page-vpn-ipsec-connections
+        title: "VPN: IPsec: Connections"
+        pattern: api/ipsec/connections/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `connection` is the uuid of an IPsec connection; `connection` and `description` together identify an entry, so keep descriptions unique per connection.
+      Deleting the connection deletes this entry too.
+      The apply needs IPsec enabled, as described for the IPsec connection.
+      In the examples, replace `EXAMPLE_CONNECTION_UUID` with the `uuid` the connection example returns.
+    examples:
+      - name: Authenticate the local side with a pre-shared key
+        items:
+          - fields:
+              connection: EXAMPLE_CONNECTION_UUID
+              auth: psk
+              id: rt-example-local.routerops.test
+              description: routerops example local
+      - name: Remove the local authentication
+        items:
+          - fields:
+              connection: EXAMPLE_CONNECTION_UUID
+              description: routerops example local
+            state: absent
+  ipsec_remote:
+    area: ipsec
+    title: IPsec remote authentication
+    module: item
+    path: ipsec/connections
+    key: remote
+    lookup: [connection, description]
+    actions:
+      search: searchRemote
+      get: getRemote
+      add: addRemote
+      set: setRemote
+      del: delRemote
+    apply: ipsec/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml
+      node: remotes.remote
+    privileges:
+      - name: page-vpn-ipsec-connections
+        title: "VPN: IPsec: Connections"
+        pattern: api/ipsec/connections/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `connection` is the uuid of an IPsec connection; `connection` and `description` together identify an entry, so keep descriptions unique per connection.
+      Deleting the connection deletes this entry too.
+      The apply needs IPsec enabled, as described for the IPsec connection.
+      In the examples, replace `EXAMPLE_CONNECTION_UUID` with the `uuid` the connection example returns.
+    examples:
+      - name: Authenticate the remote side with a pre-shared key
+        items:
+          - fields:
+              connection: EXAMPLE_CONNECTION_UUID
+              auth: psk
+              id: rt-example-remote.routerops.test
+              description: routerops example remote
+      - name: Remove the remote authentication
+        items:
+          - fields:
+              connection: EXAMPLE_CONNECTION_UUID
+              description: routerops example remote
+            state: absent

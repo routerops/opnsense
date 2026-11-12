@@ -100,3 +100,179 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
           description: "routerops example"
         state: "absent"
 ```
+
+## IPsec local authentication
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `ipsec/connections` |
+| Key | `local` |
+| Actions | `add: addLocal`, `del: delLocal`, `get: getLocal`, `search: searchLocal`, `set: setLocal` |
+| Lookup | `connection`, `description` |
+| Item ids | `uuid` |
+| Apply | `ipsec/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | - |
+| Separators | - |
+| Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+`connection` is the uuid of an IPsec connection; `connection` and `description` together identify an entry, so keep descriptions unique per connection. Deleting the connection deletes this entry too. The apply needs IPsec enabled, as described for the IPsec connection. In the examples, replace `EXAMPLE_CONNECTION_UUID` with the `uuid` the connection example returns.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#locals.local`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `enabled` | BooleanField | yes | `1` |  |
+| `connection` | ModelRelationField | yes |  |  |
+| `round` | IntegerField | yes | `0` |  |
+| `auth` | OptionField | yes | `psk` | `psk`, `pubkey`, `eap-tls`, `eap-mschapv2`, `xauth-pam`, `eap-radius` |
+| `id` | StrictTextField |  |  |  |
+| `eap_id` | StrictTextField |  |  |  |
+| `certs` | CertificateField, multiple |  |  |  |
+| `pubkeys` | ModelRelationField, multiple |  |  |  |
+| `description` | DescriptionField |  |  |  |
+
+### Examples
+
+```yaml
+- name: Authenticate the local side with a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "local"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addLocal"
+      del: "delLocal"
+      get: "getLocal"
+      search: "searchLocal"
+      set: "setLocal"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          auth: "psk"
+          id: "rt-example-local.routerops.test"
+          description: "routerops example local"
+
+- name: Remove the local authentication
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "local"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addLocal"
+      del: "delLocal"
+      get: "getLocal"
+      search: "searchLocal"
+      set: "setLocal"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          description: "routerops example local"
+        state: "absent"
+```
+
+## IPsec remote authentication
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `ipsec/connections` |
+| Key | `remote` |
+| Actions | `add: addRemote`, `del: delRemote`, `get: getRemote`, `search: searchRemote`, `set: setRemote` |
+| Lookup | `connection`, `description` |
+| Item ids | `uuid` |
+| Apply | `ipsec/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | - |
+| Separators | - |
+| Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+`connection` is the uuid of an IPsec connection; `connection` and `description` together identify an entry, so keep descriptions unique per connection. Deleting the connection deletes this entry too. The apply needs IPsec enabled, as described for the IPsec connection. In the examples, replace `EXAMPLE_CONNECTION_UUID` with the `uuid` the connection example returns.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#remotes.remote`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `enabled` | BooleanField | yes | `1` |  |
+| `connection` | ModelRelationField | yes |  |  |
+| `round` | IntegerField | yes | `0` |  |
+| `auth` | OptionField | yes | `psk` | `psk`, `pubkey`, `eap-tls`, `eap-mschapv2`, `xauth-pam`, `eap-radius` |
+| `id` | StrictTextField |  |  |  |
+| `eap_id` | StrictTextField |  |  |  |
+| `groups` | AuthGroupField, multiple |  |  |  |
+| `certs` | CertificateField, multiple |  |  |  |
+| `cacerts` | CertificateField, multiple |  |  |  |
+| `pubkeys` | ModelRelationField, multiple |  |  |  |
+| `description` | DescriptionField |  |  |  |
+
+### Examples
+
+```yaml
+- name: Authenticate the remote side with a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "remote"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addRemote"
+      del: "delRemote"
+      get: "getRemote"
+      search: "searchRemote"
+      set: "setRemote"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          auth: "psk"
+          id: "rt-example-remote.routerops.test"
+          description: "routerops example remote"
+
+- name: Remove the remote authentication
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "remote"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addRemote"
+      del: "delRemote"
+      get: "getRemote"
+      search: "searchRemote"
+      set: "setRemote"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          description: "routerops example remote"
+        state: "absent"
+```

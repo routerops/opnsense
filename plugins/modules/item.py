@@ -765,6 +765,92 @@ EXAMPLES = r"""
           description: "routerops example"
         state: "absent"
 
+- name: Authenticate the local side with a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "local"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addLocal"
+      del: "delLocal"
+      get: "getLocal"
+      search: "searchLocal"
+      set: "setLocal"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          auth: "psk"
+          id: "rt-example-local.routerops.test"
+          description: "routerops example local"
+
+- name: Remove the local authentication
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "local"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addLocal"
+      del: "delLocal"
+      get: "getLocal"
+      search: "searchLocal"
+      set: "setLocal"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          description: "routerops example local"
+        state: "absent"
+
+- name: Authenticate the remote side with a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "remote"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addRemote"
+      del: "delRemote"
+      get: "getRemote"
+      search: "searchRemote"
+      set: "setRemote"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          auth: "psk"
+          id: "rt-example-remote.routerops.test"
+          description: "routerops example remote"
+
+- name: Remove the remote authentication
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "remote"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addRemote"
+      del: "delRemote"
+      get: "getRemote"
+      search: "searchRemote"
+      set: "setRemote"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          description: "routerops example remote"
+        state: "absent"
+
 - name: Reserve an address
   routerops.opnsense.item:
     url: https://fw.example

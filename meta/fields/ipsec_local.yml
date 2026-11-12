@@ -1,0 +1,70 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Generated from the OPNsense model XML by make fields; do not edit.
+---
+version: "26.7.7"
+source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#locals.local"
+fields:
+  - name: "enabled"
+    type: "BooleanField"
+    required: true
+    default: "1"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "connection"
+    type: "ModelRelationField"
+    required: true
+    multiple: false
+    volatile: false
+    options: []
+  - name: "round"
+    type: "IntegerField"
+    required: true
+    default: "0"
+    multiple: false
+    volatile: false
+    options: []
+  - name: "auth"
+    type: "OptionField"
+    required: true
+    default: "psk"
+    multiple: false
+    volatile: false
+    options:
+      - "psk"
+      - "pubkey"
+      - "eap-tls"
+      - "eap-mschapv2"
+      - "xauth-pam"
+      - "eap-radius"
+  - name: "id"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "eap_id"
+    type: "StrictTextField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "certs"
+    type: "CertificateField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "pubkeys"
+    type: "ModelRelationField"
+    required: false
+    multiple: true
+    volatile: false
+    options: []
+  - name: "description"
+    type: "DescriptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
