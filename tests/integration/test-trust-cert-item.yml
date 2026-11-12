@@ -95,6 +95,7 @@
           ansible.builtin.uri:
             url: "{{ opnsense_test_api }}/get/{{ opnsense_test_add['outcomes'][0]['uuid'] }}"
           register: opnsense_test_crt_before
+          no_log: true
 
         - name: Add both certificates again
           routerops.opnsense.item:
@@ -109,6 +110,7 @@
           ansible.builtin.uri:
             url: "{{ opnsense_test_api }}/get/{{ opnsense_test_add['outcomes'][0]['uuid'] }}"
           register: opnsense_test_crt_after
+          no_log: true
 
         - name: Add both certificates again in check mode
           routerops.opnsense.item:
