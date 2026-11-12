@@ -41,7 +41,7 @@ A new check counts only after it failed once against a real fault: copy the test
 | Input | Source |
 |---|---|
 | `PROXMOX_HOST` | set in the untracked `integration.local.mk` (gitignored), which the Makefile includes |
-| Tunnel | `socat` on `127.0.0.1:18443` (`TUNNEL_PORT`) forwarding through `ssh -o BatchMode=yes root@$PROXMOX_HOST nc 10.250.1.1 443`; the connections share one SSH master (`ControlMaster=auto`, socket `~/.ssh/routerops-%C`, closed when the run ends) |
+| Tunnel | `socat` on `127.0.0.1:18443` (`TUNNEL_PORT`) forwarding through `ssh -o BatchMode=yes root@$PROXMOX_HOST nc 10.250.1.1 443`; the connections share one SSH master (`ControlMaster=auto`, socket `~/.ssh/routerops-%C`, closed when the run ends); the tunnel's error output goes to `build/tunnel.log`, so the run also works without a terminal |
 | API key and secret | the Bitwarden login item `routerops-opnsense-test` (username = key, password = secret), read with `bw get` in a silent recipe line; `bw` must be unlocked |
 
 Nothing is printed or written to a file; the values exist only in the environment of the test run.
