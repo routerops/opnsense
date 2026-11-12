@@ -1360,3 +1360,47 @@ opnsense_areas:
           - fields:
               name: rt-example-peer
             state: absent
+  ipsec_connection:
+    area: ipsec
+    title: IPsec connection
+    module: item
+    path: ipsec/connections
+    key: connection
+    lookup: [description]
+    actions:
+      search: searchConnection
+      get: getConnection
+      add: addConnection
+      set: setConnection
+      del: delConnection
+    apply: ipsec/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml
+      node: Connections.Connection
+    privileges:
+      - name: page-vpn-ipsec-connections
+        title: "VPN: IPsec: Connections"
+        pattern: api/ipsec/connections/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      Deleting a connection also deletes its local and remote authentications and children.
+      Do not send `local_ts` and `remote_ts`; OPNsense fills them from the children.
+      Enable IPsec first with `ipsec/connections/toggle/1`; while IPsec is disabled, every apply fails with `Service "ipsec" failed to stop.`
+      Every apply reloads the firewall rules.
+      Descriptions identify a connection; keep them unique.
+    examples:
+      - name: Add a site-to-site connection
+        items:
+          - fields:
+              description: routerops example
+              version: "2"
+              local_addrs: [10.250.1.1]
+              remote_addrs: [10.250.110.4]
+      - name: Remove a connection
+        items:
+          - fields:
+              description: routerops example
+            state: absent
