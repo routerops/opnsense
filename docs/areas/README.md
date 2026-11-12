@@ -22,6 +22,7 @@
 | [ipsec](ipsec.md) | [IPsec local authentication](ipsec.md#ipsec-local-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
 | [ipsec](ipsec.md) | [IPsec pre-shared key](ipsec.md#ipsec-pre-shared-key) | `item` | `ipsec/pre_shared_keys` | - | - | v0 | 26.7.7 |
 | [ipsec](ipsec.md) | [IPsec remote authentication](ipsec.md#ipsec-remote-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
+| [ipsec](ipsec.md) | [IPsec VTI](ipsec.md#ipsec-vti) | `item` | `ipsec/vti` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [Kea DHCPv4 general](kea.md#kea-dhcpv4-general) | `settings` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [DHCPv4 reservation](kea.md#dhcpv4-reservation) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
 | [kea](kea.md) | [DHCPv4 subnet](kea.md#dhcpv4-subnet) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |

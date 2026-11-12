@@ -928,6 +928,50 @@ EXAMPLES = r"""
           description: "routerops example remote"
         state: "absent"
 
+- name: Add a route-based tunnel interface
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/vti"
+    key: "vti"
+    lookup: ["reqid"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          reqid: "103"
+          local: "10.250.117.1"
+          remote: "10.250.117.2"
+          tunnel_local: "10.250.115.5"
+          tunnel_remote: "10.250.115.6"
+          description: "routerops example"
+
+- name: Remove a VTI
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/vti"
+    key: "vti"
+    lookup: ["reqid"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          reqid: "103"
+        state: "absent"
+
 - name: Reserve an address
   routerops.opnsense.item:
     url: https://fw.example
