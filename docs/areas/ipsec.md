@@ -1,6 +1,100 @@
 <!-- Generated from meta/areas.yml by make docs; do not edit. -->
 # Area `ipsec`
 
+## IPsec child
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `ipsec/connections` |
+| Key | `child` |
+| Actions | `add: addChild`, `del: delChild`, `get: getChild`, `search: searchChild`, `set: setChild` |
+| Lookup | `connection`, `description` |
+| Item ids | `uuid` |
+| Apply | `ipsec/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | - |
+| Separators | - |
+| Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+`connection` is the uuid of an IPsec connection; `connection` and `description` together identify a child, so keep descriptions unique per connection. Deleting the connection deletes its children too. A VTI pairs with a child through the same `reqid`; OPNsense does not check it. The apply needs IPsec enabled, as described for the IPsec connection. In the examples, replace `EXAMPLE_CONNECTION_UUID` with the `uuid` the connection example returns.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#children.child`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `enabled` | BooleanField | yes | `1` |  |
+| `connection` | ModelRelationField | yes |  |  |
+| `reqid` | IntegerField |  |  |  |
+| `esp_proposals` | IPsecProposalField, multiple | yes | `default` |  |
+| `sha256_96` | BooleanField | yes | `0` |  |
+| `start_action` | OptionField | yes | `start` | `none`, `trap\|start`, `route`, `start`, `trap` |
+| `close_action` | OptionField | yes | `none` | `none`, `trap`, `start` |
+| `dpd_action` | OptionField | yes | `clear` | `clear`, `trap`, `start` |
+| `mode` | OptionField | yes | `tunnel` | `tunnel`, `transport`, `pass`, `drop` |
+| `policies` | BooleanField | yes | `1` |  |
+| `local_ts` | NetworkField |  |  |  |
+| `remote_ts` | NetworkField |  |  |  |
+| `rekey_time` | IntegerField | yes | `3600` |  |
+| `replay_window` | IntegerField |  |  |  |
+| `description` | DescriptionField |  |  |  |
+
+### Examples
+
+```yaml
+- name: Add a tunnel child
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "child"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addChild"
+      del: "delChild"
+      get: "getChild"
+      search: "searchChild"
+      set: "setChild"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          mode: "tunnel"
+          local_ts: ["10.250.111.0/24"]
+          remote_ts: ["10.250.116.0/24"]
+          description: "routerops example child"
+
+- name: Remove a child
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "child"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addChild"
+      del: "delChild"
+      get: "getChild"
+      search: "searchChild"
+      set: "setChild"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          description: "routerops example child"
+        state: "absent"
+```
+
 ## IPsec connection
 
 | Setting | Value |

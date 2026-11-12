@@ -723,6 +723,50 @@ EXAMPLES = r"""
           descr: "routerops example"
         state: "absent"
 
+- name: Add a tunnel child
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "child"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addChild"
+      del: "delChild"
+      get: "getChild"
+      search: "searchChild"
+      set: "setChild"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          mode: "tunnel"
+          local_ts: ["10.250.111.0/24"]
+          remote_ts: ["10.250.116.0/24"]
+          description: "routerops example child"
+
+- name: Remove a child
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "child"
+    lookup: ["connection", "description"]
+    actions:
+      add: "addChild"
+      del: "delChild"
+      get: "getChild"
+      search: "searchChild"
+      set: "setChild"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          connection: "EXAMPLE_CONNECTION_UUID"
+          description: "routerops example child"
+        state: "absent"
+
 - name: Add a site-to-site connection
   routerops.opnsense.item:
     url: https://fw.example
