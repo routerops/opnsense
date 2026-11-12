@@ -852,6 +852,39 @@ EXAMPLES = r"""
           description: "routerops example local"
         state: "absent"
 
+- name: Add a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/pre_shared_keys"
+    key: "preSharedKey"
+    lookup: ["ident", "remote_ident"]
+    secret_fields: ["Key"]
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          ident: "rt-example-local.routerops.test"
+          remote_ident: "rt-example-remote.routerops.test"
+          keyType: "PSK"
+          Key: "EXAMPLE_PSK"
+
+- name: Remove a pre-shared key
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/pre_shared_keys"
+    key: "preSharedKey"
+    lookup: ["ident", "remote_ident"]
+    secret_fields: ["Key"]
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          ident: "rt-example-local.routerops.test"
+          remote_ident: "rt-example-remote.routerops.test"
+        state: "absent"
+
 - name: Authenticate the remote side with a pre-shared key
   routerops.opnsense.item:
     url: https://fw.example

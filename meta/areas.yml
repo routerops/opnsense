@@ -1538,3 +1538,41 @@ opnsense_areas:
               connection: EXAMPLE_CONNECTION_UUID
               description: routerops example child
             state: absent
+  ipsec_psk:
+    area: ipsec
+    title: IPsec pre-shared key
+    module: item
+    path: ipsec/pre_shared_keys
+    key: preSharedKey
+    lookup: [ident, remote_ident]
+    apply: ipsec/service/reconfigure
+    secret_fields: [Key]
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/IPsec/IPsec.xml
+      node: preSharedKeys.preSharedKey
+    privileges:
+      - name: page-vpn-ipsec-editkeys
+        title: "VPN: IPsec: Edit Pre-Shared Keys"
+        pattern: api/ipsec/pre_shared_keys/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `ident` and `remote_ident` together identify a key.
+      The key is readable through the API; it is masked in the diff and the return values.
+      The apply needs IPsec enabled, as described for the IPsec connection.
+    examples:
+      - name: Add a pre-shared key
+        items:
+          - fields:
+              ident: rt-example-local.routerops.test
+              remote_ident: rt-example-remote.routerops.test
+              keyType: PSK
+              Key: EXAMPLE_PSK
+      - name: Remove a pre-shared key
+        items:
+          - fields:
+              ident: rt-example-local.routerops.test
+              remote_ident: rt-example-remote.routerops.test
+            state: absent
