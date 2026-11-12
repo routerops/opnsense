@@ -3,41 +3,41 @@
 
 | Area | Item type | Module | Path | Plugin | Minimum OPNsense | Stage | Tested on |
 |---|---|---|---|---|---|---|---|
-| [dnsmasq](dnsmasq.md) | [Dnsmasq domain override](dnsmasq.md#dnsmasq-domain-override) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
-| [dnsmasq](dnsmasq.md) | [Dnsmasq general](dnsmasq.md#dnsmasq-general) | `settings` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
-| [dnsmasq](dnsmasq.md) | [Dnsmasq host](dnsmasq.md#dnsmasq-host) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
-| [dnsmasq](dnsmasq.md) | [Dnsmasq DHCP option](dnsmasq.md#dnsmasq-dhcp-option) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
-| [dnsmasq](dnsmasq.md) | [Dnsmasq DHCP range](dnsmasq.md#dnsmasq-dhcp-range) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.7 |
-| [firewall](firewall.md) | [Firewall alias](firewall.md#firewall-alias) | `item` | `firewall/alias` | - | - | v0 | 26.7.7 |
-| [firewall](firewall.md) | [Firewall destination NAT](firewall.md#firewall-destination-nat) | `item` | `firewall/d_nat` | - | - | v0 | 26.7.7 |
-| [firewall](firewall.md) | [Firewall filter rule](firewall.md#firewall-filter-rule) | `item` | `firewall/filter` | - | - | v0 | 26.7.7 |
-| [firewall](firewall.md) | [Firewall one-to-one NAT](firewall.md#firewall-one-to-one-nat) | `item` | `firewall/one_to_one` | - | - | v0 | 26.7.7 |
-| [firewall](firewall.md) | [Firewall source NAT rule](firewall.md#firewall-source-nat-rule) | `item` | `firewall/source_nat` | - | - | v0 | 26.7.7 |
-| [firewall](firewall.md) | [Firewall outbound NAT mode](firewall.md#firewall-outbound-nat-mode) | `settings` | `firewall/source_nat` | - | - | v0 | 26.7.7 |
-| [interfaces](interfaces.md) | [Assignment](interfaces.md#assignment) | `item` | `interfaces/assignment` | - | 26.7.6 | v0 | 26.7.7 |
-| [interfaces](interfaces.md) | [Virtual IP](interfaces.md#virtual-ip) | `item` | `interfaces/vip_settings` | - | - | v0 | 26.7.7 |
-| [interfaces](interfaces.md) | [VLAN](interfaces.md#vlan) | `item` | `interfaces/vlan_settings` | - | - | v0 | 26.7.7 |
-| [ipsec](ipsec.md) | [IPsec child](ipsec.md#ipsec-child) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
-| [ipsec](ipsec.md) | [IPsec connection](ipsec.md#ipsec-connection) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
-| [ipsec](ipsec.md) | [IPsec local authentication](ipsec.md#ipsec-local-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
-| [ipsec](ipsec.md) | [IPsec pre-shared key](ipsec.md#ipsec-pre-shared-key) | `item` | `ipsec/pre_shared_keys` | - | - | v0 | 26.7.7 |
-| [ipsec](ipsec.md) | [IPsec remote authentication](ipsec.md#ipsec-remote-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.7 |
-| [ipsec](ipsec.md) | [IPsec VTI](ipsec.md#ipsec-vti) | `item` | `ipsec/vti` | - | - | v0 | 26.7.7 |
-| [kea](kea.md) | [Kea DHCPv4 general](kea.md#kea-dhcpv4-general) | `settings` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
-| [kea](kea.md) | [DHCPv4 reservation](kea.md#dhcpv4-reservation) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
-| [kea](kea.md) | [DHCPv4 subnet](kea.md#dhcpv4-subnet) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.7 |
-| [nodeexporter](nodeexporter.md) | [node_exporter general](nodeexporter.md#node_exporter-general) | `settings` | `nodeexporter/general` | `os-node_exporter` | - | v0 | 26.7.7 |
-| [openvpn](openvpn.md) | [OpenVPN client-specific override](openvpn.md#openvpn-client-specific-override) | `item` | `openvpn/client_overwrites` | - | - | v0 | 26.7.7 |
-| [openvpn](openvpn.md) | [OpenVPN instance](openvpn.md#openvpn-instance) | `item` | `openvpn/instances` | - | - | v0 | 26.7.7 |
-| [openvpn](openvpn.md) | [OpenVPN static key](openvpn.md#openvpn-static-key) | `item` | `openvpn/instances` | - | - | v0 | 26.7.7 |
-| [routes](routes.md) | [Static route](routes.md#static-route) | `item` | `routes/routes` | - | - | v0 | 26.7.7 |
-| [routing](routing.md) | [Gateway](routing.md#gateway) | `item` | `routing/settings` | - | - | v0 | 26.7.7 |
-| [trust](trust.md) | [Certificate authority](trust.md#certificate-authority) | `item` | `trust/ca` | - | - | v0 | 26.7.7 |
-| [trust](trust.md) | [Certificate](trust.md#certificate) | `item` | `trust/cert` | - | - | v0 | 26.7.7 |
-| [unbound](unbound.md) | [ACL](unbound.md#acl) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
-| [unbound](unbound.md) | [Query forward](unbound.md#query-forward) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
-| [unbound](unbound.md) | [Unbound general](unbound.md#unbound-general) | `settings` | `unbound/settings` | - | - | v0 | 26.7.7 |
-| [unbound](unbound.md) | [Host alias](unbound.md#host-alias) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
-| [unbound](unbound.md) | [Host override](unbound.md#host-override) | `item` | `unbound/settings` | - | - | v0 | 26.7.7 |
-| [wireguard](wireguard.md) | [WireGuard peer](wireguard.md#wireguard-peer) | `item` | `wireguard/client` | - | - | v0 | 26.7.7 |
-| [wireguard](wireguard.md) | [WireGuard server](wireguard.md#wireguard-server) | `item` | `wireguard/server` | - | - | v0 | 26.7.7 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq domain override](dnsmasq.md#dnsmasq-domain-override) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.9 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq general](dnsmasq.md#dnsmasq-general) | `settings` | `dnsmasq/settings` | - | - | v0 | 26.7.9 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq host](dnsmasq.md#dnsmasq-host) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.9 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq DHCP option](dnsmasq.md#dnsmasq-dhcp-option) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.9 |
+| [dnsmasq](dnsmasq.md) | [Dnsmasq DHCP range](dnsmasq.md#dnsmasq-dhcp-range) | `item` | `dnsmasq/settings` | - | - | v0 | 26.7.9 |
+| [firewall](firewall.md) | [Firewall alias](firewall.md#firewall-alias) | `item` | `firewall/alias` | - | - | v0 | 26.7.9 |
+| [firewall](firewall.md) | [Firewall destination NAT](firewall.md#firewall-destination-nat) | `item` | `firewall/d_nat` | - | - | v0 | 26.7.9 |
+| [firewall](firewall.md) | [Firewall filter rule](firewall.md#firewall-filter-rule) | `item` | `firewall/filter` | - | - | v0 | 26.7.9 |
+| [firewall](firewall.md) | [Firewall one-to-one NAT](firewall.md#firewall-one-to-one-nat) | `item` | `firewall/one_to_one` | - | - | v0 | 26.7.9 |
+| [firewall](firewall.md) | [Firewall source NAT rule](firewall.md#firewall-source-nat-rule) | `item` | `firewall/source_nat` | - | - | v0 | 26.7.9 |
+| [firewall](firewall.md) | [Firewall outbound NAT mode](firewall.md#firewall-outbound-nat-mode) | `settings` | `firewall/source_nat` | - | - | v0 | 26.7.9 |
+| [interfaces](interfaces.md) | [Assignment](interfaces.md#assignment) | `item` | `interfaces/assignment` | - | 26.7.6 | v0 | 26.7.9 |
+| [interfaces](interfaces.md) | [Virtual IP](interfaces.md#virtual-ip) | `item` | `interfaces/vip_settings` | - | - | v0 | 26.7.9 |
+| [interfaces](interfaces.md) | [VLAN](interfaces.md#vlan) | `item` | `interfaces/vlan_settings` | - | - | v0 | 26.7.9 |
+| [ipsec](ipsec.md) | [IPsec child](ipsec.md#ipsec-child) | `item` | `ipsec/connections` | - | - | v0 | 26.7.9 |
+| [ipsec](ipsec.md) | [IPsec connection](ipsec.md#ipsec-connection) | `item` | `ipsec/connections` | - | - | v0 | 26.7.9 |
+| [ipsec](ipsec.md) | [IPsec local authentication](ipsec.md#ipsec-local-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.9 |
+| [ipsec](ipsec.md) | [IPsec pre-shared key](ipsec.md#ipsec-pre-shared-key) | `item` | `ipsec/pre_shared_keys` | - | - | v0 | 26.7.9 |
+| [ipsec](ipsec.md) | [IPsec remote authentication](ipsec.md#ipsec-remote-authentication) | `item` | `ipsec/connections` | - | - | v0 | 26.7.9 |
+| [ipsec](ipsec.md) | [IPsec VTI](ipsec.md#ipsec-vti) | `item` | `ipsec/vti` | - | - | v0 | 26.7.9 |
+| [kea](kea.md) | [Kea DHCPv4 general](kea.md#kea-dhcpv4-general) | `settings` | `kea/dhcpv4` | - | - | v0 | 26.7.9 |
+| [kea](kea.md) | [DHCPv4 reservation](kea.md#dhcpv4-reservation) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.9 |
+| [kea](kea.md) | [DHCPv4 subnet](kea.md#dhcpv4-subnet) | `item` | `kea/dhcpv4` | - | - | v0 | 26.7.9 |
+| [nodeexporter](nodeexporter.md) | [node_exporter general](nodeexporter.md#node_exporter-general) | `settings` | `nodeexporter/general` | `os-node_exporter` | - | v0 | 26.7.9 |
+| [openvpn](openvpn.md) | [OpenVPN client-specific override](openvpn.md#openvpn-client-specific-override) | `item` | `openvpn/client_overwrites` | - | - | v0 | 26.7.9 |
+| [openvpn](openvpn.md) | [OpenVPN instance](openvpn.md#openvpn-instance) | `item` | `openvpn/instances` | - | - | v0 | 26.7.9 |
+| [openvpn](openvpn.md) | [OpenVPN static key](openvpn.md#openvpn-static-key) | `item` | `openvpn/instances` | - | - | v0 | 26.7.9 |
+| [routes](routes.md) | [Static route](routes.md#static-route) | `item` | `routes/routes` | - | - | v0 | 26.7.9 |
+| [routing](routing.md) | [Gateway](routing.md#gateway) | `item` | `routing/settings` | - | - | v0 | 26.7.9 |
+| [trust](trust.md) | [Certificate authority](trust.md#certificate-authority) | `item` | `trust/ca` | - | - | v0 | 26.7.9 |
+| [trust](trust.md) | [Certificate](trust.md#certificate) | `item` | `trust/cert` | - | - | v0 | 26.7.9 |
+| [unbound](unbound.md) | [ACL](unbound.md#acl) | `item` | `unbound/settings` | - | - | v0 | 26.7.9 |
+| [unbound](unbound.md) | [Query forward](unbound.md#query-forward) | `item` | `unbound/settings` | - | - | v0 | 26.7.9 |
+| [unbound](unbound.md) | [Unbound general](unbound.md#unbound-general) | `settings` | `unbound/settings` | - | - | v0 | 26.7.9 |
+| [unbound](unbound.md) | [Host alias](unbound.md#host-alias) | `item` | `unbound/settings` | - | - | v0 | 26.7.9 |
+| [unbound](unbound.md) | [Host override](unbound.md#host-override) | `item` | `unbound/settings` | - | - | v0 | 26.7.9 |
+| [wireguard](wireguard.md) | [WireGuard peer](wireguard.md#wireguard-peer) | `item` | `wireguard/client` | - | - | v0 | 26.7.9 |
+| [wireguard](wireguard.md) | [WireGuard server](wireguard.md#wireguard-server) | `item` | `wireguard/server` | - | - | v0 | 26.7.9 |

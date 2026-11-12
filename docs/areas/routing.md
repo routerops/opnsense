@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-system-gateways` ("System: Gateways", `api/routing/settings/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ Gateways OPNsense generates for dynamic interfaces, such as `WAN_DHCP`, carry th
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Routing/Gateways.xml#gateway_item`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Routing/Gateways.xml#gateway_item`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

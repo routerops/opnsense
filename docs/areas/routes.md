@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-system-staticroutes` ("System: Static Routes", `api/routes/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ The gateway a route names must exist before the route; OPNsense caches its gatew
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Routes/Route.xml#route`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Routes/Route.xml#route`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

@@ -25,7 +25,7 @@ opnsense_areas:
         title: "Services: Dnsmasq DNS/DHCP: Settings"
         pattern: api/dnsmasq/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     examples:
       - name: Add a Dnsmasq host
@@ -72,7 +72,7 @@ opnsense_areas:
         title: "Firewall: Alias: Edit"
         pattern: api/firewall/alias/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     examples:
       - name: Keep a host alias
@@ -119,7 +119,7 @@ opnsense_areas:
         title: "Firewall: NAT: Destination NAT"
         pattern: api/firewall/d_nat/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     examples:
       - name: Forward port 8080 on WAN to a LAN web server
@@ -162,7 +162,7 @@ opnsense_areas:
         title: "Firewall: Rules [new]"
         pattern: api/firewall/filter/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     examples:
       - name: Allow HTTPS to the firewall from LAN
@@ -209,7 +209,7 @@ opnsense_areas:
         title: "Firewall: NAT: 1:1"
         pattern: api/firewall/one_to_one/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     examples:
       - name: Map a LAN host to a WAN address
@@ -258,7 +258,7 @@ opnsense_areas:
         title: "Firewall: NAT: Source NAT"
         pattern: api/firewall/source_nat/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       OPNsense lists source NAT rules only in the outbound NAT mode `hybrid` or `advanced` (default `automatic`);
@@ -292,7 +292,7 @@ opnsense_areas:
         title: "Firewall: NAT: Source NAT"
         pattern: api/firewall/source_nat/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Firewall/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     examples:
       - name: Use hybrid outbound NAT
@@ -315,7 +315,7 @@ opnsense_areas:
         title: "Interfaces: VLAN"
         pattern: api/interfaces/vlan_settings/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Interfaces/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Set `vlanif` (`vlan0.<tag>`) so the device name is known before the VLAN is assigned;
@@ -353,7 +353,7 @@ opnsense_areas:
         title: "Interfaces: Virtual IPs: Settings"
         pattern: api/interfaces/vip_settings/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Interfaces/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Send the address as `network`; OPNsense reads and returns it in that form, not as `subnet` and `subnet_bits`.
@@ -391,7 +391,7 @@ opnsense_areas:
         pattern: api/interfaces/assignment/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
     min_version: "26.7.6"
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Items are keyed by the interface name (`opt1`); the outcome `uuid` is that name, which a virtual IP takes as `interface`.
@@ -433,7 +433,7 @@ opnsense_areas:
         title: "Services: Prometheus Exporter"
         pattern: api/nodeexporter/*
         acl: opnsense-plugins/sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     plugin: os-node_exporter
     stage: v0
     examples:
@@ -465,7 +465,7 @@ opnsense_areas:
         title: "System: Static Routes"
         pattern: api/routes/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       The gateway a route names must exist before the route; OPNsense caches its gateway list for 20 seconds,
@@ -517,7 +517,7 @@ opnsense_areas:
         title: "System: Gateways"
         pattern: api/routing/settings/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Gateways OPNsense generates for dynamic interfaces, such as `WAN_DHCP`, carry their name as `uuid` and are not items of this area:
@@ -551,7 +551,7 @@ opnsense_areas:
         title: "Services: Unbound"
         pattern: api/unbound/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Every apply restarts Unbound, so DNS stops answering for a moment.
@@ -583,7 +583,7 @@ opnsense_areas:
         title: "Services: Unbound"
         pattern: api/unbound/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Do not send `aliases`: OPNsense adds and deletes alias items from it; manage them with the host alias area.
@@ -629,7 +629,7 @@ opnsense_areas:
         title: "Services: Unbound"
         pattern: api/unbound/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `host` is the uuid of a host override; register it from the host override's outcome.
@@ -674,7 +674,7 @@ opnsense_areas:
         title: "Services: Unbound"
         pattern: api/unbound/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Forward and DNS over TLS items share one list; the action name sets `type` and overwrites a sent one, so never send it, or every run shows a change.
@@ -716,7 +716,7 @@ opnsense_areas:
         title: "Services: Unbound"
         pattern: api/unbound/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Unbound/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Names are not unique; keep them unique, the lookup takes the name.
@@ -750,7 +750,7 @@ opnsense_areas:
         title: "Services: DHCP: Kea(v4)"
         pattern: api/kea/dhcpv4/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Kea/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Kea serves DHCP only with `enabled: true` and at least one entry in `interfaces`.
@@ -785,7 +785,7 @@ opnsense_areas:
         title: "Services: DHCP: Kea(v4)"
         pattern: api/kea/dhcpv4/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Kea/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Leave the `option_data` fields unset while `option_data_autocollect` is on; OPNsense fills them on every general save.
@@ -826,7 +826,7 @@ opnsense_areas:
         title: "Services: DHCP: Kea(v4)"
         pattern: api/kea/dhcpv4/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Kea/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `subnet` is the uuid of a subnet; register it from the subnet's outcome.
@@ -867,7 +867,7 @@ opnsense_areas:
         title: "Services: Dnsmasq DNS/DHCP: Settings"
         pattern: api/dnsmasq/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a save that moves Dnsmasq onto a port another DNS service uses fails.
@@ -901,7 +901,7 @@ opnsense_areas:
         title: "Services: Dnsmasq DNS/DHCP: Settings"
         pattern: api/dnsmasq/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       The lookup includes `ip` and `ipset`, so one domain can go to several servers or feed several aliases; send the unused one as `""`.
@@ -947,7 +947,7 @@ opnsense_areas:
         title: "Services: Dnsmasq DNS/DHCP: Settings"
         pattern: api/dnsmasq/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       A range serves DHCP once Dnsmasq is enabled, which it is by default, and listens on the range's interface, by default only `lan`.
@@ -993,7 +993,7 @@ opnsense_areas:
         title: "Services: Dnsmasq DNS/DHCP: Settings"
         pattern: api/dnsmasq/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Dnsmasq/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       OPNsense clears the fields that do not fit `type` on a write that sends it, as the GUI always does, so the module sends `type` on every update.
@@ -1039,7 +1039,7 @@ opnsense_areas:
         title: "System: Trust: Authorities"
         pattern: api/trust/ca/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       The fields that create the CA (`action`, `commonname`, the key and lifetime settings) are not stored,
@@ -1090,7 +1090,7 @@ opnsense_areas:
         title: "System: Trust: Certificates"
         pattern: api/trust/cert/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `caref` is the `refid` of the signing CA.
@@ -1149,7 +1149,7 @@ opnsense_areas:
         title: "Status: OpenVPN"
         pattern: api/openvpn/service/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `cert` and `ca` take a `refid` from the Trust areas; `tls_key` takes the uuid of a static key.
@@ -1203,7 +1203,7 @@ opnsense_areas:
         title: "Status: OpenVPN"
         pattern: api/openvpn/service/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Generate `key` with `openvpn/instances/gen_key/tls-crypt`, or `tls-auth` and `tls-crypt-v2-server` to match `mode`.
@@ -1245,7 +1245,7 @@ opnsense_areas:
         title: "VPN: OpenVPN: Client Specific Override"
         pattern: api/openvpn/client_overwrites/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Core/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       OpenVPN reads the overrides when a client connects; there is nothing to apply.
@@ -1287,7 +1287,7 @@ opnsense_areas:
         title: "VPN: WireGuard: Configuration"
         pattern: api/wireguard/server/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Wireguard/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Create the key pair with `wireguard/server/key_pair` and send `privkey` and `pubkey`; OPNsense does not derive the public key.
@@ -1337,7 +1337,7 @@ opnsense_areas:
         title: "VPN: WireGuard: Configuration"
         pattern: api/wireguard/client/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/Wireguard/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `servers` lists the uuids of the servers the peer belongs to.
@@ -1385,7 +1385,7 @@ opnsense_areas:
         title: "VPN: IPsec: Connections"
         pattern: api/ipsec/connections/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       Deleting a connection also deletes its local and remote authentications and children.
@@ -1429,7 +1429,7 @@ opnsense_areas:
         title: "VPN: IPsec: Connections"
         pattern: api/ipsec/connections/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `connection` is the uuid of an IPsec connection; `connection` and `description` together identify an entry, so keep descriptions unique per connection.
@@ -1473,7 +1473,7 @@ opnsense_areas:
         title: "VPN: IPsec: Connections"
         pattern: api/ipsec/connections/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `connection` is the uuid of an IPsec connection; `connection` and `description` together identify an entry, so keep descriptions unique per connection.
@@ -1517,7 +1517,7 @@ opnsense_areas:
         title: "VPN: IPsec: Connections"
         pattern: api/ipsec/connections/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `connection` is the uuid of an IPsec connection; `connection` and `description` together identify a child, so keep descriptions unique per connection.
@@ -1558,7 +1558,7 @@ opnsense_areas:
         title: "VPN: IPsec: Edit Pre-Shared Keys"
         pattern: api/ipsec/pre_shared_keys/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `ident` and `remote_ident` together identify a key.
@@ -1601,7 +1601,7 @@ opnsense_areas:
         title: "VPN: IPsec: Connections"
         pattern: api/ipsec/vti/*
         acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
-    tested: ["26.7.7"]
+    tested: ["26.7.9"]
     stage: v0
     note: >-
       `reqid` identifies a VTI and pairs it with the child of the same `reqid`.

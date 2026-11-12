@@ -18,7 +18,7 @@
 | Separators | - |
 | Privileges | `page-dhcp-kea-v4` ("Services: DHCP: Kea(v4)", `api/kea/dhcpv4/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -26,7 +26,7 @@ Kea serves DHCP only with `enabled: true` and at least one entry in `interfaces`
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#general`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#general`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -74,7 +74,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcp
 | Separators | - |
 | Privileges | `page-dhcp-kea-v4` ("Services: DHCP: Kea(v4)", `api/kea/dhcpv4/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -82,7 +82,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcp
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#reservations.reservation`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#reservations.reservation`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -173,7 +173,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcp
 | Separators | `pools`: `"\n"` |
 | Privileges | `page-dhcp-kea-v4` ("Services: DHCP: Kea(v4)", `api/kea/dhcpv4/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -181,10 +181,14 @@ Leave the `option_data` fields unset while `option_data_autocollect` is on; OPNs
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#subnets.subnet4`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#subnets.subnet4`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
+| `interface` | InterfaceField |  |  |  |
+| `match_code` | JsonKeyValueStoreField |  |  | `optgroup1`, `optgroup2` |
+| `match_encoding` | OptionField |  |  | `hex`, `ipv4-address`, `ipv6-address`, `uint8`, `uint16`, `uint32`, `int32`, `boolean`, `string`, `fqdn` |
+| `match_data` | KeaOptionDataField |  |  |  |
 | `subnet_id` | AutoNumberField | yes |  |  |
 | `subnet` | NetworkField | yes |  |  |
 | `valid_lifetime` | IntegerField |  |  |  |

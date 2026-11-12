@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-interfaces-assignnetworkports` ("Interfaces: Assign network ports", `api/interfaces/assignment/*`) |
 | Minimum OPNsense | 26.7.6 |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ Items are keyed by the interface name (`opt1`); the outcome `uuid` is that name,
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/NetworkInterface.xml#interface`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Interfaces/NetworkInterface.xml#interface`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -65,7 +65,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/
 | `dhcp_send_options` | Dhcp4SendOptionsField |  |  |  |
 | `dhcp_request_options` | Dhcp4RequestOptionsField |  |  |  |
 | `dhcp6vlanprio` | OptionField |  |  | `1`, `0`, `2`, `3`, `4`, `5`, `6`, `7` |
-| `dhcp6-ia-pd-len` | OptionField |  |  | `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `11`, `12`, `13`, `14`, `15`, `16`, `none` |
+| `dhcp6-ia-pd-len` | OptionField | yes | `0` | `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `11`, `12`, `13`, `14`, `15`, `16`, `none` |
 | `dhcp6prefixonly` | BooleanField |  |  |  |
 | `dhcp6_request_dns` | BooleanField |  |  |  |
 | `dhcp6-information-only` | BooleanField |  |  |  |
@@ -146,7 +146,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/
 | Separators | - |
 | Privileges | `page-firewall-virtualipaddress-edit` ("Interfaces: Virtual IPs: Settings", `api/interfaces/vip_settings/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -154,7 +154,7 @@ Send the address as `network`; OPNsense reads and returns it in that form, not a
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/Vip.xml#vip`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Interfaces/Vip.xml#vip`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -231,7 +231,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/
 | Separators | - |
 | Privileges | `page-interfaces-vlan-edit` ("Interfaces: VLAN", `api/interfaces/vlan_settings/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -239,7 +239,7 @@ Set `vlanif` (`vlan0.<tag>`) so the device name is known before the VLAN is assi
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Interfaces/Vlan.xml#vlan`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Interfaces/Vlan.xml#vlan`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

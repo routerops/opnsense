@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-system-camanager` ("System: Trust: Authorities", `api/trust/ca/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ The fields that create the CA (`action`, `commonname`, the key and lifetime sett
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xml#ca`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xml#ca`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -122,7 +122,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
 | Separators | - |
 | Privileges | `page-system-certmanager` ("System: Trust: Certificates", `api/trust/cert/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -130,7 +130,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Ca.xm
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Trust/Cert.xml#cert`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Trust/Cert.xml#cert`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

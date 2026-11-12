@@ -18,13 +18,13 @@
 | Separators | - |
 | Privileges | `page-services-nodeexporter` ("Services: Prometheus Exporter", `api/nodeexporter/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | `os-node_exporter` |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/plugins@26.7.7:sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/General.xml`.
+Read from `opnsense/plugins@26.7.9:sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/General.xml`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

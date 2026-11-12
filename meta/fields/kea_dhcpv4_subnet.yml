@@ -2,9 +2,46 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Generated from the OPNsense model XML by make fields; do not edit.
 ---
-version: "26.7.7"
-source: "opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#subnets.subnet4"
+version: "26.7.9"
+source: "opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Kea/KeaDhcpv4.xml#subnets.subnet4"
 fields:
+  - name: "interface"
+    type: "InterfaceField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
+  - name: "match_code"
+    type: "JsonKeyValueStoreField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      # mock option groups returned by JSON
+      - "optgroup1"
+      - "optgroup2"
+  - name: "match_encoding"
+    type: "OptionField"
+    required: false
+    multiple: false
+    volatile: false
+    options:
+      - "hex"
+      - "ipv4-address"
+      - "ipv6-address"
+      - "uint8"
+      - "uint16"
+      - "uint32"
+      - "int32"
+      - "boolean"
+      - "string"
+      - "fqdn"
+  - name: "match_data"
+    type: "KeaOptionDataField"
+    required: false
+    multiple: false
+    volatile: false
+    options: []
   - name: "subnet_id"
     type: "AutoNumberField"
     required: true

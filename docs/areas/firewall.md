@@ -19,13 +19,13 @@
 | Separators | `content`: `"\n"` |
 | Privileges | `page-firewall-alias-edit` ("Firewall: Alias: Edit", `api/firewall/alias/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Alias.xml#aliases.alias`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Firewall/Alias.xml#aliases.alias`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -135,13 +135,13 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Al
 | Separators | - |
 | Privileges | `page-firewall-nat-portforward-edit` ("Firewall: NAT: Destination NAT", `api/firewall/d_nat/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/DNat.xml#rule`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Firewall/DNat.xml#rule`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -243,13 +243,13 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/DN
 | Separators | - |
 | Privileges | `page-filter-api` ("Firewall: Rules [new]", `api/firewall/filter/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#rules.rule`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#rules.rule`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -402,13 +402,13 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Fi
 | Separators | - |
 | Privileges | `page-firewall-nat-1-1-edit` ("Firewall: NAT: 1:1", `api/firewall/one_to_one/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#onetoone.rule`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#onetoone.rule`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -518,7 +518,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Fi
 | Separators | - |
 | Privileges | `page-filter-snat-api` ("Firewall: NAT: Source NAT", `api/firewall/source_nat/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -526,7 +526,7 @@ OPNsense lists source NAT rules only in the outbound NAT mode `hybrid` or `advan
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#snatrules.rule`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#snatrules.rule`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -620,13 +620,13 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Fi
 | Separators | - |
 | Privileges | `page-filter-snat-api` ("Firewall: NAT: Source NAT", `api/firewall/source_nat/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#general`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Firewall/Filter.xml#general`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

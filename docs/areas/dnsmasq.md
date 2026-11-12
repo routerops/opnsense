@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ The lookup includes `ip` and `ipset`, so one domain can go to several servers or
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#domainoverrides`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#domainoverrides`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -104,7 +104,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dns
 | Separators | - |
 | Privileges | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -112,7 +112,7 @@ Unbound holds port 53, and OPNsense runs Dnsmasq on port 53053 by default; a sav
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -188,13 +188,13 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dns
 | Separators | - |
 | Privileges | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#hosts`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#hosts`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -302,7 +302,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dns
 | Separators | - |
 | Privileges | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -310,7 +310,7 @@ OPNsense clears the fields that do not fit `type` on a write that sends it, as t
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#dhcp_options`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#dhcp_options`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -391,7 +391,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dns
 | Separators | - |
 | Privileges | `page-services-dnsforwarder` ("Services: Dnsmasq DNS/DHCP: Settings", `api/dnsmasq/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -399,7 +399,7 @@ A range serves DHCP once Dnsmasq is enabled, which it is by default, and listens
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#dhcp_ranges`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Dnsmasq/Dnsmasq.xml#dhcp_ranges`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

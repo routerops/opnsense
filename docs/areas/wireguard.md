@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-wireguard-config` ("VPN: WireGuard: Configuration", `api/wireguard/client/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/Client.xml#clients.client`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Wireguard/Client.xml#clients.client`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -113,7 +113,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/C
 | Separators | - |
 | Privileges | `page-wireguard-config` ("VPN: WireGuard: Configuration", `api/wireguard/server/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -121,7 +121,7 @@ Create the key pair with `wireguard/server/key_pair` and send `privkey` and `pub
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Wireguard/Server.xml#servers.server`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Wireguard/Server.xml#servers.server`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

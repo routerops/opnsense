@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ Names are not unique; keep them unique, the lookup takes the name. Every apply r
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#acls.acl`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#acls.acl`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -101,7 +101,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 | Separators | - |
 | Privileges | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -109,7 +109,7 @@ Forward and DNS over TLS items share one list; the action name sets `type` and o
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#dots.dot`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#dots.dot`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -186,7 +186,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 | Separators | - |
 | Privileges | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -194,7 +194,7 @@ Every apply restarts Unbound, so DNS stops answering for a moment. A save that c
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#general`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#general`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -251,7 +251,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 | Separators | - |
 | Privileges | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -259,7 +259,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#aliases.alias`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#aliases.alias`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -335,7 +335,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unb
 | Separators | - |
 | Privileges | `page-services-unbound` ("Services: Unbound", `api/unbound/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -343,7 +343,7 @@ Do not send `aliases`: OPNsense adds and deletes alias items from it; manage the
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#hosts.host`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/Unbound/Unbound.xml#hosts.host`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
