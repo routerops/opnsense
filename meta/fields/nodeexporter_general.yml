@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Generated from the OPNsense model XML by make fields; do not edit.
 ---
-version: "26.7.7"
-source: "opnsense/plugins@26.7.7:sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/General.xml"
+version: "26.7.9"
+source: "opnsense/plugins@26.7.9:sysutils/node_exporter/src/opnsense/mvc/app/models/OPNsense/NodeExporter/General.xml"
 fields:
   - name: "enabled"
     type: "BooleanField"

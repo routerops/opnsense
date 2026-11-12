@@ -3,4 +3,4 @@ minor_changes:
   - >-
     Documentation - the area catalog gains Trust (CA, certificate), OpenVPN (instance, static key, client-specific override),
     WireGuard (server, peer) and IPsec (connection, local and remote authentication, child, pre-shared key, VTI),
-    each tested against OPNsense 26.7.7.
+    each tested against OPNsense 26.7.9.

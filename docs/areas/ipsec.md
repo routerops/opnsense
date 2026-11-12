@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#children.child`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#children.child`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -113,7 +113,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 | Separators | - |
 | Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -121,7 +121,7 @@ Deleting a connection also deletes its local and remote authentications and chil
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#Connections.Connection`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#Connections.Connection`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -129,7 +129,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 | `proposals` | IPsecProposalField, multiple | yes | `default` |  |
 | `unique` | OptionField | yes | `no` | `no`, `never`, `keep`, `replace` |
 | `aggressive` | BooleanField | yes | `0` |  |
-| `version` | OptionField | yes | `0` | `0`, `1`, `2` |
+| `version` | OptionField | yes | `2` | `0`, `1`, `2` |
 | `mobike` | BooleanField | yes | `1` |  |
 | `local_addrs` | IKEAddressField |  |  |  |
 | `local_port` | OptionField |  |  | ``, `4500` |
@@ -213,7 +213,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 | Separators | - |
 | Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -221,7 +221,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#locals.local`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#locals.local`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -300,7 +300,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 | Separators | - |
 | Privileges | `page-vpn-ipsec-editkeys` ("VPN: IPsec: Edit Pre-Shared Keys", `api/ipsec/pre_shared_keys/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -308,7 +308,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/IPsec.xml#preSharedKeys.preSharedKey`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/IPsec/IPsec.xml#preSharedKeys.preSharedKey`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -373,7 +373,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/IPsec
 | Separators | - |
 | Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/connections/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -381,7 +381,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/IPsec
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#remotes.remote`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#remotes.remote`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -462,7 +462,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 | Separators | - |
 | Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/vti/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -470,7 +470,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#VTIs.VTI`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#VTIs.VTI`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|

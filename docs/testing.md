@@ -7,12 +7,12 @@
 | Item | Setting |
 |---|---|
 | Host | the owner's Proxmox |
-| OPNsense | latest 26.7.x, at least 26.7.6 (the interface assignment tests need it); currently 26.7.7 (amd64, FreeBSD 15.1-RELEASE-p4) |
+| OPNsense | latest 26.7.x, at least 26.7.6 (the interface assignment tests need it); currently 26.7.9_1 (amd64, FreeBSD 15.1-RELEASE-p6) |
 | VM | VMID 9090 (`opnsense-test`), `onboot 0`, disk excluded from backups (`backup=0`) |
 | WAN | `vtnet0` on `vmbr-optwan`, a bridge without a physical port: VM 10.250.0.2/30, the Proxmox host 10.250.0.1 as gateway, DNS 1.1.1.1; the host masquerades it, and the nft table `opnsense_test` lets the VM reach the internet but neither the home network nor the ISP network |
 | LAN | `vtnet1` on `vmbr-optlan`, a bridge without a physical port: VM 10.250.1.1/24, the Proxmox host 10.250.1.2; DHCP is off (dhcpd and Kea not running, port 67 closed) |
 | Access | the Proxmox host forbids SSH port forwarding, so `socat` forwards a local port through `ssh root@<proxmox-host> nc 10.250.1.1 443`: `socat TCP-LISTEN:8443,bind=127.0.0.1,reuseaddr,fork EXEC:"ssh -o BatchMode=yes root@<proxmox-host> nc 10.250.1.1 443"` |
-| Plugins | `os-acme-client` 4.17, `os-node_exporter` 1.2, `os-mdns-repeater` 1.2, installed before the snapshot |
+| Plugins | `os-acme-client` 4.18, `os-node_exporter` 1.2, `os-mdns-repeater` 1.2, installed before the snapshot |
 | API user | `ansible-test`, no shell, only the privileges in the table below |
 | Snapshot | `clean`, taken with the VM shut down and the ISO ejected, after the update, the plugins and the API user |
 | TLS | the VM's self-signed certificate; `OPNSENSE_VALIDATE_CERTS=false` is only for this VM |
@@ -168,3 +168,4 @@ The API user gets only the privileges the tests need, read from each area's `ACL
 | 12.11.2026 | 26.7.7 | `test-ipsec-vti-item` | passed (`failed=0`, one ignored expected failure: `local` without `remote` answers "A local and remote address should be provided or both should be left empty" and "Protocol families should match" on `vti.local`); the fault-injected copy failed on the idempotency assert, as intended |
 | 12.11.2026 | 26.7.7 | `scenario-ipsec-connection` | passed (`failed=0`); a rerun of the connection with computed `local_ts` and `remote_ts` shows `changed=0`; deleting only the connection removes its local and remote authentications and its child; a copy that updates the connection instead of deleting it failed on the "gone" assert, as intended |
 | 12.11.2026 | 26.7.7 | all `test-*` and `scenario-*` in one `make integration-local` after `make integration-reset`, closing plan 4d | all 45 plays passed (`failed=0`) |
+| 12.11.2026 | 26.7.9_1 | all `test-*` and `scenario-*` in one `make integration` after `make integration-reset`, with `tested` raised to 26.7.9 and the fields regenerated | all 45 plays passed (`failed=0`) |

@@ -19,7 +19,7 @@
 | Separators | - |
 | Privileges | `page-openvpn-csc` ("VPN: OpenVPN: Client Specific Override", `api/openvpn/client_overwrites/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -27,7 +27,7 @@ OpenVPN reads the overrides when a client connects; there is nothing to apply. A
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Overwrites.Overwrite`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Overwrites.Overwrite`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -111,7 +111,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/Ope
 | Separators | - |
 | Privileges | `page-openvpn-instances` ("VPN: OpenVPN: Instances", `api/openvpn/instances/*`), `page-status-openvpn` ("Status: OpenVPN", `api/openvpn/service/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -119,7 +119,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/Ope
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Instances.Instance`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#Instances.Instance`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
@@ -258,7 +258,7 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/Ope
 | Separators | - |
 | Privileges | `page-openvpn-instances` ("VPN: OpenVPN: Instances", `api/openvpn/instances/*`), `page-status-openvpn` ("Status: OpenVPN", `api/openvpn/service/*`) |
 | Minimum OPNsense | - |
-| Tested on | 26.7.7 |
+| Tested on | 26.7.9 |
 | Plugin | - |
 | Stage | v0 |
 
@@ -266,7 +266,7 @@ Generate `key` with `openvpn/instances/gen_key/tls-crypt`, or `tls-auth` and `tl
 
 ### Fields
 
-Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#StaticKeys.StaticKey`.
+Read from `opnsense/core@26.7.9:src/opnsense/mvc/app/models/OPNsense/OpenVPN/OpenVPN.xml#StaticKeys.StaticKey`.
 
 | Field | Type | Required | Default | Values |
 |---|---|---|---|---|
