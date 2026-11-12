@@ -1,0 +1,147 @@
+# SPDX-FileCopyrightText: routerops.opnsense contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Test that deleting an IPsec connection deletes its local and remote authentications and children
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../meta/areas.yml
+  module_defaults:
+    group/routerops.opnsense.opnsense:
+      path: "{{ opnsense_test_area['path'] }}"
+      key: "{{ opnsense_test_area['key'] }}"
+      lookup: "{{ opnsense_test_area['lookup'] }}"
+      actions: "{{ opnsense_test_area['actions'] | default({}) }}"
+      separators: "{{ opnsense_test_area['separators'] | default({}) }}"
+      secret_fields: "{{ opnsense_test_area['secret_fields'] | default([]) }}"
+      ordered_fields: "{{ opnsense_test_area['ordered_fields'] | default([]) }}"
+      always_send: "{{ opnsense_test_area['always_send'] | default([]) }}"
+      apply: "{{ opnsense_test_area['apply'] | default(none) }}"
+    ansible.builtin.uri:
+      url_username: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_KEY') }}"
+      url_password: "{{ lookup('ansible.builtin.env', 'OPNSENSE_API_SECRET') }}"
+      force_basic_auth: true
+      validate_certs: "{{ lookup('ansible.builtin.env', 'OPNSENSE_VALIDATE_CERTS') | default('true', true) | bool }}"
+  vars:
+    opnsense_test_connection_area: "{{ opnsense_areas['ipsec_connection'] }}"
+    opnsense_test_toggle: "{{ lookup('ansible.builtin.env', 'OPNSENSE_URL') }}/api/ipsec/connections/toggle/1"
+    opnsense_test_connection:
+      description: routerops scenario
+      version: "2"
+      local_addrs: [10.250.1.1]
+      remote_addrs: [10.250.110.5]
+    opnsense_test_uuid: "{{ opnsense_test_connection_add['outcomes'][0]['uuid'] | default('') }}"
+    opnsense_test_parts:
+      - area: ipsec_local
+        fields: {connection: "{{ opnsense_test_uuid }}", auth: psk, id: rt-scenario-local.routerops.test, description: routerops scenario local}
+      - area: ipsec_remote
+        fields: {connection: "{{ opnsense_test_uuid }}", auth: psk, id: rt-scenario-remote.routerops.test, description: routerops scenario remote}
+      - area: ipsec_child
+        fields: {connection: "{{ opnsense_test_uuid }}", local_ts: [10.250.111.0/24], remote_ts: [10.250.112.0/24], description: routerops scenario child}
+  tasks:
+    - name: Run the IPsec connection scenario
+      block:
+        - name: Enable IPsec
+          ansible.builtin.uri:
+            url: "{{ opnsense_test_toggle }}"
+            method: POST
+            body_format: json
+            body: {}
+          register: opnsense_test_enable
+          failed_when: opnsense_test_enable['json']['status'] != 'ok'
+
+        - name: Add the connection
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_connection }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_test_connection_area }}"
+          register: opnsense_test_connection_add
+
+        - name: Add the local and remote authentications and the child
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ opnsense_test_parts }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+          register: opnsense_test_parts_add
+
+        - name: Add the connection again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_connection }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_test_connection_area }}"
+          register: opnsense_test_connection_again
+
+        - name: Add the local and remote authentications and the child again
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ opnsense_test_parts }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+          register: opnsense_test_parts_again
+
+        - name: Remove the connection only
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ opnsense_test_connection }}"
+                state: absent
+          vars:
+            opnsense_test_area: "{{ opnsense_test_connection_area }}"
+          register: opnsense_test_connection_delete
+
+        - name: Look up the local and remote authentications and the child after the connection is gone
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+                state: query
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ opnsense_test_parts }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+          register: opnsense_test_parts_left
+
+        - name: Assert the results
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_parts_add['results'] | map(attribute='outcomes') | map('first') | map(attribute='action') | list == ['added', 'added', 'added']
+              - not opnsense_test_connection_again['changed']
+              - opnsense_test_parts_again['results'] | selectattr('changed') | list | length == 0
+              - opnsense_test_connection_delete['outcomes'][0]['action'] == 'deleted'
+              - opnsense_test_parts_left['results'] | map(attribute='outcomes') | map('first') | map(attribute='uuid') | select | list | length == 0
+      always:
+        - name: Remove the child, the remote and local authentications and the connection
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+                state: absent
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ (opnsense_test_parts | reverse | list) + [{'area': 'ipsec_connection', 'fields': opnsense_test_connection}] }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+
+        - name: Look up everything after the cleanup
+          routerops.opnsense.item:
+            items:
+              - fields: "{{ item['fields'] }}"
+                state: query
+          vars:
+            opnsense_test_area: "{{ opnsense_areas[item['area']] }}"
+          loop: "{{ opnsense_test_parts + [{'area': 'ipsec_connection', 'fields': opnsense_test_connection}] }}"
+          loop_control:
+            label: "{{ item['area'] }}"
+          register: opnsense_test_left
+
+        - name: Assert that the cleanup left nothing behind
+          ansible.builtin.assert:
+            that:
+              - opnsense_test_left['results'] | map(attribute='outcomes') | map('first') | map(attribute='uuid') | select | list | length == 0
