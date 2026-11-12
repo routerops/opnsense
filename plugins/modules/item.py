@@ -723,6 +723,48 @@ EXAMPLES = r"""
           descr: "routerops example"
         state: "absent"
 
+- name: Add a site-to-site connection
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "connection"
+    lookup: ["description"]
+    actions:
+      add: "addConnection"
+      del: "delConnection"
+      get: "getConnection"
+      search: "searchConnection"
+      set: "setConnection"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          description: "routerops example"
+          version: "2"
+          local_addrs: ["10.250.1.1"]
+          remote_addrs: ["10.250.110.4"]
+
+- name: Remove a connection
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/connections"
+    key: "connection"
+    lookup: ["description"]
+    actions:
+      add: "addConnection"
+      del: "delConnection"
+      get: "getConnection"
+      search: "searchConnection"
+      set: "setConnection"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          description: "routerops example"
+        state: "absent"
+
 - name: Reserve an address
   routerops.opnsense.item:
     url: https://fw.example
