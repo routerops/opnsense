@@ -443,3 +443,93 @@ Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanc
           description: "routerops example remote"
         state: "absent"
 ```
+
+## IPsec VTI
+
+| Setting | Value |
+|---|---|
+| Module | `routerops.opnsense.item` |
+| Path | `ipsec/vti` |
+| Key | `vti` |
+| Actions | `add: add`, `del: del`, `get: get`, `search: search`, `set: set` |
+| Lookup | `reqid` |
+| Item ids | `uuid` |
+| Apply | `ipsec/service/reconfigure` |
+| Write-only fields | - |
+| Ordered fields | - |
+| Always sent | - |
+| Secret fields | - |
+| Separators | - |
+| Privileges | `page-vpn-ipsec-connections` ("VPN: IPsec: Connections", `api/ipsec/vti/*`) |
+| Minimum OPNsense | - |
+| Tested on | 26.7.7 |
+| Plugin | - |
+| Stage | v0 |
+
+`reqid` identifies a VTI and pairs it with the child of the same `reqid`. Send `local` and `remote` together or leave both out. Legacy tunnels show up in the search with ids like `ipsec1000`; the module leaves them alone. The apply needs IPsec enabled, as described for the IPsec connection.
+
+### Fields
+
+Read from `opnsense/core@26.7.7:src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml#VTIs.VTI`.
+
+| Field | Type | Required | Default | Values |
+|---|---|---|---|---|
+| `enabled` | BooleanField | yes | `1` |  |
+| `reqid` | IntegerField | yes |  |  |
+| `local` | NetworkField |  |  |  |
+| `remote` | NetworkField |  |  |  |
+| `tunnel_local` | NetworkField | yes |  |  |
+| `tunnel_remote` | NetworkField | yes |  |  |
+| `tunnel_local2` | NetworkField |  |  |  |
+| `tunnel_remote2` | NetworkField |  |  |  |
+| `skip_fw` | BooleanField |  |  |  |
+| `origin` | TextField, not stored |  |  |  |
+| `description` | DescriptionField |  |  |  |
+
+### Examples
+
+```yaml
+- name: Add a route-based tunnel interface
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/vti"
+    key: "vti"
+    lookup: ["reqid"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          reqid: "103"
+          local: "10.250.117.1"
+          remote: "10.250.117.2"
+          tunnel_local: "10.250.115.5"
+          tunnel_remote: "10.250.115.6"
+          description: "routerops example"
+
+- name: Remove a VTI
+  routerops.opnsense.item:
+    url: https://fw.example
+    api_key: "{{ opnsense_api_key }}"
+    api_secret: "{{ opnsense_api_secret }}"
+    path: "ipsec/vti"
+    key: "vti"
+    lookup: ["reqid"]
+    actions:
+      add: "add"
+      del: "del"
+      get: "get"
+      search: "search"
+      set: "set"
+    apply: "ipsec/service/reconfigure"
+    items:
+      - fields:
+          reqid: "103"
+        state: "absent"
+```

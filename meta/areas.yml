@@ -1576,3 +1576,48 @@ opnsense_areas:
               ident: rt-example-local.routerops.test
               remote_ident: rt-example-remote.routerops.test
             state: absent
+  ipsec_vti:
+    area: ipsec
+    title: IPsec VTI
+    module: item
+    path: ipsec/vti
+    key: vti
+    lookup: [reqid]
+    actions:
+      search: search
+      get: get
+      add: add
+      set: set
+      del: del
+    apply: ipsec/service/reconfigure
+    model:
+      repo: core
+      file: src/opnsense/mvc/app/models/OPNsense/IPsec/Swanctl.xml
+      node: VTIs.VTI
+    privileges:
+      - name: page-vpn-ipsec-connections
+        title: "VPN: IPsec: Connections"
+        pattern: api/ipsec/vti/*
+        acl: opnsense-core/src/opnsense/mvc/app/models/OPNsense/IPsec/ACL/ACL.xml
+    tested: ["26.7.7"]
+    stage: v0
+    note: >-
+      `reqid` identifies a VTI and pairs it with the child of the same `reqid`.
+      Send `local` and `remote` together or leave both out.
+      Legacy tunnels show up in the search with ids like `ipsec1000`; the module leaves them alone.
+      The apply needs IPsec enabled, as described for the IPsec connection.
+    examples:
+      - name: Add a route-based tunnel interface
+        items:
+          - fields:
+              reqid: "103"
+              local: 10.250.117.1
+              remote: 10.250.117.2
+              tunnel_local: 10.250.115.5
+              tunnel_remote: 10.250.115.6
+              description: routerops example
+      - name: Remove a VTI
+        items:
+          - fields:
+              reqid: "103"
+            state: absent
